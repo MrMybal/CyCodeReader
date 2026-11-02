@@ -1,0 +1,23 @@
+name: Reader file services
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  core:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Ninja
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - run: python scripts/fetch_dependencies.py --core-only
+      - run: python scripts/build.py --core-only
+      # Full GUI builds require the owner's separate CyUI checkout.
+      # Cross-platform execution remains unverified until these jobs run.

@@ -1,0 +1,14 @@
+{
+  "abi": 1,
+  "id": "cy.reader.text-tools",
+  "name": "Text tools and CyConfig",
+  "version": "0.1.0",
+  "commands": [
+    {"id": "sort", "title": "Sort lines", "operation": "sortLines"},
+    {"id": "trim", "title": "Trim trailing whitespace", "operation": "trimTrailing"}
+  ],
+  "languages": [
+    {"id": "cyconfig", "name": "CyConfig", "extensions": [".cycfg"], "base": "cpp", "lineComment": "#", "keywords": ["section", "option", "enabled", "disabled"], "types": ["string", "number", "boolean"]}
+  ],
+  "options": [{"id": "showHints", "type": "boolean", "default": true}]
+}

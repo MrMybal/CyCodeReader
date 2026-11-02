@@ -1,0 +1,131 @@
+# CyCodeReader
+
+An independent native C++20 code/text editor built with CyUI, SDL3 and Dear ImGui.
+Files open directly without loading CyCode, solutions, language servers, project
+tools. CyToolsCore supplies the integrated SDK/MCP companion. Repository: https://github.com/MrMybal/CyCodeReader.
+
+`editor/` is also the shared source library consumed by CyCode: one implementation
+of the widget, lexical/Tree-sitter colors, icons, snippets and native file I/O.
+Changes to that library can benefit both applications without copying code.
+
+## Use
+
+Open several files from the command line, the multi-file dialog or drag and drop.
+Documents are dockable tabs; drag a tab outside or choose **Move to new window**
+for a real native window. Launch another instance to keep separate file sets.
+
+| Shortcut | Action |
+|---|---|
+| Ctrl+N / Ctrl+O | New document / open files |
+| Ctrl+S / Ctrl+Shift+S / Ctrl+Alt+S | Save / Save As / Save all |
+| Ctrl+W / Ctrl+Tab | Close / next document |
+| Ctrl+F / Ctrl+H / F3 | Find / replace / next match |
+| Ctrl+G | Go to line |
+| Ctrl+P / Ctrl+Shift+P | Open-file / action palette |
+
+The widget provides undo/redo, multiple cursors, folding, bracket matching,
+indentation and selection. View offers wrapping, whitespace, a minimap, text size,
+six themes and English/French. C/C++/Unreal, C#, HLSL/GLSL, Python, Lua, JSON and
+Markdown use shared lexical rules. Rust, Java, JS/JSX, TS/TSX, HTML and CSS use
+incremental Tree-sitter parsing, including HTML script/style regions. Syntax works
+without installing Rust, Java or Node.js. Project semantic services remain in CyCode.
+
+UTF-8, UTF-8 BOM and UTF-16 LE/BE BOM are detected automatically. Windows-1252
+is available explicitly through the Open Windows-1252 command and SDK; it is never guessed. The Encoding menu
+converts encodings and LF/CRLF/CR in memory, with an explicit save afterward and
+no lossy replacement of unrepresentable characters. Files are limited to 4 MiB.
+No-op saves retain original bytes;
+edited saves retain the detected newline convention. Disk conflicts preserve the
+live buffer, Save As checks existing/open targets, and saves use guarded atomic
+replacement. Unsaved documents prompt before close/reload. Preferences are under
+data/reader; crash recovery is not implemented.
+
+## Build
+
+Requirements: Python 3.11+, CMake 3.24+, C++20 compiler and a separate CyUI checkout
+(`../CyImgui_Interface`, or `--cyui PATH`). Windows uses Visual Studio 2022 C++;
+Linux/macOS use Ninja, OpenGL and SDL3 platform development libraries.
+
+```sh
+python scripts/fetch_dependencies.py
+python scripts/build.py --cyui ../CyImgui_Interface
+```
+
+Build outputs remain in runtime/build-vs/Release on Windows, runtime/build elsewhere.
+Building runs CTest but does not install, restore old binaries or open an app.
+locales/ui.json is deployed beside the build executable. To make a portable folder:
+
+```sh
+cmake --install runtime/build-vs --config Release --prefix dist
+```
+
+The file/snippet tests need neither CyUI nor any GUI dependency:
+
+```sh
+python scripts/fetch_dependencies.py --core-only
+python scripts/build.py --core-only
+```
+
+The native editor needs no CyCode checkout or Python runtime. The MCP companion
+uses a separate private Python/CyToolsCore installation (below). Source archives are
+version/hash pinned; no downloaded dependencies, runtimes, personal preferences or
+binaries belong in Git. The project license is undecided; dependency notices are
+in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+`scripts/verify_reader.py` preserves the hidden desktop acceptance suite and
+`scripts/verify_languages.py` covers Reader syntax. They require a deployed binary
+selected with CYCODE_READER and do not run during builds. Do not run them while the
+existing protection issue remains unresolved. Current evidence and platform limits
+are recorded in [Docs/Validation.md](Docs/Validation.md).
+
+## Shared editor development
+
+CyCode consumes this repository at a pinned commit. Its build can select a working
+checkout explicitly with CYCODE_EDITOR_ROOT or --editor-root. Only `editor/` is
+added as a CMake subdirectory; that does not build or install the Reader application.
+Keep the target names and `cycode` namespace stable. See [architecture](Docs/Architecture.md).
+
+## Extensions
+
+The Extensions menu and manager load `plugins/*.json` at startup. Manifests can
+contribute commands, typed options and languages. Language packs define extensions,
+keywords, types, identifiers and comments using the C++ or JSON lexical base; the
+included `.cycfg` language demonstrates real widget coloration. New parser engines,
+per-plugin panels and a remote marketplace remain future work.
+
+Native extensions use the versioned C ABI in src/PluginABI.h, exchanging UTF-8 JSON
+without C++ objects. examples/sample_plugin.cpp executes a word-count command;
+plugins/native-sample.json declares it. Data-only commands can expose built-in text
+transforms. Extensions run in-process, are trusted, load once, and require restart
+for library/manifest changes. They are not sandboxed or forcibly interruptible.
+Options are type-checked and persisted with Reader preferences. Load errors appear
+in the manager. See [Docs/Plugins.md](Docs/Plugins.md).
+
+Edit > Text tools provides full-document line sorting/deduplication, trailing-space
+cleanup and ASCII case conversion that preserves other UTF-8 bytes. Ctrl+Shift+F
+searches currently open buffers, including unsaved text. Folder search, regex
+replacement, macros, arbitrary external run commands, advanced encodings and full
+Notepad++ feature coverage remain future work.
+
+## CyToolsCore / MCP
+
+Install the owner's checksum-pinned SDK wheel in this repository's private runtime:
+
+```sh
+python scripts/setup_sdk.py --sdk-wheel ../CyToolsCore/dist/cytools_core-0.10.1-py3-none-any.whl
+```
+
+The wheel and runtime are not published in this repository. The native Reader starts
+one real CyToolsCore service per instance when that private Python is available;
+CYCODE_READER_PYTHON can select another compatible interpreter. The CyToolsCore/MCP
+panel reports service status and copies separate read-only/editing MCP configurations.
+Each instance has private endpoint/credential files; do not share or commit data/.
+SDK 0.10.1 and official MCP SDK 1.30.0 are used, not a custom job/MCP implementation.
+
+The SDK operates on the same ReaderCore documents as the GUI: list/read/new/open,
+replace/save/close, encoding/newline conversion, search, transformations and plugins.
+Expected revisions, read-only state, dirty-close guards and disk baselines are checked.
+Read-only identities cannot edit/open arbitrary files or invoke plugins. Saving is
+explicit. Plugins require plugins.execute plus workspace.write; opening a supplied
+path requires filesystem.read. Source documents are persistent files and are never
+SDK task artifacts. See [Docs/MCP.md](Docs/MCP.md) for CLI/service usage and tests.

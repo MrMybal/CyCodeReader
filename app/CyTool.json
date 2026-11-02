@@ -1,0 +1,1031 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "1.0",
+  "id": "cy.code.reader",
+  "name": "CyCodeReader",
+  "version": "0.1.0",
+  "description": "Live native code/text documents and extension commands through CyToolsCore.",
+  "vendor": "Cyberalien",
+  "author": "Cyberalien",
+  "executable": "python app/tool.py",
+  "categories": [
+    "development"
+  ],
+  "tags": [
+    "code-editor",
+    "plugins",
+    "MCP"
+  ],
+  "capabilities": [
+    "jobs",
+    "cancellation",
+    "live-documents",
+    "document-search",
+    "native-plugins"
+  ],
+  "backends": [],
+  "platforms": [
+    {
+      "os": "Windows",
+      "architecture": "x64",
+      "status": "Experimental",
+      "computeBackends": [
+        "CPU"
+      ]
+    },
+    {
+      "os": "Linux",
+      "architecture": "x64",
+      "status": "Experimental",
+      "computeBackends": [
+        "CPU"
+      ]
+    },
+    {
+      "os": "macOS",
+      "architecture": "ARM64",
+      "status": "Experimental",
+      "computeBackends": [
+        "CPU"
+      ]
+    }
+  ],
+  "interfaces": [
+    "Native",
+    "CLI",
+    "JSONL",
+    "HTTP",
+    "MCP",
+    "ImGui"
+  ],
+  "runtimeRequirements": [],
+  "concurrency": {
+    "policy": "Concurrent",
+    "maxWorkers": 4
+  },
+  "operations": [
+    {
+      "id": "documents_list",
+      "name": "Documents List",
+      "description": "List documents currently open in this Reader instance.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "path": {
+                  "type": "string"
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "dirty": {
+                  "type": "boolean"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                },
+                "encoding": {
+                  "type": "string"
+                },
+                "lineEnding": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "path",
+                "revision",
+                "dirty",
+                "readOnly",
+                "encoding",
+                "lineEnding"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "documents"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false
+    },
+    {
+      "id": "documents_read",
+      "name": "Documents Read",
+      "description": "Read an open live document by issued ID. Paths are persistent user files, never SDK task artifacts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false
+    },
+    {
+      "id": "documents_open",
+      "name": "Documents Open",
+      "description": "Open a user file; auto detects UTF-8/BOM and UTF-16 BOM, or use an explicit encoding (Windows-1252 is never guessed). Requires filesystem.read. GUI shows it on its next frame.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "encoding": {
+            "type": "string",
+            "enum": [
+              "utf-8",
+              "utf-8-bom",
+              "utf-16le",
+              "utf-16be",
+              "windows-1252"
+            ]
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "filesystem.read"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "documents_new",
+      "name": "Documents New",
+      "description": "Create an unsaved native document.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "documents_replace",
+      "name": "Documents Replace",
+      "description": "Replace an open buffer at expectedRevision; does not save. Read-only documents and obsolete revisions are rejected.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 4194304
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "documents_save",
+      "name": "Documents Save",
+      "description": "Save an already-named document at expectedRevision using its native disk baseline and guarded atomic replacement.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "documents_format",
+      "name": "Documents Format",
+      "description": "Change the pending encoding/newline convention at expectedRevision. Unrepresentable characters fail without lossy replacement. Changes remain unsaved until documents_save.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "encoding": {
+            "type": "string",
+            "enum": [
+              "utf-8",
+              "utf-8-bom",
+              "utf-16le",
+              "utf-16be",
+              "windows-1252"
+            ]
+          },
+          "lineEnding": {
+            "type": "string",
+            "enum": [
+              "LF",
+              "CRLF",
+              "CR"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "documents_close",
+      "name": "Documents Close",
+      "description": "Close an open document at expectedRevision. Dirty documents require explicit discard=true.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "discard": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "closed": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "closed"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "search_open_documents",
+      "name": "Search Open Documents",
+      "description": "Bounded literal search over current live buffers. Results use zero-based UTF-8 byte offsets and one-based lines/byte columns. Case-insensitive matching folds ASCII only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "caseSensitive": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "matches": {
+            "type": "array",
+            "maxItems": 2000,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "revision": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "column": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "id",
+                "revision",
+                "offset",
+                "line",
+                "column"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "matches",
+          "truncated"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false
+    },
+    {
+      "id": "text_transform",
+      "name": "Text Transform",
+      "description": "Apply a native full-document text transformation at expectedRevision. Case conversion preserves non-ASCII bytes; no automatic save.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "uppercase",
+              "lowercase",
+              "trimTrailing",
+              "sortLines",
+              "sortLinesDescending",
+              "uniqueLines"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision",
+          "operation"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "plugins_list",
+      "name": "Plugins List",
+      "description": "Inspect loaded native/data plugins, commands, options, language definitions and load errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "plugins": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "plugins",
+          "errors"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false
+    },
+    {
+      "id": "plugins_configure",
+      "name": "Plugins Configure",
+      "description": "Validate declared plugin option types and update this instance. No plugin code executes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "plugin": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "plugin",
+          "options"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "plugins": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "plugins",
+          "errors"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    },
+    {
+      "id": "plugins_invoke",
+      "name": "Plugins Invoke",
+      "description": "Execute a trusted plugin command against an open guarded buffer. A returned text field updates its unsaved document. Native extensions run in process and cannot be forcibly cancelled or sandboxed; cancellation is checked before/after invocation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "plugin": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision",
+          "plugin",
+          "command"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "document": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "path": {
+                "type": "string"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "dirty": {
+                "type": "boolean"
+              },
+              "readOnly": {
+                "type": "boolean"
+              },
+              "encoding": {
+                "type": "string"
+              },
+              "lineEnding": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "path",
+              "revision",
+              "dirty",
+              "readOnly",
+              "encoding",
+              "lineEnding",
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          "result": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "document",
+          "result"
+        ],
+        "additionalProperties": false
+      },
+      "resourceRequirements": {
+        "ramBytes": 16777216
+      },
+      "supportedBackends": [],
+      "permissions": [
+        "plugins.execute",
+        "workspace.write"
+      ],
+      "canRunAsync": true,
+      "canCancel": true,
+      "supportsProgress": false,
+      "exclusiveGroups": [
+        "reader-mutations"
+      ]
+    }
+  ],
+  "standaloneExecutable": "CyCodeReader.exe",
+  "distributionStatus": "Development milestone; see Docs/Validation.md"
+}

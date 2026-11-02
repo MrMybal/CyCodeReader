@@ -1,0 +1,402 @@
+{
+  "Automatic": {
+    "en": "Automatic",
+    "fr": "Automatique"
+  },
+  "C": {
+    "en": "C",
+    "fr": "C"
+  },
+  "C#": {
+    "en": "C#",
+    "fr": "C#"
+  },
+  "C++": {
+    "en": "C++",
+    "fr": "C++"
+  },
+  "CSS": {
+    "en": "CSS",
+    "fr": "CSS"
+  },
+  "Cancel": {
+    "en": "Cancel",
+    "fr": "Annuler"
+  },
+  "Close a document before opening more files.": {
+    "en": "Close a document before opening more files.",
+    "fr": "Fermez un document avant d ouvrir plus de fichiers."
+  },
+  "Close file": {
+    "en": "Close file",
+    "fr": "Fermer le fichier"
+  },
+  "Code editor": {
+    "en": "Code editor",
+    "fr": "Editeur de code"
+  },
+  "Copy": {
+    "en": "Copy",
+    "fr": "Copier"
+  },
+  "Copy editing MCP configuration": {
+    "en": "Copy editing MCP configuration",
+    "fr": "Copier la configuration MCP avec écriture"
+  },
+  "Copy read-only MCP configuration": {
+    "en": "Copy read-only MCP configuration",
+    "fr": "Copier la configuration MCP en lecture seule"
+  },
+  "Cut": {
+    "en": "Cut",
+    "fr": "Couper"
+  },
+  "Discard": {
+    "en": "Discard",
+    "fr": "Abandonner"
+  },
+  "Edit": {
+    "en": "Edit",
+    "fr": "Edition"
+  },
+  "Encoding": {
+    "en": "Encoding",
+    "fr": "Encodage"
+  },
+  "Exit": {
+    "en": "Exit",
+    "fr": "Quitter"
+  },
+  "Extension manager": {
+    "en": "Extension manager",
+    "fr": "Gestionnaire d’extensions"
+  },
+  "Extensions": {
+    "en": "Extensions",
+    "fr": "Extensions"
+  },
+  "File": {
+    "en": "File",
+    "fr": "Fichier"
+  },
+  "File changed on disk. Reload it or save a copy.": {
+    "en": "File changed on disk. Reload it or save a copy.",
+    "fr": "Le fichier a change sur le disque. Rechargez-le ou enregistrez une copie."
+  },
+  "Filter files...": {
+    "en": "Filter files...",
+    "fr": "Filtrer les fichiers..."
+  },
+  "Find": {
+    "en": "Find",
+    "fr": "Rechercher"
+  },
+  "Find / replace": {
+    "en": "Find / replace",
+    "fr": "Rechercher / remplacer"
+  },
+  "Find all": {
+    "en": "Find all",
+    "fr": "Tout rechercher"
+  },
+  "Find next": {
+    "en": "Find next",
+    "fr": "Occurrence suivante"
+  },
+  "GLSL": {
+    "en": "GLSL",
+    "fr": "GLSL"
+  },
+  "Go": {
+    "en": "Go",
+    "fr": "Aller"
+  },
+  "Go to line": {
+    "en": "Go to line",
+    "fr": "Aller a la ligne"
+  },
+  "HLSL": {
+    "en": "HLSL",
+    "fr": "HLSL"
+  },
+  "HTML": {
+    "en": "HTML",
+    "fr": "HTML"
+  },
+  "Install the Reader SDK runtime with scripts/setup_sdk.py.": {
+    "en": "Install the Reader SDK runtime with scripts/setup_sdk.py.",
+    "fr": "Installez le SDK du Reader avec scripts/setup_sdk.py."
+  },
+  "JSON": {
+    "en": "JSON",
+    "fr": "JSON"
+  },
+  "Java": {
+    "en": "Java",
+    "fr": "Java"
+  },
+  "JavaScript": {
+    "en": "JavaScript",
+    "fr": "JavaScript"
+  },
+  "Language": {
+    "en": "Language",
+    "fr": "Langue"
+  },
+  "Licenses": {
+    "en": "Licenses",
+    "fr": "Licences"
+  },
+  "Line": {
+    "en": "Line",
+    "fr": "Ligne"
+  },
+  "Lines": {
+    "en": "Lines",
+    "fr": "Lignes"
+  },
+  "Lowercase (ASCII)": {
+    "en": "Lowercase (ASCII)",
+    "fr": "minuscules (ASCII)"
+  },
+  "Lua": {
+    "en": "Lua",
+    "fr": "Lua"
+  },
+  "Markdown": {
+    "en": "Markdown",
+    "fr": "Markdown"
+  },
+  "Minimap": {
+    "en": "Minimap",
+    "fr": "Minicarte"
+  },
+  "Move to new window": {
+    "en": "Move to new window",
+    "fr": "Deplacer dans une nouvelle fenetre"
+  },
+  "New file": {
+    "en": "New file",
+    "fr": "Nouveau fichier"
+  },
+  "Open Windows-1252 file...": {
+    "en": "Open Windows-1252 file...",
+    "fr": "Ouvrir un fichier Windows-1252..."
+  },
+  "Open files": {
+    "en": "Open files",
+    "fr": "Fichiers ouverts"
+  },
+  "Open files...": {
+    "en": "Open files...",
+    "fr": "Ouvrir des fichiers..."
+  },
+  "Open or drop code files to begin.": {
+    "en": "Open or drop code files to begin.",
+    "fr": "Ouvrez ou deposez des fichiers de code pour commencer."
+  },
+  "Options": {
+    "en": "Options",
+    "fr": "Options"
+  },
+  "Paste": {
+    "en": "Paste",
+    "fr": "Coller"
+  },
+  "Place plugin manifests and libraries in the Reader plugins folder.": {
+    "en": "Place plugin manifests and libraries in the Reader plugins folder.",
+    "fr": "Placez les manifestes et bibliothèques dans le dossier plugins du Reader."
+  },
+  "Plain text": {
+    "en": "Plain text",
+    "fr": "Texte brut"
+  },
+  "Plugins load at startup. Restart Reader after changing manifests or libraries.": {
+    "en": "Plugins load at startup. Restart Reader after changing manifests or libraries.",
+    "fr": "Les extensions sont chargées au démarrage. Redémarrez Reader après une modification des manifestes ou bibliothèques."
+  },
+  "Python": {
+    "en": "Python",
+    "fr": "Python"
+  },
+  "Read-only": {
+    "en": "Read-only",
+    "fr": "Lecture seule"
+  },
+  "Recent files": {
+    "en": "Recent files",
+    "fr": "Fichiers recents"
+  },
+  "Redo": {
+    "en": "Redo",
+    "fr": "Retablir"
+  },
+  "Reload from disk": {
+    "en": "Reload from disk",
+    "fr": "Recharger depuis le disque"
+  },
+  "Remove duplicate lines": {
+    "en": "Remove duplicate lines",
+    "fr": "Supprimer les lignes en double"
+  },
+  "Replace": {
+    "en": "Replace",
+    "fr": "Remplacer"
+  },
+  "Replace all": {
+    "en": "Replace all",
+    "fr": "Tout remplacer"
+  },
+  "Replace existing file?": {
+    "en": "Replace existing file?",
+    "fr": "Remplacer le fichier existant ?"
+  },
+  "Reset layout": {
+    "en": "Reset layout",
+    "fr": "Reinitialiser la disposition"
+  },
+  "Return to editor": {
+    "en": "Return to editor",
+    "fr": "Reancrer dans l'editeur"
+  },
+  "Rust": {
+    "en": "Rust",
+    "fr": "Rust"
+  },
+  "SDK service ready": {
+    "en": "SDK service ready",
+    "fr": "Service SDK prêt"
+  },
+  "SDK service unavailable": {
+    "en": "SDK service unavailable",
+    "fr": "Service SDK indisponible"
+  },
+  "Save": {
+    "en": "Save",
+    "fr": "Enregistrer"
+  },
+  "Save all": {
+    "en": "Save all",
+    "fr": "Tout enregistrer"
+  },
+  "Save as...": {
+    "en": "Save as...",
+    "fr": "Enregistrer sous..."
+  },
+  "Save changes before continuing?": {
+    "en": "Save changes before continuing?",
+    "fr": "Enregistrer les modifications avant de continuer ?"
+  },
+  "Saved": {
+    "en": "Saved",
+    "fr": "Enregistre"
+  },
+  "Search": {
+    "en": "Search",
+    "fr": "Recherche"
+  },
+  "Search open documents": {
+    "en": "Search open documents",
+    "fr": "Rechercher dans les documents ouverts"
+  },
+  "Search text": {
+    "en": "Search text",
+    "fr": "Texte à rechercher"
+  },
+  "Select all": {
+    "en": "Select all",
+    "fr": "Tout selectionner"
+  },
+  "Show whitespace": {
+    "en": "Show whitespace",
+    "fr": "Afficher les espaces"
+  },
+  "Sort lines": {
+    "en": "Sort lines",
+    "fr": "Trier les lignes"
+  },
+  "Sort lines descending": {
+    "en": "Sort lines descending",
+    "fr": "Trier les lignes en ordre inverse"
+  },
+  "Start SDK service": {
+    "en": "Start SDK service",
+    "fr": "Démarrer le service SDK"
+  },
+  "Switch file / actions": {
+    "en": "Switch file / actions",
+    "fr": "Changer de fichier / actions"
+  },
+  "Syntax": {
+    "en": "Syntax",
+    "fr": "Coloration"
+  },
+  "Text size": {
+    "en": "Text size",
+    "fr": "Taille du texte"
+  },
+  "Text tools": {
+    "en": "Text tools",
+    "fr": "Outils de texte"
+  },
+  "The Reader SDK service stopped.": {
+    "en": "The Reader SDK service stopped.",
+    "fr": "Le service SDK du Reader est arrêté."
+  },
+  "The read identity cannot edit files or execute plugins. Saving remains explicit.": {
+    "en": "The read identity cannot edit files or execute plugins. Saving remains explicit.",
+    "fr": "L’identité de lecture ne peut ni modifier les fichiers ni exécuter les extensions. La sauvegarde reste explicite."
+  },
+  "Theme": {
+    "en": "Theme",
+    "fr": "Theme"
+  },
+  "This file is already open in another tab.": {
+    "en": "This file is already open in another tab.",
+    "fr": "Ce fichier est deja ouvert dans un autre onglet."
+  },
+  "Trim trailing whitespace": {
+    "en": "Trim trailing whitespace",
+    "fr": "Supprimer les espaces de fin de ligne"
+  },
+  "Type a file name or action...": {
+    "en": "Type a file name or action...",
+    "fr": "Saisissez un nom de fichier ou une action..."
+  },
+  "TypeScript": {
+    "en": "TypeScript",
+    "fr": "TypeScript"
+  },
+  "TypeScript / TSX": {
+    "en": "TypeScript / TSX",
+    "fr": "TypeScript / TSX"
+  },
+  "Undo": {
+    "en": "Undo",
+    "fr": "Annuler"
+  },
+  "Unsaved changes": {
+    "en": "Unsaved changes",
+    "fr": "Modifications non enregistrees"
+  },
+  "Untitled": {
+    "en": "Untitled",
+    "fr": "Sans titre"
+  },
+  "Uppercase (ASCII)": {
+    "en": "Uppercase (ASCII)",
+    "fr": "MAJUSCULES (ASCII)"
+  },
+  "View": {
+    "en": "View",
+    "fr": "Affichage"
+  },
+  "Word wrap": {
+    "en": "Word wrap",
+    "fr": "Retour a la ligne automatique"
+  },
+  "application": {
+    "en": "application",
+    "fr": "application"
+  }
+}
