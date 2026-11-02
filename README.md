@@ -100,8 +100,18 @@ python scripts/build.py --core-only
 The native editor needs no CyCode checkout or Python runtime. The MCP companion
 uses a separate private Python/CyToolsCore installation (below). Source archives are
 version/hash pinned; no downloaded dependencies, runtimes, personal preferences or
-binaries belong in Git. The project license is undecided; dependency notices are
-in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+binaries belong in Git.
+
+## License
+
+CyCodeReader and its original shared `editor/` source library are licensed under
+[GNU GPL v3 only](LICENSE) (`GPL-3.0-only`). Copyright (c) 2026 Cyberalien;
+see [COPYRIGHT](COPYRIGHT). Third-party components retain their own licenses,
+listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Build folders and CMake installs include LICENSE and COPYRIGHT. Binary recipients
+must also have access to the exact corresponding source, including pinned CyUI,
+shared editor dependencies and build scripts; private dependency access is not
+granted automatically by this notice.
 
 `scripts/verify_reader.py` preserves the hidden desktop acceptance suite and
 `scripts/verify_languages.py` covers Reader syntax. They require a deployed binary

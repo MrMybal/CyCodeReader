@@ -1,7 +1,9 @@
 # Third-party notices
 
-The owner has not selected a license for CyCodeReader or its shared editor source.
-Dependency licenses do not grant a license for this project's original code.
+CyCodeReader's original source, including the shared `editor/` library, is
+licensed under [GNU GPL v3 only](LICENSE) (`GPL-3.0-only`).
+Copyright (c) 2026 Cyberalien; see [COPYRIGHT](COPYRIGHT).
+Dependencies retain their own licenses and copyright notices.
 
 | Component | License | Source |
 |---|---|---|

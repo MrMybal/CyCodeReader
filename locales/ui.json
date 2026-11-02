@@ -426,5 +426,9 @@
   "Search results limited to 2000 matches.": {
     "en": "Search results limited to 2000 matches.",
     "fr": "Resultats limites a 2000 correspondances."
+  },
+  "CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.": {
+    "en": "CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.",
+    "fr": "CyCodeReader : GPL-3.0-only. Copyright (c) 2026 Cyberalien. Ce programme est fourni sans aucune garantie. Voir LICENSE et COPYRIGHT."
   }
 }

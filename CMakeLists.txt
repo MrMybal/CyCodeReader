@@ -83,8 +83,10 @@ if(CYCODE_READER_BUILD_GUI)
     COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:CyCodeReader>/app"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/app/tool.py" "${CMAKE_CURRENT_SOURCE_DIR}/app/contracts.py" "${CMAKE_CURRENT_SOURCE_DIR}/app/CyTool.json" "$<TARGET_FILE_DIR:CyCodeReader>/app"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_BINARY_DIR}/plugins" "$<TARGET_FILE_DIR:CyCodeReader>/plugins"
-    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/licenses" "$<TARGET_FILE_DIR:CyCodeReader>/licenses")
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/licenses" "$<TARGET_FILE_DIR:CyCodeReader>/licenses"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" "${CMAKE_CURRENT_SOURCE_DIR}/COPYRIGHT" "${CMAKE_CURRENT_SOURCE_DIR}/THIRD_PARTY_NOTICES.md" "$<TARGET_FILE_DIR:CyCodeReader>")
   install(TARGETS CyCodeReader RUNTIME DESTINATION .)
+  install(FILES LICENSE COPYRIGHT THIRD_PARTY_NOTICES.md DESTINATION .)
   install(FILES locales/ui.json DESTINATION locales)
   install(DIRECTORY app/ DESTINATION app FILES_MATCHING PATTERN "*.py" PATTERN "*.json")
   install(DIRECTORY "${CMAKE_BINARY_DIR}/plugins/" DESTINATION plugins)

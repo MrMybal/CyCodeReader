@@ -5,6 +5,8 @@ LABELS = {'Automatic': 'Automatique', 'C': 'C', 'C#': 'C#', 'C++': 'C++', 'CSS':
 
 LABELS.update({"Copy result":"Copier le resultat", "Copy logs":"Copier les journaux", "Clear logs":"Effacer les journaux", "Density":"Densite", "Documents":"Documents", "Actions":"Actions", "Search results limited to 2000 matches.":"Resultats limites a 2000 correspondances."})
 
+LABELS.update({'CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.': 'CyCodeReader : GPL-3.0-only. Copyright (c) 2026 Cyberalien. Ce programme est fourni sans aucune garantie. Voir LICENSE et COPYRIGHT.'})
+
 if __name__ == "__main__":
     path=Path(__file__).resolve().parents[1]/"locales/ui.json"
     path.write_text(json.dumps({key:{"en":key,"fr":value} for key,value in LABELS.items()},indent=2,ensure_ascii=False)+"\n",encoding="utf-8")

@@ -180,6 +180,14 @@ void Reader::extensionPanels() {
                 applyAppearance();
             }
             if (ImGui::CollapsingHeader(tr("Licenses"))) {
+                ImGui::TextWrapped("%s",tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT."));
+                std::error_code projectLicenseError;
+                for (const auto *name : {"LICENSE", "COPYRIGHT"}) {
+                    const auto file=options_.installation/name;
+                    if (std::filesystem::is_regular_file(file,projectLicenseError) && ImGui::TreeNode(name)) {
+                        const auto text=readTextFileBytes(file);ImGui::TextWrapped("%s",text.c_str());ImGui::TreePop();
+                    }
+                }
                 std::error_code ec;for (const auto &file : std::filesystem::directory_iterator(options_.installation/"licenses",ec)) {
                     if (file.path().extension()!=".txt") continue;
                     if (ImGui::TreeNode(file.path().filename().string().c_str())) { const auto text=readTextFileBytes(file.path());ImGui::TextUnformatted(text.c_str());ImGui::TreePop(); }
