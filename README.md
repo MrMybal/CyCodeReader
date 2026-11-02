@@ -5,7 +5,7 @@ Files open directly without loading CyCode, solutions, language servers, project
 tools. CyToolsCore supplies the integrated SDK/MCP companion. Repository: https://github.com/MrMybal/CyCodeReader.
 
 `editor/` is also the shared source library consumed by CyCode: one implementation
-of the widget, lexical/Tree-sitter colors, icons, snippets and native file I/O.
+of the CyUI editor adapter, lexical/Tree-sitter overlays, icons, snippets and native file I/O.
 Changes to that library can benefit both applications without copying code.
 
 ## Use
@@ -42,14 +42,45 @@ data/reader; crash recovery is not implemented.
 
 ## Build
 
-Requirements: Python 3.11+, CMake 3.24+, C++20 compiler and a separate CyUI checkout
-(`../CyImgui_Interface`, or `--cyui PATH`). Windows uses Visual Studio 2022 C++;
-Linux/macOS use Ninja, OpenGL and SDL3 platform development libraries.
+Requirements: Python 3.11+, Git, CMake 3.24+ and a C++20 compiler. Windows uses
+Visual Studio 2022 C++; Linux/macOS use Ninja, OpenGL and SDL3 platform development
+libraries. CyUI is fetched from its official repository at the exact commit in
+`editor/cyui-source.lock.json`, using existing Git credentials if required.
 
 ```sh
 python scripts/fetch_dependencies.py
-python scripts/build.py --cyui ../CyImgui_Interface
+python scripts/build.py
 ```
+
+To use a separate clean checkout at that same locked revision, pass `--cyui PATH`
+(or CMake `-DCYUI_DIR=PATH`). A changed revision or tracked local changes are refused;
+no developer checkout is reset or updated. For a fresh configuration use
+`python scripts/build.py --build-dir runtime/build-modular`.
+
+### Shared syntax catalogue
+
+The locked CyUI commit provides 101 syntax modes, including HLSL/GLSL, file
+associations, whole-line Error/Warning colors for `.log` files and syntax engines
+contributed by plugins. Reader's Language menu consumes this common registry.
+Its richer Unreal/C# adapters and incremental Tree-sitter parsers are preserved.
+The normal build uses this catalogue without a development flag.
+
+For further unpublished CyUI work, an explicit opt-in accepts a changed local
+checkout without altering the normal revision lock:
+
+```sh
+python scripts/build.py --cyui ../CyImgui_Interface --cyui-development --build-dir runtime/build-code-languages-vs
+```
+
+The current dependency commit is local until CyUI is pushed. Publish CyUI before
+using the new Reader source lock on another machine. The validated local cache
+already contains the exact committed revision.
+
+The UI selects **Core, Code, CodeEditor, Commands, Inspector and Diagnostics**.
+Only one ImGui and one TextEditor backend are compiled. Audio, Gallery, demos,
+CEF and unused interface modules are disabled. Source/model ownership and the
+remaining native compatibility hooks are described in
+[the migration notes](Docs/CyUI-Migration.md).
 
 Build outputs remain in runtime/build-vs/Release on Windows, runtime/build elsewhere.
 Building runs CTest but does not install, restore old binaries or open an app.
@@ -89,9 +120,11 @@ Keep the target names and `cycode` namespace stable. See [architecture](Docs/Arc
 
 The Extensions menu and manager load `plugins/*.json` at startup. Manifests can
 contribute commands, typed options and languages. Language packs define extensions,
-keywords, types, identifiers and comments using the C++ or JSON lexical base; the
-included `.cycfg` language demonstrates real widget coloration. New parser engines,
-per-plugin panels and a remote marketplace remain future work.
+keywords, types, identifiers and comments. In the expanded CyUI build, they can
+also derive from any built-in lexer or provide their own native syntax engine.
+The `.cycfg` data pack and `.cynative` native parser demonstrate both paths.
+See [the plugin contract](Docs/Plugins.md). Per-plugin panels and a remote
+marketplace remain future work.
 
 Native extensions use the versioned C ABI in src/PluginABI.h, exchanging UTF-8 JSON
 without C++ objects. examples/sample_plugin.cpp executes a word-count command;

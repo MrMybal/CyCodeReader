@@ -1,5 +1,6 @@
 #pragma once
-#include <cyui/CyUI.h>
+#include <cyui/Core.h>
+#include <cyui/modules/CodeEditor.h>
 #include <TextEditor.h>
 #include <initializer_list>
 namespace cycode {
@@ -9,5 +10,7 @@ struct SyntaxColours {
 };
 SyntaxColours syntaxColours(const std::string &key);
 TextEditor::Palette editorColours(const std::string &key);
+// Add the application's extra token roles to the common CodeEditor renderer.
+void configureCodeEditor(cyui::CodeEditor &editor);
 ImU32 readableText(ImU32 foreground, std::initializer_list<ImU32> backgrounds);
 } // namespace cycode

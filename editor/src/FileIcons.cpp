@@ -2,7 +2,7 @@
 #include "cycode/EditorTheme.h"
 #include "cycode/Paths.h"
 #include <algorithm>
-#include <cyui/CyUI.h>
+#include <cyui/Core.h>
 #include <imgui_internal.h>
 namespace cycode {
 void drawFileIcon(ImDrawList *draw, ImVec2 pos, float size, const std::string &path, const std::string &theme,

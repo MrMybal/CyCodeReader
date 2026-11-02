@@ -1,7 +1,7 @@
 #include "Reader.h"
 #include "cycode/Paths.h"
 #include <SDL3/SDL_opengl.h>
-#include <cyui/CyUI.h>
+#include <cyui/Core.h>
 #include <fstream>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>

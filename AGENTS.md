@@ -7,7 +7,8 @@ CyCode language servers, project services, Git and debugger remain separate.
 
 - `editor/` is the single shared source library consumed by CyCode too. Preserve
   its `cycode_*` CMake targets and namespace; incompatible changes need an API bump.
-- Use CyUI via CYUI_DIR. Read its docs/AI_GUIDE.md; use palette roles and dp sizes.
+- Use the locked official CyUI revision (optional clean CYUI_DIR override). Read
+  docs/AI_GUIDE.md and MODULES.md; use explicit module targets, palette roles and dp.
   Do not edit CyUI or upstream downloaded sources. Widget patches live in
   editor/scripts/prepare_texteditor.py and modify only a build-local copy.
 - Keep file services independent of SDL/ImGui. Check disk baselines and preserve
@@ -25,3 +26,6 @@ CyCode language servers, project services, Git and debugger remain separate.
   and TaskFiles.md. Keep user documents persistent; never stage them as task artifacts.
 - GUI and MCP must share ReaderCore and its revision/disk guards. Plugins cross
   the versioned C ABI with UTF-8 JSON only; no STL/ImGui objects across the boundary.
+
+- Read Docs/CyUI-Migration.md before changing UI adapters. Keep one ImGui and one
+  shared CyUI TextEditor backend; never link a second native widget implementation.

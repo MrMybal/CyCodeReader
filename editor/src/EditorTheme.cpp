@@ -1,6 +1,7 @@
 #include "cycode/EditorTheme.h"
 #include <algorithm>
 #include <cmath>
+static_assert(IMGUI_VERSION_NUM >= 19200, "CyUI requires Dear ImGui 1.92 or newer");
 namespace cycode {
 ImU32 readableText(ImU32 foreground, std::initializer_list<ImU32> backgrounds) {
     auto luminance = [](ImU32 color) {
@@ -51,17 +52,23 @@ void applyEditorTheme(const std::string &key) {
     p.info = cyui::rgb(0x7e9ac3);
     cyui::setPalette(p);
 }
-SyntaxColours syntaxColours(const std::string &key) {
-    const auto p = cyui::palette();
-    const auto ground=ImGui::ColorConvertU32ToFloat4(p.bg0);
-    const bool light=.2126f*ground.x+.7152f*ground.y+.0722f*ground.z>.5f;
-    // Code roles have stable hues, independent of the theme's button accent.
-    if (light) return {cyui::rgb(0x28599c),cyui::rgb(0x754294),cyui::rgb(0x435b83),
-        cyui::rgb(0x805126),cyui::rgb(0x376b27),cyui::rgb(0x28599c),
-        cyui::rgb(0x08736c),cyui::rgb(0x28599c),cyui::rgb(0x754294)};
-    return {cyui::rgb(0x6c95eb),cyui::rgb(0xc599ff),cyui::rgb(0xb7c9e2),
-        cyui::rgb(0xd0a369),cyui::rgb(0x89ba6b),cyui::rgb(0x6c95eb),
-        cyui::rgb(0x27d3c4),cyui::rgb(0x6c95eb),cyui::rgb(0xc599ff)};
+SyntaxColours syntaxColours(const std::string &) {
+    // One common token palette for the editor, source views and Tree-sitter overlays.
+    using R=cyui::TokenRole;
+    return {cyui::tokenColor(R::keyword),cyui::tokenColor(R::type),cyui::tokenColor(R::number),
+        cyui::tokenColor(R::string),cyui::tokenColor(R::comment),cyui::tokenColor(R::preprocessor),
+        cyui::tokenColor(R::function),cyui::tokenColor(R::preprocessor),cyui::tokenColor(R::type)};
+}
+void configureCodeEditor(cyui::CodeEditor &editor) {
+    editor.native().SetPaletteTransform([](TextEditor::Palette &colors) {
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+        const auto shared=colors;
+#endif
+        colors=editorColours("");
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+        for (auto i=size_t(TextEditor::Color::sharedFunction);i<=size_t(TextEditor::Color::sharedAnsiWhite);++i) colors[i]=shared[i];
+#endif
+    });
 }
 TextEditor::Palette editorColours(const std::string &key) {
     const auto &p=cyui::palette(); const auto syntax=syntaxColours(key);

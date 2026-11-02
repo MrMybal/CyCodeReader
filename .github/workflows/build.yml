@@ -19,5 +19,5 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ninja-build
       - run: python scripts/fetch_dependencies.py --core-only
       - run: python scripts/build.py --core-only
-      # Full GUI builds require the owner's separate CyUI checkout.
+      # GUI builds resolve the exact CyUI Git revision; private access may require credentials.
       # Cross-platform execution remains unverified until these jobs run.

@@ -12,7 +12,9 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--core-only',action='store_true')
     parser.add_argument('--configuration',default='Release')
-    parser.add_argument('--cyui',type=Path,default=ROOT.parent/'CyImgui_Interface')
+    parser.add_argument('--cyui',type=Path,help='Optional clean checkout at editor/cyui-source.lock.json revision')
+    parser.add_argument('--build-dir',type=Path,help='Separate build directory for a clean configuration')
+    parser.add_argument('--cyui-development',action='store_true',help='Explicit opt-in to an unpublished local CyUI checkout')
     args=parser.parse_args()
     env=dict(os.environ);cmake=shutil.which('cmake');ninja=shutil.which('ninja')
     if sys.platform=='win32':
@@ -29,10 +31,10 @@ def main():
             env.update(dict(line.split('=',1) for line in output.splitlines() if '=' in line and not line.startswith('=')))
         env={key.upper():value for key,value in env.items()}
     if not cmake: raise SystemExit('Install CMake 3.24+ and a C++20 compiler.')
-    build=ROOT/'runtime'/(('core-build' if args.core_only else 'build')+('-vs' if sys.platform=='win32' else ''))
+    build=(args.build_dir or ROOT/'runtime'/(('core-build' if args.core_only else 'build')+('-vs' if sys.platform=='win32' else ''))).resolve()
     build.mkdir(parents=True,exist_ok=True);log=build/'build.log'
     generator=['-G','Visual Studio 17 2022','-A','x64'] if sys.platform=='win32' else ['-G','Ninja',f'-DCMAKE_MAKE_PROGRAM={ninja or "ninja"}']
-    commands=[[cmake,'-S',str(ROOT),'-B',str(build),*generator,f'-DCMAKE_BUILD_TYPE={args.configuration}',f'-DCYUI_DIR={args.cyui}',f'-DCYCODE_READER_BUILD_GUI={"OFF" if args.core_only else "ON"}','-DBUILD_TESTING=ON'],
+    commands=[[cmake,'-S',str(ROOT),'-B',str(build),*generator,f'-DCMAKE_BUILD_TYPE={args.configuration}',f'-DCYUI_DIR={args.cyui.resolve() if args.cyui else ""}',f'-DCYCODE_CYUI_DEVELOPMENT={"ON" if args.cyui_development else "OFF"}',f'-DCYCODE_READER_BUILD_GUI={"OFF" if args.core_only else "ON"}','-DBUILD_TESTING=ON'],
               [cmake,'--build',str(build),'--config',args.configuration,'--parallel','4']]
     with log.open('w',encoding='utf-8') as stream:
         for command in commands:

@@ -398,5 +398,33 @@
   "application": {
     "en": "application",
     "fr": "application"
+  },
+  "Copy result": {
+    "en": "Copy result",
+    "fr": "Copier le resultat"
+  },
+  "Copy logs": {
+    "en": "Copy logs",
+    "fr": "Copier les journaux"
+  },
+  "Clear logs": {
+    "en": "Clear logs",
+    "fr": "Effacer les journaux"
+  },
+  "Density": {
+    "en": "Density",
+    "fr": "Densite"
+  },
+  "Documents": {
+    "en": "Documents",
+    "fr": "Documents"
+  },
+  "Actions": {
+    "en": "Actions",
+    "fr": "Actions"
+  },
+  "Search results limited to 2000 matches.": {
+    "en": "Search results limited to 2000 matches.",
+    "fr": "Resultats limites a 2000 correspondances."
   }
 }

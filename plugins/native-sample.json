@@ -4,7 +4,26 @@
   "name": "Native word count example",
   "version": "0.1.0",
   "library": "reader_sample_plugin",
-  "commands": [{"id": "wordCount", "title": "Count words"}],
-  "languages": [],
+  "commands": [
+    {
+      "id": "wordCount",
+      "title": "Count words"
+    },
+    {
+      "id": "highlight",
+      "title": "Native syntax provider",
+      "kind": "syntax"
+    }
+  ],
+  "languages": [
+    {
+      "id": "entity",
+      "name": "Native entity example",
+      "extensions": [
+        ".cynative"
+      ],
+      "providerCommand": "highlight"
+    }
+  ],
   "options": []
 }

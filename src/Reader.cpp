@@ -6,7 +6,7 @@
 #include "cycode/Paths.h"
 #include <algorithm>
 #include <fstream>
-#include <cyui/CyUI.h>
+#include <cyui/Core.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
 #ifdef _WIN32
@@ -43,6 +43,7 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
     if (!options_.automated) try {
         const auto settings=Json::parse(readTextFileBytes(options_.installation/"data/reader/preferences.json"));
         theme_=settings.value("theme",theme_); locale_=settings.value("language",locale_);
+        density_=settings.value("density",density_);
         textScale_=std::clamp(settings.value("textScale",textScale_),.8f,2.f);
         wrap_=settings.value("wrap",false); minimap_=settings.value("minimap",false);
         if (settings.contains("recent")) recent_=settings.at("recent").get<std::vector<std::string>>();
@@ -54,7 +55,8 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
     if (std::find(std::begin(themes),std::end(themes),theme_)==std::end(themes)) theme_="graphite";
     if (locale_!="en" && locale_!="fr") locale_="en";
     cyui::Config config; config.themeKey=theme_.c_str(); config.squareWindows=true;
-    config.dpiScale=SDL_GetWindowDisplayScale(window_); cyui::apply(config);
+    config.density=density_=="comfortable" ? cyui::Density::comfortable : cyui::Density::compact;
+    config.dpiScale=window_ ? SDL_GetWindowDisplayScale(window_) : 1.f; cyui::apply(config);
     applyEditorTheme(theme_); cyui::loadFonts(); ImGui::GetStyle().FontScaleMain=textScale_;
     preparePluginLanguages();
     for (const auto &path : options_.files) open(path);
@@ -63,6 +65,9 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
 Reader::~Reader() {
     bridge_.reset();
     if (sdk_.valid()) { if (sdk_.wait_for(std::chrono::seconds(2))!=std::future_status::ready) sdkStop_=true; sdk_.wait(); }
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+    for (const auto &[id,language] : pluginSyntax_) cyui::unregisterCodeLanguage(id);
+#endif
     if (options_.automated) return;
     try {
         const auto path=options_.installation/"data/reader/preferences.json";
@@ -70,7 +75,7 @@ Reader::~Reader() {
         std::optional<std::string> baseline;
         if (std::filesystem::exists(path)) baseline=readTextFileBytes(path);
         const auto pluginState=core_.plugins().describe();Json pluginOptions=Json::object();for (const auto &plugin : pluginState.at("plugins")) pluginOptions[plugin.at("id").get<std::string>()]=plugin.at("options");
-        writeTextFileAtomic(path,Json{{"pluginOptions",pluginOptions},{"theme",theme_},{"language",locale_},{"textScale",textScale_},
+        writeTextFileAtomic(path,Json{{"pluginOptions",pluginOptions},{"density",density_},{"theme",theme_},{"language",locale_},{"textScale",textScale_},
             {"wrap",wrap_},{"minimap",minimap_},{"recent",recent_}}.dump(2),baseline);
     } catch (...) {}
 }
@@ -78,7 +83,14 @@ const char *Reader::tr(const char *key) const {
     const auto it=translations_.find(key);
     return it!=translations_.end() && it->contains(locale_) ? it->at(locale_).get_ref<const std::string &>().c_str() : key;
 }
-void Reader::error(const std::exception &exception) { lastError_=exception.what(); cyui::notify(lastError_.c_str(),cyui::Tone::error); }
+void Reader::error(const std::exception &exception) { lastError_=exception.what(); serviceLogs_.append(cyui::LogLevel::error,lastError_,"Reader");cyui::notify(lastError_.c_str(),cyui::Tone::error); }
+void Reader::applyAppearance() {
+    cyui::Config config;
+    config.themeKey=theme_=="graphite" ? "navy" : theme_.c_str();config.squareWindows=true;
+    config.density=density_=="comfortable" ? cyui::Density::comfortable : cyui::Density::compact;
+    config.dpiScale=cyui::dpi();cyui::apply(config);applyEditorTheme(theme_);
+    ImGui::GetStyle().FontScaleMain=textScale_;
+}
 std::shared_ptr<Reader::Tab> Reader::find(size_t id) const { for (const auto &tab : tabs_) if (tab->id==id) return tab; return {}; }
 std::shared_ptr<Reader::Tab> Reader::active() const { return find(active_); }
 std::string Reader::title(const std::shared_ptr<Tab> &tab) const {
@@ -90,6 +102,30 @@ void Reader::remember(const std::filesystem::path &path) {
     std::erase(recent_,text); recent_.insert(recent_.begin(),text); if (recent_.size()>12) recent_.resize(12);
 }
 void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+    const auto &mode=tab->language;
+    tab->syntaxPath=tab->document.untitled() ? "code.cpp" : pathUtf8(tab->document.path());
+    const bool unreal=mode=="C++ / Unreal" || mode=="unreal" ||
+        (mode=="auto" && !tab->document.untitled() && unrealFile(tab->document.path()));
+    auto selected=mode=="auto" ? cyui::codeLanguageForPath(tab->syntaxPath) :
+        cyui::codeLanguageFromName(mode.starts_with("plugin:") ? mode.substr(7) : mode);
+    if (mode=="TypeScript / TSX") selected=cyui::CodeLanguage::tsx;
+    if (unreal && (selected==cyui::CodeLanguage::cpp || selected==cyui::CodeLanguage::c || mode=="C++ / Unreal")) selected=cyui::CodeLanguage::unreal;
+    const auto info=cyui::codeLanguageInfo(selected);
+    if (mode!="auto") tab->syntaxPath=info.extensions.empty() ? "code.txt" : "code."+info.extensions.front();
+    if (selected==cyui::CodeLanguage::unreal) tab->syntaxPath="code.cpp";
+    // Preserve the context-aware Unreal/C# tokenizer and existing incremental parsers.
+    const bool rich=selected==cyui::CodeLanguage::c || selected==cyui::CodeLanguage::cpp ||
+        selected==cyui::CodeLanguage::unreal || selected==cyui::CodeLanguage::csharp ||
+        selected==cyui::CodeLanguage::rust || selected==cyui::CodeLanguage::java ||
+        selected==cyui::CodeLanguage::javascript || selected==cyui::CodeLanguage::typescript ||
+        selected==cyui::CodeLanguage::tsx || selected==cyui::CodeLanguage::html || selected==cyui::CodeLanguage::css;
+    tab->codeEditor.setLanguage(selected);tab->codeEditor.setSyntaxEnabled(!rich);
+    if (rich) tab->editor.SetLanguage(editorLanguage(tab->syntaxPath,unreal));
+    // A manually selected plain/plugin mode must not keep an old Tree-sitter overlay.
+    if (!rich) tab->syntaxPath="code.txt";
+    tab->syntax.update(tab->editor,tab->syntaxPath,tab->document.text());
+#else
     const auto &mode=tab->language;
     const TextEditor::Language *language=nullptr;
     tab->syntaxPath=tab->document.untitled() ? "code.cpp" : pathUtf8(tab->document.path());
@@ -104,9 +140,11 @@ void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
     else if (mode=="auto") { const auto ext=tab->document.path().extension().string();if (pluginExtensions_.contains(ext)) { language=pluginLanguages_.at(pluginExtensions_.at(ext)).get();tab->syntaxPath="code.txt"; } }
     tab->editor.SetLanguage(language);
     tab->syntax.update(tab->editor,tab->syntaxPath,tab->document.text());
+#endif
 }
 void Reader::install(const std::shared_ptr<Tab> &tab) {
-    tab->editor.SetInsertSpacesOnTabs(false); tab->editor.SetText(tab->document.text());
+    configureCodeEditor(tab->codeEditor);
+    tab->editor.SetInsertSpacesOnTabs(false); tab->codeEditor.setText(tab->document.text());
     tab->editor.SetInsertSpacesOnTabs(true); tab->editor.SetTabSize(4); tab->editor.SetLineFoldingEnabled(true);
     tab->editor.SetCompletePairedGlyphs(true); setLanguage(tab);
     core_.refresh();tab->appliedRevision=tab->live->revision;
@@ -139,6 +177,9 @@ void Reader::showDialog(bool save,size_t tab) {
     if (dialog_) return;
     dialog_=std::make_shared<Dialog>(); dialog_->save=save; dialog_->tab=tab;
     if (const auto doc=find(tab); doc && !doc->document.untitled()) dialog_->initial=pathUtf8(doc->document.path());
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+    for (const auto &[id,language] : pluginSyntax_) cyui::unregisterCodeLanguage(id);
+#endif
     if (options_.automated) return; // Scripted selection uses pollDialog; native dialogs stay interactive-only.
     auto *owner=new std::shared_ptr<Dialog>(dialog_);
     auto callback=[](void *data,const char *const *files,int) {
@@ -222,8 +263,12 @@ void Reader::execute(const std::string &command,const Json &params) {
         auto tab=active();
         if (command.starts_with("transform.")) nativeAction("text.transform",{{"operation",command.substr(10)}});
         else if (command=="plugin") nativeAction("plugins.invoke",params);
+        else if (command=="syntax" && tab) { tab->language=params.at("language");setLanguage(tab); }
         else if (command=="format") nativeAction("documents.format",params);
         else if (command=="searchOpen") searchPanel_=true;
+        else if (command=="plugins") pluginsPanel_=true;
+        else if (command=="mcp") mcpPanel_=true;
+        else if (command=="options") optionsPanel_=true;
         else if (command=="new") newFile();
         else if (command=="open1252") { openEncoding_="windows-1252";showDialog(false); }
         else if (command=="open") { openEncoding_="auto";if (params.contains("path")) open(utf8Path(params.at("path"))); else showDialog(false); }
@@ -301,18 +346,35 @@ void Reader::menus() {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu(tr("Syntax"))) {
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+            auto choose=[&](const std::string &label,const std::string &id) {
+                if (ImGui::MenuItem(label.c_str(),nullptr,active() && active()->language==id,bool(active()))) execute("syntax",{{"language",id}});
+            };
+            choose(tr("Automatic"),"auto");choose(tr("Plain text"),"plain");ImGui::Separator();
+            auto catalogue=cyui::codeLanguages();
+            std::sort(catalogue.begin(),catalogue.end(),[](const auto &a,const auto &b) { return a.name<b.name; });
+            for (char initial='A';initial<='Z';++initial) {
+                const std::string group(1,initial);
+                if (ImGui::BeginMenu(group.c_str())) {
+                    for (const auto &item : catalogue) if (item.language!=cyui::CodeLanguage::plain &&
+                        !item.name.empty() && std::toupper(static_cast<unsigned char>(item.name.front()))==initial) choose(item.name,item.id);
+                    ImGui::EndMenu();
+                }
+            }
+#else
             for (const auto &[id,language] : pluginLanguages_) if (ImGui::MenuItem(language->name.c_str(),nullptr,active() && active()->language=="plugin:"+id,bool(active()))) { active()->language="plugin:"+id;setLanguage(active()); }
             for (auto language : languages) if (ImGui::MenuItem(std::string(language)=="auto" ? tr("Automatic") : std::string(language)=="plain" ? tr("Plain text") : language,nullptr,active() && active()->language==language, bool(active()))) { active()->language=language; setLanguage(active()); }
+#endif
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu(tr("Extensions"))) { if (ImGui::MenuItem(tr("Extension manager"))) pluginsPanel_=true;const auto state=core_.plugins().describe();for (const auto &plugin : state.at("plugins")) if (ImGui::BeginMenu(plugin.at("name").get_ref<const std::string&>().c_str())) { for (const auto &command : plugin.at("commands")) if (ImGui::MenuItem(command.at("title").get_ref<const std::string&>().c_str(),nullptr,false,active() && !active()->editor.IsReadOnlyEnabled())) execute("plugin",{{"plugin",plugin.at("id")},{"command",command.at("id")}});ImGui::EndMenu(); }ImGui::EndMenu(); }
+        if (ImGui::BeginMenu(tr("Extensions"))) { if (ImGui::MenuItem(tr("Extension manager"))) pluginsPanel_=true;const auto state=core_.plugins().describe();for (const auto &plugin : state.at("plugins")) if (ImGui::BeginMenu(plugin.at("name").get_ref<const std::string&>().c_str())) { for (const auto &command : plugin.at("commands")) if (command.value("kind","")!="syntax" && ImGui::MenuItem(command.at("title").get_ref<const std::string&>().c_str(),nullptr,false,active() && !active()->editor.IsReadOnlyEnabled())) execute("plugin",{{"plugin",plugin.at("id")},{"command",command.at("id")}});ImGui::EndMenu(); }ImGui::EndMenu(); }
         if (ImGui::MenuItem("CyToolsCore / MCP")) mcpPanel_=true;
         if (ImGui::MenuItem(tr("Options"))) optionsPanel_=true;
         ImGui::EndMainMenuBar();
     }
 }
 void Reader::tools() {
-    cyui::beginTopBar("##reader-tools",36);
+    cyui::beginTopBar("##reader-tools",cyui::dp(36));
     cyui::textColoured(cyui::palette().accent,"CYCODE READER"); ImGui::SameLine(); cyui::toolbarSeparator();
     if (cyui::iconButton(cyui::icon::add,(std::string(tr("New file"))+" (Ctrl+N)").c_str())) execute("new"); ImGui::SameLine();
     if (cyui::iconButton(cyui::icon::folder,(std::string(tr("Open files..."))+" (Ctrl+O)").c_str())) execute("open"); ImGui::SameLine();
@@ -380,11 +442,18 @@ void Reader::documents() {
             documentIcon(tab->document.untitled() ? "new.cpp" : pathUtf8(tab->document.path()),theme_);
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) active_=tab->id;
             if (tab->diskChanged) { cyui::callout(cyui::Tone::warning,tr("File changed on disk. Reload it or save a copy.")); if (cyui::button(tr("Reload from disk"))) requestClose(tab->id,true); ImGui::SameLine(); if (cyui::button(tr("Save as..."))) save(tab,true); }
-            tab->editor.SetPalette(editorColours(theme_)); tab->editor.SetWordWrapEnabled(wrap_);
+            tab->editor.SetWordWrapEnabled(wrap_);
             tab->editor.SetShowMiniMapEnabled(minimap_); tab->editor.SetShowWhitespacesEnabled(whitespace_);
             tab->editor.SetFindButtonLabel(tr("Find")); tab->editor.SetFindAllButtonLabel(tr("Find all"));
             tab->editor.SetReplaceButtonLabel(tr("Replace")); tab->editor.SetReplaceAllButtonLabel(tr("Replace all"));
-            { cyui::ScopedFont mono(cyui::monoFont()); if (tab->editor.Render(("##reader-text-"+std::to_string(tab->id)).c_str())) tab->version=~size_t(0); }
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+            try { tab->codeEditor.refreshSyntax(); }
+            catch (const std::exception &e) {
+                // A failed extension must leave the live editor usable and report once.
+                tab->codeEditor.setSyntaxEnabled(false);tab->editor.SetLanguage(nullptr);error(e);
+            }
+#endif
+            if (tab->codeEditor.draw(("##reader-text-"+std::to_string(tab->id)).c_str())) tab->version=~size_t(0);
             sync(tab);
         }
         if (ImGui::BeginPopupContextWindow("##reader-tab-actions",ImGuiPopupFlags_MouseButtonRight|ImGuiPopupFlags_NoOpenOverItems)) {
@@ -419,20 +488,29 @@ void Reader::dialogs() {
             ImGui::SameLine(); if (cyui::button(tr("Cancel"))) { overwrite_={}; saveQueue_.clear(); ImGui::CloseCurrentPopup(); } ImGui::EndPopup();
         }
     }
-    if (palette_) ImGui::OpenPopup(tr("Switch file / actions"));
-    if (ImGui::BeginPopupModal(tr("Switch file / actions"),&palette_,ImGuiWindowFlags_AlwaysAutoResize)) {
-        if (ImGui::IsWindowAppearing()) ImGui::SetKeyboardFocusHere();
-        ImGui::SetNextItemWidth(cyui::dp(540)); ImGui::InputTextWithHint("##palette-query",tr("Type a file name or action..."),&paletteQuery_);
+    // The application maps stable IDs to its existing actions; CyUI owns matching,
+    // scrolling, keyboard focus, arrows, Enter and Escape.
+    std::vector<cyui::Command> commands;
+    std::map<cyui::ItemId,size_t> documentCommands;
+    std::map<cyui::ItemId,std::string> actionsById;
+    if (palette_) {
         for (const auto &tab : tabs_) {
             const auto name=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path());
-            if (contains(name,paletteQuery_) && ImGui::Selectable(name.c_str())) { active_=tab->id; tab->focus=true; palette_=false; }
+            const auto id=uiId("document/"+std::to_string(tab->id));
+            commands.push_back({id,name,"",tr("Documents")});documentCommands.emplace(id,tab->id);
         }
-        const std::pair<const char *,const char *> actions[]={{"New file","new"},{"Open files...","open"},{"Save all","saveAll"},{"Find / replace","find"},{"Go to line","goto"}};
-        ImGui::Separator();
-        for (const auto &[name,action] : actions) if (contains(tr(name),paletteQuery_) && ImGui::Selectable(tr(name))) { palette_=false; execute(action); }
-        if (ImGui::IsKeyPressed(ImGuiKey_Escape) || cyui::button(tr("Cancel"))) palette_=false;
-        if (!palette_) ImGui::CloseCurrentPopup(); ImGui::EndPopup();
+        const char *actions[][3]={{"New file","new","Ctrl+N"},{"Open files...","open","Ctrl+O"},
+            {"Save all","saveAll","Ctrl+Alt+S"},{"Find / replace","find","Ctrl+F"},{"Go to line","goto","Ctrl+G"},{"Search open documents","searchOpen","Ctrl+Shift+F"},
+            {"Extensions","plugins",""},{"Options","options",""},{"CyToolsCore / MCP","mcp",""}};
+        for (const auto &action : actions) {
+            const auto id=uiId(std::string("action/")+action[1]);
+            commands.push_back({id,tr(action[0]),action[2],tr("Actions"),active() || std::string(action[1])=="new" || std::string(action[1])=="open"});
+            actionsById.emplace(id,action[1]);
+        }
     }
+    const auto request=cyui::commandPalette((std::string(tr("Switch file / actions"))+"###reader-command-palette").c_str(),palette_,commandState_,commands,cyui::dp(620,380));
+    if (documentCommands.contains(request)) { if (auto tab=find(documentCommands.at(request))) { active_=tab->id;tab->focus=true; } }
+    else if (actionsById.contains(request)) execute(actionsById.at(request));
     if (goto_) ImGui::OpenPopup(tr("Go to line"));
     if (ImGui::BeginPopupModal(tr("Go to line"),&goto_,ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::InputInt(tr("Line"),&line_);
@@ -458,8 +536,8 @@ void Reader::frame() {
                 if (tab->diskChanged && !tab->document.dirty()) { tab->document=Document::open(tab->document.path()); install(tab); }
             }
         }
-        if (const auto tab=active()) SDL_SetWindowTitle(window_,("CyCodeReader — "+(tab->document.untitled() ? std::string(tr("Untitled")) : pathUtf8(tab->document.path().filename()))+(tab->document.dirty() ? " *" : "")).c_str());
-        else SDL_SetWindowTitle(window_,"CyCodeReader");
+        if (const auto tab=active(); tab && window_) SDL_SetWindowTitle(window_,("CyCodeReader — "+(tab->document.untitled() ? std::string(tr("Untitled")) : pathUtf8(tab->document.path().filename()))+(tab->document.dirty() ? " *" : "")).c_str());
+        else if (window_) SDL_SetWindowTitle(window_,"CyCodeReader");
     } catch (const std::exception &exception) { error(exception); }
     cyui::renderNotifications();
 }

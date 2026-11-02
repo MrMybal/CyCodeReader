@@ -68,11 +68,16 @@ void Plugins::load(const std::filesystem::path &directory) {
             if (!commands.is_array() || commands.size()>64 || !languages.is_array() || languages.size()>64 || !options.is_array() || options.size()>64) throw std::runtime_error("Invalid plugin contribution limits");
             std::set<std::string> names;
             for (const auto &command : commands) if (!identifier(command.at("id")) || !names.insert(command.at("id")).second || command.at("title").get<std::string>().size()>256) throw std::runtime_error("Invalid plugin command");
+            const auto commandNames=names;
+            for (const auto &command : commands) if (command.contains("kind") && command.at("kind")!="syntax") throw std::runtime_error("Unknown plugin command kind");
             names.clear();for (const auto &language : languages) {
                 if (!identifier(language.at("id")) || !names.insert(language.at("id")).second || language.at("name").get<std::string>().empty() || language.at("name").get<std::string>().size()>128) throw std::runtime_error("Invalid plugin language");
                 const auto extensions=language.at("extensions");if (!extensions.is_array() || extensions.empty() || extensions.size()>32) throw std::runtime_error("Invalid language extensions");
                 for (const auto &ext : extensions) { auto s=ext.get<std::string>();if (s.size()<2 || s.size()>32 || s[0]!='.' || s.find_first_of("/\\")!=std::string::npos) throw std::runtime_error("Invalid language extension"); }
                 for (const auto *key : {"base","lineComment","commentStart","commentEnd"}) if (language.contains(key) && (!language.at(key).is_string() || language.at(key).get_ref<const std::string&>().size()>64)) throw std::runtime_error("Invalid language delimiter");
+                if (language.contains("providerCommand") && (!language.at("providerCommand").is_string() || !commandNames.contains(language.at("providerCommand").get<std::string>()) || !p.manifest.contains("library"))) throw std::runtime_error("Syntax provider must name a declared native command");
+                if (language.contains("lexer") && language.at("lexer")!="rules" && language.at("lexer")!="inherit") throw std::runtime_error("Unknown syntax lexer mode");
+                if (language.contains("wordLists")) { if (!language.at("wordLists").is_array() || language.at("wordLists").size()>9) throw std::runtime_error("Invalid lexer word lists");for (const auto &words : language.at("wordLists")) if (!words.is_string() || words.get_ref<const std::string&>().size()>32768) throw std::runtime_error("Lexer word list exceeds limit"); }
                 if (language.contains("caseSensitive") && !language.at("caseSensitive").is_boolean()) throw std::runtime_error("Invalid language case-sensitivity option");
                 for (const auto &field : {"keywords","types","identifiers"}) if (language.contains(field)) { if (!language.at(field).is_array() || language.at(field).size()>2048) throw std::runtime_error("Invalid language word limit");for (const auto &word : language.at(field)) if (!word.is_string() || word.get_ref<const std::string&>().size()>128) throw std::runtime_error("Invalid language word"); }
             }

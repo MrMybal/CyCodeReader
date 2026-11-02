@@ -2,7 +2,7 @@
 #include "PluginLanguage.h"
 #include "cycode/EditorTheme.h"
 #include "cycode/Paths.h"
-#include <cyui/CyUI.h>
+#include <cyui/Core.h>
 #include <imgui_stdlib.h>
 #include <cstdlib>
 #ifdef _WIN32
@@ -12,20 +12,38 @@
 #endif
 namespace cycode::reader {
 void Reader::nativeAction(const std::string &method,Json params) {
-    if (auto tab=active()) { sync(tab);params["id"]=tab->id;params["expectedRevision"]=tab->live->revision;auto result=core_.dispatch(method,params);if (method=="plugins.invoke") pluginResult_=result.at("result").dump(2);sync(tab); }
+    if (auto tab=active()) { sync(tab);params["id"]=tab->id;params["expectedRevision"]=tab->live->revision;auto result=core_.dispatch(method,params);if (method=="plugins.invoke") { pluginResult_=result.at("result").dump(2);pluginOutput_.setLanguage(cyui::CodeLanguage::json);configureCodeEditor(pluginOutput_);pluginOutput_.setText(pluginResult_);pluginOutput_.setReadOnly(true); }sync(tab); }
 }
 void Reader::preparePluginLanguages() {
     const auto state=core_.plugins().describe();
+    for (const auto &issue : state.at("errors")) serviceLogs_.append(cyui::LogLevel::warning,issue.dump(),"Plugins");
     for (const auto &plugin : state.at("plugins")) for (const auto &definition : plugin.at("languages")) {
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+        try {
+            const auto pluginId=plugin.at("id").get<std::string>();
+            const auto key=pluginId+"/"+definition.at("id").get<std::string>();
+            auto shared=sharedPluginLanguage(key,definition);
+            if (definition.contains("providerCommand")) {
+                const auto command=definition.at("providerCommand").get<std::string>();
+                shared.highlight=[this,pluginId,command](std::string_view source) {
+                    std::lock_guard lock(core_.mutex());
+                    return pluginSyntaxTokens(core_.plugins().invoke(pluginId,command,{{"text",std::string(source)}}));
+                };
+            }
+            pluginSyntax_[key]=cyui::registerCodeLanguage(shared);
+        } catch (const std::exception &e) { serviceLogs_.append(cyui::LogLevel::error,e.what(),"Plugin syntax"); }
+#else
         auto language=makePluginLanguage(definition);
         const auto key=plugin.at("id").get<std::string>()+"/"+definition.at("id").get<std::string>();
         for (const auto &ext : definition.at("extensions")) pluginExtensions_[ext.get<std::string>()]=key;
         pluginLanguages_.emplace(key,std::move(language));
+#endif
     }
 }
 void Reader::startSdk() {
     if (sdk_.valid() && sdk_.wait_for(std::chrono::seconds(0))!=std::future_status::ready) return;
     if (sdk_.valid()) sdk_.get();sdkStop_=false;sdkError_.clear();
+    serviceLogs_.append(cyui::LogLevel::info,"Starting CyToolsCore SDK service","CyToolsCore");
     try {
         if (!bridge_) {
 #ifdef _WIN32
@@ -51,28 +69,42 @@ void Reader::startSdk() {
         if (!std::filesystem::is_regular_file(script)) throw std::runtime_error("Reader SDK app/tool.py is missing");
         std::vector<std::string> argv={pathUtf8(python_),pathUtf8(script),"--desktop-service","--native-descriptor",pathUtf8(bridge_->descriptor()),"--service-descriptor",pathUtf8(sdkDescriptor_),"--data-dir",pathUtf8(sdkDescriptor_.parent_path()/"jobs")};
         sdk_=std::async(std::launch::async,[this,argv] { return runProcess(argv,options_.installation,std::chrono::hours(24),256*1024,&sdkStop_); });
-    } catch (const std::exception &e) { sdkError_=e.what(); }
+    } catch (const std::exception &e) { sdkError_=e.what();serviceLogs_.append(cyui::LogLevel::error,sdkError_,"CyToolsCore"); }
 }
 void Reader::extensionPanels() {
     if (searchPanel_) {
-        const bool visible=ImGui::Begin(tr("Search open documents"),&searchPanel_);
+        const bool visible=ImGui::Begin((std::string(tr("Search open documents"))+"###reader-search").c_str(),&searchPanel_);
         if (visible) {
             ImGui::InputText(tr("Search text"),&searchQuery_);
-            ImGui::BeginDisabled(searchQuery_.empty());if (cyui::primaryButton(tr("Find all"))) searchMatches_=core_.dispatch("search.openDocuments",{{"query",searchQuery_}});ImGui::EndDisabled();
-            for (const auto &match : searchMatches_.value("matches",Json::array())) {
-                const auto tab=find(match.at("id"));if (!tab) continue;
-                const auto label=pathUtf8(tab->document.path().filename())+":"+std::to_string(match.at("line").get<int>())+":"+std::to_string(match.at("column").get<int>());
-                ImGui::PushID(static_cast<int>(tab->id));ImGui::PushID(static_cast<int>(match.at("offset").get<size_t>()));
-                if (ImGui::Selectable(label.c_str())) {
-                    if (match.at("revision")!=tab->live->revision) { searchMatches_=Json::object();ImGui::PopID();ImGui::PopID();break; }
-                    active_=tab->id;tab->focus=true;tab->editor.SetCursor({match.at("line").get<size_t>()-1,0});
-                }ImGui::PopID();ImGui::PopID();
+            ImGui::BeginDisabled(searchQuery_.empty());
+            if (cyui::primaryButton(tr("Find all"))) {
+                searchMatches_=core_.dispatch("search.openDocuments",{{"query",searchQuery_}});
+                searchRows_.clear();searchNavigation_.clear();
+                for (const auto &match : searchMatches_.value("matches",Json::array())) {
+                    const auto tab=find(match.at("id"));if (!tab) continue;
+                    const auto id=uiId("search/"+std::to_string(tab->id)+"/"+match.at("revision").dump()+"/"+match.at("offset").dump());
+                    const auto source=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path());
+                    searchRows_.push_back({id,cyui::LogLevel::info,source,searchQuery_,match.at("line"),match.at("column")});
+                    searchNavigation_.emplace(id,match);
+                }
+            }ImGui::EndDisabled();
+            if (searchMatches_.value("truncated",false)) cyui::callout(cyui::Tone::warning,tr("Search results limited to 2000 matches."));
+            const auto request=cyui::diagnosticList("##reader-search-results",searchRows_,{0,0});
+            if (searchNavigation_.contains(request)) {
+                const auto &match=searchNavigation_.at(request);const auto tab=find(match.at("id"));
+                if (tab && match.at("revision")==tab->live->revision) {
+                    const auto &text=tab->document.text();const auto end=match.at("offset").get<size_t>();
+                    const auto line=text.rfind('\n',end);size_t glyphs=0;
+                    for (size_t byte=line==std::string::npos ? 0 : line+1;byte<end;++byte)
+                        if ((static_cast<unsigned char>(text[byte])&0xc0)!=0x80) ++glyphs;
+                    active_=tab->id;tab->focus=true;tab->editor.SetCursor({match.at("line").get<size_t>()-1,glyphs});
+                } else { searchMatches_=Json::object();searchRows_.clear();searchNavigation_.clear(); }
             }
         }ImGui::End();
     }
-    if (sdk_.valid() && sdk_.wait_for(std::chrono::seconds(0))==std::future_status::ready) { const auto result=sdk_.get();sdkError_=result.output.empty() ? tr("The Reader SDK service stopped.") : result.output; }
+    if (sdk_.valid() && sdk_.wait_for(std::chrono::seconds(0))==std::future_status::ready) { const auto result=sdk_.get();sdkError_=result.output.empty() ? tr("The Reader SDK service stopped.") : result.output;serviceLogs_.append(cyui::LogLevel::error,sdkError_,"CyToolsCore"); }
     if (pluginsPanel_) {
-        const bool visible=ImGui::Begin(tr("Extensions"),&pluginsPanel_);
+        const bool visible=ImGui::Begin((std::string(tr("Extensions"))+"###reader-plugins").c_str(),&pluginsPanel_);
         if (visible) {
             const auto state=core_.plugins().describe();
             cyui::textDim("%s",tr("Plugins load at startup. Restart Reader after changing manifests or libraries."));
@@ -82,25 +114,25 @@ void Reader::extensionPanels() {
                 if (ImGui::CollapsingHeader(plugin.at("name").get_ref<const std::string&>().c_str(),ImGuiTreeNodeFlags_DefaultOpen)) {
                     cyui::textDim("%s | %s",plugin.at("id").get_ref<const std::string&>().c_str(),plugin.at("version").get_ref<const std::string&>().c_str());
                     for (const auto &command : plugin.at("commands")) {
+                        if (command.value("kind","")=="syntax") continue;
                         ImGui::BeginDisabled(!active() || active()->editor.IsReadOnlyEnabled());
                         if (cyui::button(command.at("title").get_ref<const std::string&>().c_str())) execute("plugin",{{"plugin",plugin.at("id")},{"command",command.at("id")}});
                         ImGui::EndDisabled();
                     }
-                    if (cyui::beginProperties("##plugin-options",cyui::dp(160))) {
-                        for (const auto &definition : plugin.at("optionDefinitions")) {
-                            const auto key=definition.at("id").get<std::string>();auto value=plugin.at("options").at(key);bool changed=false;
-                            cyui::property(key.c_str());ImGui::PushID(key.c_str());
-                            if (value.is_boolean()) { auto typed=value.get<bool>();changed=ImGui::Checkbox("##value",&typed);value=typed; }
-                            else if (value.is_number_integer()) { auto typed=value.get<int>();changed=ImGui::InputInt("##value",&typed);value=typed; }
-                            else if (value.is_string()) { auto typed=value.get<std::string>();changed=ImGui::InputText("##value",&typed);value=typed; }
-                            if (changed && (!value.is_string() || value.get_ref<const std::string&>().size()<=4096)) core_.plugins().configure(plugin.at("id"),{{key,value}});ImGui::PopID();
-                        }cyui::endProperties();
-                    }
+                    const auto pluginId=plugin.at("id").get<std::string>();
+                    auto &view=pluginOptions_[pluginId];view.synchronize(plugin);
+                    const auto edits=cyui::inspector("##plugin-options",view.state,view.properties,view.revision,
+                        [&](auto id,const auto &value) { return view.validate(id,value); });
+                    view.commit(core_.plugins(),pluginId,edits);
                     for (const auto &language : plugin.at("languages")) cyui::textDim("%s",language.at("name").get_ref<const std::string&>().c_str());
                 }ImGui::PopID();
             }
             for (const auto &issue : state.at("errors")) cyui::callout(cyui::Tone::warning,issue.dump().c_str());
-            if (!pluginResult_.empty()) { ImGui::Separator();ImGui::InputTextMultiline("##plugin-result",&pluginResult_,ImVec2(-1,cyui::dp(120)),ImGuiInputTextFlags_ReadOnly); }
+            if (!pluginResult_.empty()) {
+                ImGui::Separator();
+                if (cyui::button(tr("Copy result"))) ImGui::SetClipboardText(pluginResult_.c_str());
+                pluginOutput_.draw("##plugin-result",cyui::dp(0,180));
+            }
         }ImGui::End();
     }
     if (mcpPanel_) {
@@ -108,7 +140,7 @@ void Reader::extensionPanels() {
         if (visible) {
             const bool ready=sdk_.valid() && !sdkDescriptor_.empty() && std::filesystem::is_regular_file(sdkDescriptor_);
             cyui::badge(tr(ready ? "SDK service ready" : "SDK service unavailable"),ready ? cyui::Tone::success : cyui::Tone::warning);
-            if (!sdkError_.empty()) { auto message=sdkError_;ImGui::InputTextMultiline("##sdk-error",&message,ImVec2(-1,cyui::dp(100)),ImGuiInputTextFlags_ReadOnly); }
+
             if (cyui::button(tr("Start SDK service"))) startSdk();
             ImGui::BeginDisabled(!ready);
             for (bool edit : {false,true}) if (cyui::button(tr(edit ? "Copy editing MCP configuration" : "Copy read-only MCP configuration"))) {
@@ -116,15 +148,37 @@ void Reader::extensionPanels() {
                 ImGui::SetClipboardText(config.dump(2).c_str());
             }ImGui::EndDisabled();
             cyui::textDim("%s",tr("The read identity cannot edit files or execute plugins. Saving remains explicit."));
+            if (cyui::button(tr("Copy logs"))) {
+                std::vector<cyui::LogEntry> rows;serviceLogs_.snapshot(rows,0);std::string text;
+                for (const auto &row : rows) text+=row.text+"\n";
+                ImGui::SetClipboardText(text.c_str());
+            }ImGui::SameLine();if (cyui::button(tr("Clear logs"))) serviceLogs_.clear();
+            cyui::logView("##reader-service-log",serviceLogState_,serviceLogs_,{0,0});
         }ImGui::End();
     }
     if (optionsPanel_) {
-        const bool visible=ImGui::Begin(tr("Options"),&optionsPanel_);
-        if (visible && cyui::beginProperties("##reader-options",cyui::dp(140))) {
-            cyui::property(tr("Language"));if (ImGui::Button(locale_=="en" ? "English" : "Français")) locale_=locale_=="en" ? "fr" : "en";
-            cyui::property(tr("Theme"));if (ImGui::BeginCombo("##theme",theme_.c_str())) { for (const auto *key : {"graphite","mid-grey","light-grey","amber-night","violet","navy"}) if (ImGui::Selectable(key,theme_==key)) { theme_=key;applyEditorTheme(theme_); }ImGui::EndCombo(); }
-            cyui::property(tr("Text size"));if (ImGui::SliderFloat("##scale",&textScale_,.8f,2.f,"%.2f")) ImGui::GetStyle().FontScaleMain=textScale_;
-            cyui::endProperties();
+        const bool visible=ImGui::Begin((std::string(tr("Options"))+"###reader-options").c_str(),&optionsPanel_);
+        if (visible) {
+            const Json current={{"language",locale_},{"theme",theme_},{"density",density_},{"scale",textScale_}};
+            if (optionsModel_!=current) { optionsModel_=current;++optionsRevision_; }
+            std::vector<cyui::Property> properties;
+            auto choice=[&](const char *key,const char *label,std::string value,std::vector<std::string> choices) {
+                cyui::Property property;property.id=uiId(std::string("options/")+key);property.label=tr(label);
+                property.value=std::move(value);property.choices=std::move(choices);properties.push_back(std::move(property));
+            };
+            choice("language","Language",locale_,{"en","fr"});
+            choice("theme","Theme",theme_,{"graphite","mid-grey","light-grey","amber-night","violet","navy"});
+            choice("density","Density",density_,{"compact","comfortable"});
+            cyui::Property scale;scale.id=uiId("options/scale");scale.label=tr("Text size");scale.value=double(textScale_);
+            scale.bounded=true;scale.minimum=.8;scale.maximum=2.;properties.push_back(scale);
+            for (const auto &proposal : cyui::inspector("##reader-options",optionsState_,properties,optionsRevision_)) {
+                if (!proposal.edit.committed()) continue;
+                if (proposal.id==uiId("options/language")) locale_=std::get<std::string>(proposal.edit.value);
+                else if (proposal.id==uiId("options/theme")) theme_=std::get<std::string>(proposal.edit.value);
+                else if (proposal.id==uiId("options/density")) density_=std::get<std::string>(proposal.edit.value);
+                else if (proposal.id==uiId("options/scale")) textScale_=float(std::clamp(std::get<double>(proposal.edit.value),.8,2.));
+                applyAppearance();
+            }
             if (ImGui::CollapsingHeader(tr("Licenses"))) {
                 std::error_code ec;for (const auto &file : std::filesystem::directory_iterator(options_.installation/"licenses",ec)) {
                     if (file.path().extension()!=".txt") continue;

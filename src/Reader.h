@@ -3,7 +3,11 @@
 #include "Core.h"
 #include "Bridge.h"
 #include "NativeProcess.h"
+#include "ModuleModels.h"
 #include "cycode/Syntax.h"
+#include <cyui/modules/CodeEditor.h>
+#include <cyui/modules/Commands.h>
+#include <cyui/modules/Diagnostics.h>
 #include <TextEditor.h>
 #include <SDL3/SDL.h>
 #include <nlohmann/json.hpp>
@@ -32,11 +36,12 @@ class Reader {
     Json state() const;
   private:
     struct Tab {
-        explicit Tab(std::shared_ptr<LiveDocument> entry) : live(std::move(entry)),document(live->document) {}
+        explicit Tab(std::shared_ptr<LiveDocument> entry) : live(std::move(entry)),document(live->document),editor(codeEditor.native()) {}
         std::shared_ptr<LiveDocument> live;
         Document &document;
         size_t id=0;
-        TextEditor editor;
+        cyui::CodeEditor codeEditor;
+        TextEditor &editor; // Advanced native hooks use the same common editor instance.
         Syntax syntax;
         std::string syntaxPath;
         std::string language="auto";
@@ -78,6 +83,7 @@ class Reader {
     void documents();
     void dialogs();
     void extensionPanels();
+    void applyAppearance();
     void startSdk();
     void nativeAction(const std::string &method,Json params=Json::object());
     void preparePluginLanguages();
@@ -97,6 +103,19 @@ class Reader {
     std::string searchQuery_;
     std::string openEncoding_="auto";
     Json searchMatches_=Json::object();
+    std::vector<cyui::Diagnostic> searchRows_;
+    std::map<cyui::ItemId,Json> searchNavigation_;
+    std::map<std::string,PluginOptionsView> pluginOptions_;
+    cyui::CommandState commandState_;
+    cyui::InspectorState optionsState_;
+    Json optionsModel_;
+    uint64_t optionsRevision_=0;
+    cyui::LogBuffer serviceLogs_{2000,512*1024};
+    cyui::LogState serviceLogState_;
+    cyui::CodeEditor pluginOutput_;
+#ifdef CYUI_CODE_LANGUAGE_CATALOGUE
+    std::map<std::string,cyui::CodeLanguage> pluginSyntax_;
+#endif
     std::map<std::string,std::unique_ptr<TextEditor::Language>> pluginLanguages_;
     std::map<std::string,std::string> pluginExtensions_;
     SDL_Window *window_;
@@ -112,6 +131,6 @@ class Reader {
     double pollAt_=0;
     int line_=1;
     ImGuiID dock_=0, editorDock_=0;
-    std::string theme_="graphite", locale_="en", lastError_, filter_, paletteQuery_;
+    std::string theme_="graphite", locale_="en", density_="compact", lastError_, filter_;
 };
 } // namespace cycode::reader

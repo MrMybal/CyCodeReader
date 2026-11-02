@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import tarfile
+import sys
 import urllib.request
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -30,6 +31,11 @@ def fetch(destination,core_only=False):
                 member.name=str(Path(*parts[1:]));package.extract(member,target,filter='data')
         marker.write_text(item['sha256'],encoding='utf-8')
         print(f'{key}: {item["revision"]}',flush=True)
+
+    if not core_only:
+        sys.path.insert(0, str(ROOT/'editor/scripts'))
+        from cyui_dependency import resolve
+        print(f'CyUI: {resolve(destination/"CyUI")}',flush=True)
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)

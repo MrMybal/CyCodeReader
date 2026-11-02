@@ -7,7 +7,10 @@ def prepare(source, destination):
         raise RuntimeError('Prepare the editor in a separate build directory')
     edits = {
         'TextEditor.h': [
-            ('if (line != std::prev(end()) || line->size()) {', 'if (line != std::prev(end())) {', 2),
+            # CyUI already fixes exact final-newline extraction in its bundled backend.
+            ('inline void SetPalette(const Palette& newPalette) { paletteBase = newPalette; paletteAlpha = -1.0f; }',
+             'inline void SetPalette(const Palette& newPalette) { paletteBase = newPalette; if (paletteTransform) paletteTransform(paletteBase); paletteAlpha = -1.0f; }\n\tvoid SetPaletteTransform(std::function<void(Palette&)> callback) { paletteTransform = std::move(callback); }'),
+            ('\tPalette paletteBase;', '\tPalette paletteBase;\n\tstd::function<void(Palette&)> paletteTransform;'),
             ('\tvoid SetLanguage(const Language* language);', '\tvoid SetLanguage(const Language* language);\n\tvoid SetSelections(const std::vector<DocSelection>& selections);\n\tvoid SetInputHandler(std::function<bool()> handler) { inputHandler = std::move(handler); }\n\tvoid SetResetHandler(std::function<void()> handler) { resetHandler = std::move(handler); }'),
             ('\tvoid SetLanguage(const Language* language);', '\tvoid SetLanguage(const Language* language);\n\tvoid CollapseUndoCursors(size_t firstTransaction);'),
             ('\t} colorizer;', '\t} colorizer;\n\tstd::function<bool()> inputHandler;\n\tstd::function<void()> resetHandler;'),
@@ -43,6 +46,22 @@ def prepare(source, destination):
              '\t\t\t\t// CyCode context tokenizer preserves the built-in comment/string state machine.\n\t\t\t\tif (language->contextTokenizer && (tokenEnd = language->contextTokenizer(Iterator(line.data()), tokenStart, lineEnd, color)) != tokenStart) {\n\t\t\t\t\tconst auto size = tokenEnd - tokenStart;\n\t\t\t\t\tsetColor(glyph, glyph + size, color); glyph += size;\n\t\t\t\t} else if (language->customTokenizer'),
         ],
     }
+    shared = 'SetSharedSyntaxTokens' in (source/'TextEditor.h').read_text('utf-8')
+    if shared:
+        import re
+        header = (source/'TextEditor.h').read_text('utf-8')
+        tail = re.search(r'(\t\t[^\n]+sharedAnsiWhite,)\n\t\tcount', header)
+        if not tail: raise RuntimeError('Shared CyUI editor palette anchor changed')
+        for i, entry in enumerate(edits['TextEditor.h']):
+            if entry[0] == '\t\tcurrentLineHighlightBorder,\n\t\tcount':
+                before=tail[0]
+                after=entry[1].replace('\t\tcurrentLineHighlightBorder,',tail[1])
+                edits['TextEditor.h'][i]=(before,after)
+        fallback='sharedSyntaxVersion == transactions.getVersion() && glyph.sharedSyntaxColor != Color::count ? glyph.sharedSyntaxColor : glyph.color'
+        for i, entry in enumerate(edits['TextEditor.cpp']):
+            if entry[0] == 'palette.get(glyph.color), codepoint);':
+                edits['TextEditor.cpp'][i]=('palette.get('+fallback+'), codepoint);',entry[1].replace(': glyph.color),',': '+fallback+'),'))
+        edits['TextEditor.cpp']=[entry for entry in edits['TextEditor.cpp'] if entry[0]!='#include <set>']
     destination.mkdir(parents=True, exist_ok=True)
     for name, replacements in edits.items():
         content = (source/name).read_text('utf-8')
@@ -130,6 +149,12 @@ void TextEditor::SetSyntaxTokens(const std::vector<SemanticToken>& tokens) {
 '''
         if name == 'TextEditor.h':
             content = content.replace('void SetSemanticTokens(const std::vector<SemanticToken>& tokens);', 'void SetSemanticTokens(const std::vector<SemanticToken>& tokens);\n\tvoid SetSyntaxTokens(const std::vector<SemanticToken>& tokens);')
+        if shared and name == 'TextEditor.cpp':
+            content=content.replace('syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : glyph.color;',
+                                    'syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : GetSharedSyntaxColor(position);',1)
+        if shared and name == 'TextEditor.cpp':
+            content=content.replace('syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : glyph.color;',
+                                    'syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : GetSharedSyntaxColor({token.line,i});')
         path = destination/name
         data = content.encode('utf-8')
         if not path.exists() or path.read_bytes() != data:
