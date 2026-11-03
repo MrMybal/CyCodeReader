@@ -15,6 +15,19 @@ Version 0.1.1 is the first public beta; see [release notes and known limits](Doc
 of the CyUI editor adapter, lexical/Tree-sitter overlays, icons, snippets and native file I/O.
 Changes to that library can benefit both applications without copying code.
 
+## Screenshots
+
+Views from CyCodeReader v0.1.1 using sample C++ documents. Select a preview to
+view the full-size image.
+
+[![Code editor with syntax highlighting, tabs and minimap](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/editor.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/editor.png)
+
+| Find and replace | Search across open documents |
+| :---: | :---: |
+| [![Dedicated find and replace window with minimap match markers](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/find-replace.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/find-replace.png) | [![Search results across open documents with a source preview](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/search-documents.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/search-documents.png) |
+| **Side-by-side comparison** | **Git history with inline diff** |
+| [![Side-by-side file comparison with syntax colors and inline changes](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/compare.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/compare.png) | [![File revision history and the selected commit diff](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/git-history.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/git-history.png) |
+
 ## Use
 
 Open several files from the command line, the multi-file dialog or drag and drop.
