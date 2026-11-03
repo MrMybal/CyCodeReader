@@ -1,4 +1,5 @@
 #include "Reader.h"
+#include "Branding.h"
 #include "LiveEditor.h"
 #include "ModuleModels.h"
 #include "cycode/EditorTheme.h"
@@ -142,11 +143,20 @@ static void logs() {
     buffer.clear();frame([&] { cyui::logView("SDK logs",state,buffer,cyui::dp(0,200)); });
     require(state.rows.empty(),"Clearing logs left stale rows");
 }
-int main() {
+int main(int argc,char **argv) {
     const auto directory=std::filesystem::temp_directory_path()/
         ("cyreader-modules-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
     ImGui::CreateContext();
     try {
+        require(argc==2,"Reader source path required for branding resources");
+        const auto logo=loadBrandSurface(utf8Path(argv[1]));
+        require(logo->w>0 && logo->w==logo->h,"Application logo must be square");
+        bool transparent=false,visible=false;
+        for (int y=0;y<logo->h;++y) for (int x=0;x<logo->w;++x) {
+            const auto alpha=static_cast<const unsigned char*>(logo->pixels)[y*logo->pitch+x*4+3];
+            transparent|=alpha==0;visible|=alpha>0;
+        }
+        require(transparent && visible,"Application logo alpha/content was lost");
         auto &io=ImGui::GetIO();io.IniFilename=nullptr;io.DisplaySize={1500,1100};io.DeltaTime=1.f/60;
         io.ConfigFlags|=ImGuiConfigFlags_DockingEnable;
         cyui::apply();cyui::loadFonts();unsigned char *pixels;int width,height;
@@ -154,7 +164,7 @@ int main() {
         commands();pluginOptions(directory/"plugins");editor();logs();
         // Draw the actual application views, with no SDL init or native OS window.
         for (const auto *theme : {"graphite","mid-grey","light-grey","amber-night","violet","navy"}) {
-            Reader reader({directory,{},theme,"en",true},nullptr);
+            Reader reader({directory,{},theme,"en",true,ImTextureID(4242)},nullptr);
             io.Fonts->GetTexDataAsRGBA32(&pixels,&width,&height);io.Fonts->SetTexID(ImTextureID(1));
             reader.execute("new");reader.testAction({{"command","setText"},{"text","UFUNCTION() void Trace();\n"}});
             reader.execute("undo");reader.execute("redo");

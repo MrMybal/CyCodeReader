@@ -7,6 +7,25 @@ cyui::ItemId uiId(const std::string &key) {
     for (unsigned char byte : key) { value ^= byte; value *= 1099511628211ull; }
     return value ? value : 1;
 }
+cyui::ItemId MenuModel::add(std::vector<cyui::FilterMenuItem> &into,const std::string &label,
+    const std::string &command,Json params,const std::string &shortcut,bool enabled,bool checked,const std::string &keywords) {
+    if (params.is_null()) params=Json::object();
+    const auto id=uiId("reader/menu/"+command+"/"+params.dump());
+    if (!actions.emplace(id,MenuAction{command,std::move(params),enabled}).second) throw std::runtime_error("Duplicate menu action identity");
+    into.push_back({id,label,shortcut,keywords,enabled,checked,{}});return id;
+}
+void cancelInspectorDrafts(cyui::InspectorState &state) {
+    for (auto &[id,draft] : state.drafts) if (draft.active) {
+        draft.value=draft.before;draft.active=false;draft.cancelled=true;draft.error.clear();
+    }
+}
+const std::vector<cyui::Diagnostic> &DiagnosticFilterView::rows(const std::vector<cyui::Diagnostic> &source,
+    uint64_t revision,const cyui::TextFilter &filter) {
+    if (revision_==revision && query_==filter.query && locale_==cyui::locale()) return rows_;
+    rows_.clear();
+    for (const auto &row : source) if (filter.matches(row.source,row.source+" "+row.message+" "+std::to_string(row.line)+" "+std::to_string(row.column))) rows_.push_back(row);
+    revision_=revision;query_=filter.query;locale_=cyui::locale();return rows_;
+}
 void PluginOptionsView::synchronize(const Json &plugin) {
     if (model == plugin) return;
     model = plugin; ++revision;

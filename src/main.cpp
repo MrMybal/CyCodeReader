@@ -1,4 +1,5 @@
 #include "Reader.h"
+#include "Branding.h"
 #include "cycode/Paths.h"
 #include <SDL3/SDL_opengl.h>
 #include <cyui/Core.h>
@@ -41,6 +42,9 @@ int main(int argc,char **argv) {
     SDL_Window *window=nullptr; SDL_GLContext context=nullptr;
     bool hidden=false, initialized=false; int frameLimit=0;
     std::filesystem::path installation,capture,report;
+    std::optional<reader::PreparedUpdate> pendingUpdate;
+    std::unique_ptr<reader::InstanceLock> instance;
+    std::unique_ptr<reader::Branding> branding;
     reader::Json script=reader::Json::array();
     try {
         reader::Options options;
@@ -66,6 +70,7 @@ int main(int argc,char **argv) {
         for (int depth=0; depth<6; ++depth) { if (std::filesystem::exists(base/"locales/ui.json")) { installation=base; break; } base=base.parent_path(); }
         if (installation.empty()) throw std::runtime_error("Cannot locate locales/ui.json beside CyCodeReader");
         options.installation=installation;
+        if (!options.automated) instance=std::make_unique<reader::InstanceLock>(reader::readerDataDirectory(installation),false,reader::distribution(installation)==reader::Distribution::installed);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,3); SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
 #ifdef __APPLE__
@@ -78,6 +83,7 @@ int main(int argc,char **argv) {
         if (!window) throw std::runtime_error(SDL_GetError());
         context=SDL_GL_CreateContext(window); if (!context) throw std::runtime_error(SDL_GetError());
         SDL_GL_MakeCurrent(window,context); SDL_GL_SetSwapInterval(options.automated ? 0 : 1);
+        branding=std::make_unique<reader::Branding>(installation);options.logo=branding->texture();
         IMGUI_CHECKVERSION(); ImGui::CreateContext();
         auto &io=ImGui::GetIO(); io.IniFilename=nullptr;
         io.ConfigFlags|=ImGuiConfigFlags_NavEnableKeyboard|ImGuiConfigFlags_DockingEnable|ImGuiConfigFlags_ViewportsEnable;
@@ -117,7 +123,7 @@ int main(int argc,char **argv) {
                 int width=0,height=0; SDL_GetWindowSizeInPixels(window,&width,&height); glViewport(0,0,width,height);
                 const auto ground=cyui::vec(cyui::palette().bg0); glClearColor(ground.x,ground.y,ground.z,1); glClear(GL_COLOR_BUFFER_BIT);
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-                ImGui::UpdatePlatformWindows(); ImGui::RenderPlatformWindowsDefault(); SDL_GL_MakeCurrent(window,context);
+                ImGui::UpdatePlatformWindows();branding->updateWindowIcons();ImGui::RenderPlatformWindowsDefault(); SDL_GL_MakeCurrent(window,context);
                 if (frameLimit && frame+1>=frameLimit) {
                     auto state=app.state(); int count=0; bool allHidden=true;
                     auto windows=SDL_GetWindows(&count); for (int i=0; i<count; ++i) allHidden&=bool(SDL_GetWindowFlags(windows[i])&SDL_WINDOW_HIDDEN); SDL_free(windows);
@@ -128,14 +134,18 @@ int main(int argc,char **argv) {
                 }
                 SDL_GL_SwapWindow(window); SDL_Delay(frameLimit ? 4 : 20);
             }
+            pendingUpdate=app.pendingUpdate();
         }
         ImGui::DestroyPlatformWindows(); ImGui_ImplOpenGL3_Shutdown(); ImGui_ImplSDL3_Shutdown(); ImGui::DestroyContext();
-        SDL_GL_DestroyContext(context); SDL_DestroyWindow(window); SDL_Quit(); return 0;
+        initialized=false;branding.reset();SDL_GL_DestroyContext(context);context=nullptr;SDL_DestroyWindow(window);window=nullptr;SDL_Quit();instance.reset();
+        if (pendingUpdate) reader::launchUpdate(*pendingUpdate);
+        return 0;
     } catch (const std::exception &exception) {
-        const auto path=(installation.empty() ? std::filesystem::current_path() : installation)/"data/reports/reader-startup-error.txt";
+        const auto path=(installation.empty() ? std::filesystem::current_path()/"data" : reader::readerDataDirectory(installation))/"reports/reader-startup-error.txt";
         std::error_code ec; std::filesystem::create_directories(path.parent_path(),ec); std::ofstream(path)<<exception.what();
         if (!frameLimit && !hidden) SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"CyCodeReader",exception.what(),window);
         if (initialized) { ImGui::DestroyPlatformWindows(); ImGui_ImplOpenGL3_Shutdown(); ImGui_ImplSDL3_Shutdown(); ImGui::DestroyContext(); }
+        if (context) SDL_GL_MakeCurrent(window,context);branding.reset();
         if (context) SDL_GL_DestroyContext(context); if (window) SDL_DestroyWindow(window); SDL_Quit(); return 1;
     }
 }

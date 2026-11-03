@@ -1,0 +1,6 @@
+{
+  "version": "@PROJECT_VERSION@",
+  "platform": "@CMAKE_SYSTEM_NAME@",
+  "architecture": "@CMAKE_GENERATOR_PLATFORM@",
+  "publicUpdates": "@CYCODE_READER_PUBLIC_UPDATES@"
+}

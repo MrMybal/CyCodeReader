@@ -18,5 +18,6 @@ ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesy
                          std::chrono::milliseconds timeout = std::chrono::seconds(15),
                          std::size_t maxOutput = 4 * 1024 * 1024,
                          const std::atomic<bool> *cancellation = nullptr,
-                         const std::map<std::string,std::string> &environment = {});
+                         const std::map<std::string,std::string> &environment = {},
+                         const std::vector<std::string> &removeEnvironment = {});
 } // namespace cycode

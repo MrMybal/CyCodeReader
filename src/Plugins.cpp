@@ -50,7 +50,7 @@ std::string transformText(const std::string &text,const std::string &operation) 
     } else throw std::runtime_error("Unknown text transformation");
     validateEditorText(result);return result;
 }
-Plugins::~Plugins() { for (const auto &[id,p] : plugins_) release(p.library); }
+Plugins::~Plugins()=default;
 void Plugins::load(const std::filesystem::path &directory) {
     if (!plugins_.empty() || !errors_.empty()) throw std::runtime_error("Plugin reload requires restarting Reader");
     if (!std::filesystem::exists(directory)) return;
@@ -69,7 +69,19 @@ void Plugins::load(const std::filesystem::path &directory) {
             std::set<std::string> names;
             for (const auto &command : commands) if (!identifier(command.at("id")) || !names.insert(command.at("id")).second || command.at("title").get<std::string>().size()>256) throw std::runtime_error("Invalid plugin command");
             const auto commandNames=names;
-            for (const auto &command : commands) if (command.contains("kind") && command.at("kind")!="syntax") throw std::runtime_error("Unknown plugin command kind");
+            for (const auto &command : commands) if (command.contains("kind") && command.at("kind")!="syntax" && command.at("kind")!="service") throw std::runtime_error("Unknown plugin command kind");
+            if (p.manifest.contains("fileComparisons")) {
+                const auto &provider=p.manifest.at("fileComparisons");
+                const auto declaredService=[&](const std::string &name) { return std::any_of(commands.begin(),commands.end(),[&](const auto &c) { return c.at("id")==name && c.value("kind","")=="service"; }); };
+                if (!p.manifest.contains("library") || !provider.is_object() || provider.at("menu").get<std::string>().empty() || provider.at("menu").get_ref<const std::string&>().size()>64 || !declaredService(provider.at("detect"))) throw std::runtime_error("Invalid file comparison provider");
+                const auto &actions=provider.at("actions");if (!actions.is_array() || actions.empty() || actions.size()>16) throw std::runtime_error("Invalid file comparison actions");
+                if (provider.contains("history")) {
+                    const auto &history=provider.at("history");if (!history.is_object()) throw std::runtime_error("Invalid file history provider");
+                    for (const auto *key : {"file","selection","compare"}) if (!history.contains(key) || !history.at(key).is_string() || !declaredService(history.at(key))) throw std::runtime_error("Invalid file history command");
+                }
+                std::set<std::string> actionIds;
+                for (const auto &action : actions) if (!declaredService(action.at("command")) || !actionIds.insert(action.at("command")).second || action.at("title").get<std::string>().empty() || action.at("title").get_ref<const std::string&>().size()>128) throw std::runtime_error("Invalid file comparison action");
+            }
             names.clear();for (const auto &language : languages) {
                 if (!identifier(language.at("id")) || !names.insert(language.at("id")).second || language.at("name").get<std::string>().empty() || language.at("name").get<std::string>().size()>128) throw std::runtime_error("Invalid plugin language");
                 const auto extensions=language.at("extensions");if (!extensions.is_array() || extensions.empty() || extensions.size()>32) throw std::runtime_error("Invalid language extensions");
@@ -92,29 +104,36 @@ void Plugins::load(const std::filesystem::path &directory) {
 #endif
                 if (file.parent_path()!=std::filesystem::weakly_canonical(directory)) throw std::runtime_error("Plugin library escapes plugin directory");
 #ifdef _WIN32
-                p.library=LoadLibraryExW(file.c_str(),nullptr,LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR|LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
-                auto init=p.library ? reinterpret_cast<CyCodeReaderPluginEntry>(GetProcAddress(static_cast<HMODULE>(p.library),"cycodereader_plugin_v1")) : nullptr;
+                p.library=std::shared_ptr<void>(LoadLibraryExW(file.c_str(),nullptr,LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR|LOAD_LIBRARY_SEARCH_DEFAULT_DIRS),release);
+                auto init=p.library ? reinterpret_cast<CyCodeReaderPluginEntry>(GetProcAddress(static_cast<HMODULE>(p.library.get()),"cycodereader_plugin_v1")) : nullptr;
 #else
-                p.library=dlopen(file.c_str(),RTLD_NOW|RTLD_LOCAL);auto init=p.library ? reinterpret_cast<CyCodeReaderPluginEntry>(dlsym(p.library,"cycodereader_plugin_v1")) : nullptr;
+                p.library=std::shared_ptr<void>(dlopen(file.c_str(),RTLD_NOW|RTLD_LOCAL),release);auto init=p.library ? reinterpret_cast<CyCodeReaderPluginEntry>(dlsym(p.library.get(),"cycodereader_plugin_v1")) : nullptr;
 #endif
                 p.api=init ? init() : nullptr;
                 if (!p.api || p.api->abi!=CYCODE_READER_PLUGIN_ABI || p.api->size<sizeof(CyCodeReaderPluginV1) || !p.api->execute) throw std::runtime_error("Invalid plugin library/API");
             }
             plugins_.emplace(id,std::move(p));
-        } catch (const std::exception &e) { release(p.library);errors_.push_back({{"manifest",pathUtf8(entry.path().filename())},{"error",e.what()}}); }
+        } catch (const std::exception &e) { errors_.push_back({{"manifest",pathUtf8(entry.path().filename())},{"error",e.what()}}); }
     }
 }
 Json Plugins::describe() const {
-    Json items=Json::array();for (const auto &[id,p] : plugins_) items.push_back({{"id",id},{"name",p.manifest.value("name",id)},{"version",p.manifest.value("version","")},{"commands",p.manifest.value("commands",Json::array())},{"languages",p.manifest.value("languages",Json::array())},{"optionDefinitions",p.manifest.value("options",Json::array())},{"options",p.options},{"native",p.api!=nullptr}});
+    Json items=Json::array();for (const auto &[id,p] : plugins_) items.push_back({{"id",id},{"name",p.manifest.value("name",id)},{"version",p.manifest.value("version","")},{"commands",p.manifest.value("commands",Json::array())},{"languages",p.manifest.value("languages",Json::array())},{"optionDefinitions",p.manifest.value("options",Json::array())},{"options",p.options},{"native",p.api!=nullptr},{"fileComparisons",p.manifest.value("fileComparisons",Json::object())}});
     return {{"plugins",items},{"errors",errors_}};
 }
 Json Plugins::configure(const std::string &id,const Json &options) { auto &p=plugins_.at(id);validateOptions(p.manifest.value("options",Json::array()),options);p.options.update(options);return describe(); }
 Json Plugins::invoke(const std::string &id,const std::string &command,const Json &input) {
-    auto &p=plugins_.at(id);const auto commands=p.manifest.value("commands",Json::array());auto found=std::find_if(commands.begin(),commands.end(),[&](const auto &c) { return c.at("id")==command; });if (found==commands.end()) throw std::runtime_error("Unknown plugin command");
-    if (found->contains("operation")) return {{"text",transformText(input.at("text"),found->at("operation"))}};
+    return prepare(id,command,input)();
+}
+std::function<Json()> Plugins::prepare(const std::string &id,const std::string &command,const Json &input) const {
+    const auto &p=plugins_.at(id);const auto commands=p.manifest.value("commands",Json::array());auto found=std::find_if(commands.begin(),commands.end(),[&](const auto &c) { return c.at("id")==command; });if (found==commands.end()) throw std::runtime_error("Unknown plugin command");
+    if (found->contains("operation")) return [input,operation=found->at("operation").get<std::string>()] { return Json{{"text",transformText(input.at("text"),operation)}}; };
     if (!p.api) throw std::runtime_error("This command requires a native plugin library");
-    auto payload=input;payload["options"]=p.options;const auto serialized=payload.dump();const char *reply=p.api->execute(command.c_str(),serialized.c_str());if (!reply) throw std::runtime_error("Plugin returned no result");
+    auto payload=input;payload["options"]=p.options;const auto serialized=payload.dump();
+    return [library=p.library,api=p.api,execution=p.execution,serialized,command] {
+    std::lock_guard lock(*execution);
+    const char *reply=api->execute(command.c_str(),serialized.c_str());if (!reply) throw std::runtime_error("Plugin returned no result");
     size_t length=0;while (length<=8*1024*1024 && reply[length]) ++length;if (length>8*1024*1024) throw std::runtime_error("Plugin response exceeds 8 MiB");
     auto result=Json::parse(reply,reply+length);if (!result.is_object()) throw std::runtime_error("Plugin response must be an object");if (result.contains("text")) validateEditorText(result.at("text"));return result;
+    };
 }
 }

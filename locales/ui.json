@@ -101,7 +101,7 @@
   },
   "Find next": {
     "en": "Find next",
-    "fr": "Occurrence suivante"
+    "fr": "Résultat suivant"
   },
   "GLSL": {
     "en": "GLSL",
@@ -329,7 +329,7 @@
   },
   "Syntax": {
     "en": "Syntax",
-    "fr": "Coloration"
+    "fr": "Syntaxe"
   },
   "Text size": {
     "en": "Text size",
@@ -427,8 +427,628 @@
     "en": "Search results limited to 2000 matches.",
     "fr": "Resultats limites a 2000 correspondances."
   },
+  "Filter search results...": {
+    "en": "Filter search results...",
+    "fr": "Filtrer les résultats..."
+  },
+  "No matching results": {
+    "en": "No matching results",
+    "fr": "Aucun résultat ne correspond"
+  },
+  "No matching files": {
+    "en": "No matching files",
+    "fr": "Aucun fichier ne correspond"
+  },
+  "No matching extensions": {
+    "en": "No matching extensions",
+    "fr": "Aucune extension ne correspond"
+  },
+  "Increase text size": {
+    "en": "Increase text size",
+    "fr": "Agrandir le texte"
+  },
+  "Decrease text size": {
+    "en": "Decrease text size",
+    "fr": "Réduire le texte"
+  },
+  "Reset text size": {
+    "en": "Reset text size",
+    "fr": "Réinitialiser la taille du texte"
+  },
+  "Other syntaxes": {
+    "en": "Other syntaxes",
+    "fr": "Autres syntaxes"
+  },
   "CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.": {
     "en": "CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.",
     "fr": "CyCodeReader : GPL-3.0-only. Copyright (c) 2026 Cyberalien. Ce programme est fourni sans aucune garantie. Voir LICENSE et COPYRIGHT."
+  },
+  "Updates": {
+    "en": "Updates",
+    "fr": "Mises à jour"
+  },
+  "CyCodeReader updates": {
+    "en": "CyCodeReader updates",
+    "fr": "Mises à jour de CyCodeReader"
+  },
+  "Current version:": {
+    "en": "Current version:",
+    "fr": "Version actuelle :"
+  },
+  "Portable edition": {
+    "en": "Portable edition",
+    "fr": "Version portable"
+  },
+  "Installed edition": {
+    "en": "Installed edition",
+    "fr": "Version installée"
+  },
+  "Development build": {
+    "en": "Development build",
+    "fr": "Version de développement"
+  },
+  "Updates are prepared for the public repository. Online checks are disabled in this build.": {
+    "en": "Updates are prepared for the public repository. Online checks are disabled in this build.",
+    "fr": "Les mises à jour sont préparées pour le dépôt public. Les vérifications en ligne sont désactivées dans cette version."
+  },
+  "Use an installed or portable release to enable updates.": {
+    "en": "Use an installed or portable release to enable updates.",
+    "fr": "Utilisez une version installée ou portable pour activer les mises à jour."
+  },
+  "Check for updates at startup": {
+    "en": "Check for updates at startup",
+    "fr": "Vérifier les mises à jour au démarrage"
+  },
+  "Check for updates": {
+    "en": "Check for updates",
+    "fr": "Vérifier les mises à jour"
+  },
+  "Checking for updates...": {
+    "en": "Checking for updates...",
+    "fr": "Recherche de mises à jour..."
+  },
+  "A new version is available.": {
+    "en": "A new version is available.",
+    "fr": "Une nouvelle version est disponible."
+  },
+  "You have the latest version.": {
+    "en": "You have the latest version.",
+    "fr": "Vous disposez de la dernière version."
+  },
+  "Update downloaded and verified.": {
+    "en": "Update downloaded and verified.",
+    "fr": "Mise à jour téléchargée et vérifiée."
+  },
+  "Downloading update...": {
+    "en": "Downloading update...",
+    "fr": "Téléchargement de la mise à jour..."
+  },
+  "Cancel download / check": {
+    "en": "Cancel download / check",
+    "fr": "Annuler le téléchargement / la vérification"
+  },
+  "Download update": {
+    "en": "Download update",
+    "fr": "Télécharger la mise à jour"
+  },
+  "Close and install update": {
+    "en": "Close and install update",
+    "fr": "Fermer et installer la mise à jour"
+  },
+  "Reader will close normally before updating. Save prompts remain active. Close other instances using this copy.": {
+    "en": "Reader will close normally before updating. Save prompts remain active. Close other instances using this copy.",
+    "fr": "Reader se fermera normalement avant la mise à jour, avec confirmation des modifications non enregistrées. Fermez les autres instances utilisant cette copie."
+  },
+  "No public release is available yet. Updates will work when the repository and its releases are public.": {
+    "en": "No public release is available yet. Updates will work when the repository and its releases are public.",
+    "fr": "Aucune version publique disponible. Les mises à jour fonctionneront lorsque le dépôt et ses versions seront publics."
+  },
+  "Public GitHub access is unavailable or rate limited. Retry later.": {
+    "en": "Public GitHub access is unavailable or rate limited. Retry later.",
+    "fr": "L’accès public à GitHub est indisponible ou limité. Réessayez plus tard."
+  },
+  "Update cancelled": {
+    "en": "Update cancelled",
+    "fr": "Mise à jour annulée"
+  },
+  "GitHub update connection failed": {
+    "en": "GitHub update connection failed",
+    "fr": "Échec de connexion à GitHub pour les mises à jour"
+  },
+  "Update download interrupted": {
+    "en": "Update download interrupted",
+    "fr": "Téléchargement de la mise à jour interrompu"
+  },
+  "Update SHA-256 or size verification failed": {
+    "en": "Update SHA-256 or size verification failed",
+    "fr": "Échec de la vérification SHA-256 ou de la taille de la mise à jour"
+  },
+  "Application updates currently require Windows x64": {
+    "en": "Application updates currently require Windows x64",
+    "fr": "Les mises à jour de l’application nécessitent actuellement Windows x64"
+  },
+  "Public updates are not enabled in this preparation build": {
+    "en": "Public updates are not enabled in this preparation build",
+    "fr": "Les mises à jour publiques ne sont pas activées dans cette version de préparation"
+  },
+  "This release does not contain exactly one compatible Windows x64 package": {
+    "en": "This release does not contain exactly one compatible Windows x64 package",
+    "fr": "Cette version ne contient pas un paquet Windows x64 compatible unique"
+  },
+  "Release asset has no valid GitHub SHA-256 digest": {
+    "en": "Release asset has no valid GitHub SHA-256 digest",
+    "fr": "Le fichier de version ne possède pas d’empreinte SHA-256 GitHub valide"
+  },
+  "Compare": {
+    "en": "Compare",
+    "fr": "Comparer"
+  },
+  "Compare files": {
+    "en": "Compare files",
+    "fr": "Comparer des fichiers"
+  },
+  "Comparison": {
+    "en": "Comparison",
+    "fr": "Comparaison"
+  },
+  "Select for comparison": {
+    "en": "Select for comparison",
+    "fr": "Sélectionner pour comparaison"
+  },
+  "Compare with selected tab": {
+    "en": "Compare with selected tab",
+    "fr": "Comparer avec l’onglet sélectionné"
+  },
+  "Compare with saved version": {
+    "en": "Compare with saved version",
+    "fr": "Comparer avec la version enregistrée"
+  },
+  "Compare with file...": {
+    "en": "Compare with file...",
+    "fr": "Comparer avec un fichier..."
+  },
+  "Compare buffer with HEAD": {
+    "en": "Compare buffer with HEAD",
+    "fr": "Comparer le tampon avec HEAD"
+  },
+  "Compare buffer with Git index": {
+    "en": "Compare buffer with Git index",
+    "fr": "Comparer le tampon avec l’index Git"
+  },
+  "Compare staged changes (HEAD to index)": {
+    "en": "Compare staged changes (HEAD to index)",
+    "fr": "Comparer les changements préparés (HEAD vers index)"
+  },
+  "Refresh repository status": {
+    "en": "Refresh repository status",
+    "fr": "Actualiser l’état du dépôt"
+  },
+  "Detecting repository...": {
+    "en": "Detecting repository...",
+    "fr": "Détection du dépôt..."
+  },
+  "Left document": {
+    "en": "Left document",
+    "fr": "Document de gauche"
+  },
+  "Right document": {
+    "en": "Right document",
+    "fr": "Document de droite"
+  },
+  "Choose a document": {
+    "en": "Choose a document",
+    "fr": "Choisir un document"
+  },
+  "Refresh comparison": {
+    "en": "Refresh comparison",
+    "fr": "Actualiser la comparaison"
+  },
+  "Last saved version": {
+    "en": "Last saved version",
+    "fr": "Dernière version enregistrée"
+  },
+  "Current buffer": {
+    "en": "Current buffer",
+    "fr": "Tampon actuel"
+  },
+  "Git index": {
+    "en": "Git index",
+    "fr": "Index Git"
+  },
+  "Detached HEAD": {
+    "en": "Detached HEAD",
+    "fr": "HEAD détachée"
+  },
+  "No text differences": {
+    "en": "No text differences",
+    "fr": "Aucune différence de texte"
+  },
+  "Previous change": {
+    "en": "Previous change",
+    "fr": "Différence précédente"
+  },
+  "Next change": {
+    "en": "Next change",
+    "fr": "Différence suivante"
+  },
+  "Side by side": {
+    "en": "Side by side",
+    "fr": "Côte à côte"
+  },
+  "Comparison snapshot is outdated. Refresh to include current changes.": {
+    "en": "Comparison snapshot is outdated. Refresh to include current changes.",
+    "fr": "Cette comparaison n’est plus à jour. Actualisez-la pour inclure les changements actuels."
+  },
+  "Large comparison: difference grouping is approximate.": {
+    "en": "Large comparison: difference grouping is approximate.",
+    "fr": "Comparaison volumineuse : le regroupement des différences est approximatif."
+  },
+  "Choose two open documents, compare with a file, or use a repository menu.": {
+    "en": "Choose two open documents, compare with a file, or use a repository menu.",
+    "fr": "Choisissez deux documents ouverts, comparez avec un fichier ou utilisez le menu du dépôt."
+  },
+  "Loading comparison...": {
+    "en": "Loading comparison...",
+    "fr": "Chargement de la comparaison..."
+  },
+  "Document selected for comparison": {
+    "en": "Document selected for comparison",
+    "fr": "Document sélectionné pour comparaison"
+  },
+  "Untracked file; missing Git versions are empty": {
+    "en": "Untracked file; missing Git versions are empty",
+    "fr": "Fichier non suivi ; les versions Git absentes sont vides"
+  },
+  "Git index has unresolved conflicts": {
+    "en": "Git index has unresolved conflicts",
+    "fr": "L’index Git contient des conflits non résolus"
+  },
+  "Save this document before using Git comparisons": {
+    "en": "Save this document before using Git comparisons",
+    "fr": "Enregistrez ce document avant d’utiliser les comparaisons Git"
+  },
+  "This file is not in a Git working tree": {
+    "en": "This file is not in a Git working tree",
+    "fr": "Ce fichier n’appartient pas à un dépôt de travail Git"
+  },
+  "Git could not inspect this file. Check repository access and Git ownership settings.": {
+    "en": "Git could not inspect this file. Check repository access and Git ownership settings.",
+    "fr": "Git ne peut pas analyser ce fichier. Vérifiez les droits d’accès et les réglages de propriétaire du dépôt."
+  },
+  "Git is not installed or is not available in PATH": {
+    "en": "Git is not installed or is not available in PATH",
+    "fr": "Git n’est pas installé ou n’est pas disponible dans le PATH"
+  },
+  "Git comparison timed out": {
+    "en": "Git comparison timed out",
+    "fr": "La comparaison Git a dépassé le délai autorisé"
+  },
+  "Git output exceeds the comparison limit": {
+    "en": "Git output exceeds the comparison limit",
+    "fr": "La sortie Git dépasse la limite de comparaison"
+  },
+  "Git entry is not a regular text blob": {
+    "en": "Git entry is not a regular text blob",
+    "fr": "L’entrée Git n’est pas un fichier texte ordinaire"
+  },
+  "Git comparison supports regular text files only": {
+    "en": "Git comparison supports regular text files only",
+    "fr": "La comparaison Git accepte uniquement les fichiers texte ordinaires"
+  },
+  "Git could not read the index": {
+    "en": "Git could not read the index",
+    "fr": "Git ne peut pas lire l’index"
+  },
+  "Git could not inspect HEAD": {
+    "en": "Git could not inspect HEAD",
+    "fr": "Git ne peut pas analyser HEAD"
+  },
+  "Git object is unavailable locally": {
+    "en": "Git object is unavailable locally",
+    "fr": "L’objet Git n’est pas disponible localement"
+  },
+  "Git text blob exceeds 4 MiB": {
+    "en": "Git text blob exceeds 4 MiB",
+    "fr": "Le fichier texte Git dépasse 4 Mio"
+  },
+  "Git object could not be read locally": {
+    "en": "Git object could not be read locally",
+    "fr": "L’objet Git ne peut pas être lu localement"
+  },
+  "Resolve the Git index conflict before comparing this version": {
+    "en": "Resolve the Git index conflict before comparing this version",
+    "fr": "Résolvez le conflit de l’index Git avant de comparer cette version"
+  },
+  "Comparison lines exceed 65536 bytes": {
+    "en": "Comparison lines exceed 65536 bytes",
+    "fr": "Les lignes de la comparaison dépassent 65 536 octets"
+  },
+  "Comparison supports up to 100000 lines per side": {
+    "en": "Comparison supports up to 100000 lines per side",
+    "fr": "La comparaison accepte jusqu’à 100 000 lignes par côté"
+  },
+  "Comparison document is no longer open": {
+    "en": "Comparison document is no longer open",
+    "fr": "Le document à comparer n’est plus ouvert"
+  },
+  "Wait for the current comparison to finish": {
+    "en": "Wait for the current comparison to finish",
+    "fr": "Attendez la fin de la comparaison en cours"
+  },
+  "Comparison provider is not available": {
+    "en": "Comparison provider is not available",
+    "fr": "Le fournisseur de comparaison n’est pas disponible"
+  },
+  "Open a document before comparing files": {
+    "en": "Open a document before comparing files",
+    "fr": "Ouvrez un document avant de comparer des fichiers"
+  },
+  "Save this document before comparing its saved version": {
+    "en": "Save this document before comparing its saved version",
+    "fr": "Enregistrez ce document avant de comparer sa version enregistrée"
+  },
+  "Choose two different open documents": {
+    "en": "Choose two different open documents",
+    "fr": "Choisissez deux documents ouverts différents"
+  },
+  "Document changed while loading; refresh the comparison": {
+    "en": "Document changed while loading; refresh the comparison",
+    "fr": "Le document a changé pendant le chargement ; actualisez la comparaison"
+  },
+  "Open comparison window": {
+    "en": "Open comparison window",
+    "fr": "Ouvrir la comparaison en grand"
+  },
+  "Loading revision diff...": {
+    "en": "Loading revision diff...",
+    "fr": "Chargement des différences de la révision..."
+  },
+  "Select a revision to view its file diff.": {
+    "en": "Select a revision to view its file diff.",
+    "fr": "Sélectionnez une révision pour afficher les différences du fichier."
+  },
+  "Clear search marks": {
+    "en": "Clear search marks",
+    "fr": "Effacer les repères"
+  },
+  "Filter history...": {
+    "en": "Filter history...",
+    "fr": "Filtrer l’historique..."
+  },
+  "Search query must contain 1 to 4096 bytes": {
+    "en": "Search query must contain 1 to 4096 bytes",
+    "fr": "La recherche doit contenir de 1 à 4096 octets"
+  },
+  "All open documents": {
+    "en": "All open documents",
+    "fr": "Tous les documents ouverts"
+  },
+  "Find previous": {
+    "en": "Find previous",
+    "fr": "Résultat précédent"
+  },
+  "Match case": {
+    "en": "Match case",
+    "fr": "Respecter la casse"
+  },
+  "Whole word": {
+    "en": "Whole word",
+    "fr": "Mot entier"
+  },
+  "Wrap around": {
+    "en": "Wrap around",
+    "fr": "Boucler"
+  },
+  "Extended escapes": {
+    "en": "Extended escapes",
+    "fr": "Séquences étendues"
+  },
+  "Interpret \\n, \\r, \\t and \\\\.": {
+    "en": "Interpret \\n, \\r, \\t and \\\\.",
+    "fr": "Interpréter \\n, \\r, \\t et \\\\."
+  },
+  "In selection": {
+    "en": "In selection",
+    "fr": "Dans la sélection"
+  },
+  "Replace with": {
+    "en": "Replace with",
+    "fr": "Remplacer par"
+  },
+  "Find in all open documents": {
+    "en": "Find in all open documents",
+    "fr": "Rechercher dans tous les documents ouverts"
+  },
+  "matches": {
+    "en": "matches",
+    "fr": "résultats"
+  },
+  "matches in open documents": {
+    "en": "matches in open documents",
+    "fr": "résultats dans les documents ouverts"
+  },
+  "No matches": {
+    "en": "No matches",
+    "fr": "Aucun résultat"
+  },
+  "Start of document reached": {
+    "en": "Start of document reached",
+    "fr": "Début du document atteint"
+  },
+  "End of document reached": {
+    "en": "End of document reached",
+    "fr": "Fin du document atteinte"
+  },
+  "replacements": {
+    "en": "replacements",
+    "fr": "remplacements"
+  },
+  "Open result": {
+    "en": "Open result",
+    "fr": "Ouvrir le résultat"
+  },
+  "Type to search all open documents, including unsaved buffers.": {
+    "en": "Type to search all open documents, including unsaved buffers.",
+    "fr": "Saisissez une recherche dans tous les documents ouverts, y compris les textes non enregistrés."
+  },
+  "Selection changed. Select the search range again.": {
+    "en": "Selection changed. Select the search range again.",
+    "fr": "La sélection a changé. Sélectionnez à nouveau la zone de recherche."
+  },
+  "Too many replacements. Narrow the search or use a selection.": {
+    "en": "Too many replacements. Narrow the search or use a selection.",
+    "fr": "Trop de remplacements. Précisez la recherche ou utilisez une sélection."
+  },
+  "Git history": {
+    "en": "Git history",
+    "fr": "Historique Git"
+  },
+  "File history": {
+    "en": "File history",
+    "fr": "Historique du fichier"
+  },
+  "Selection history": {
+    "en": "Selection history",
+    "fr": "Historique de la sélection"
+  },
+  "Selection / line history": {
+    "en": "Selection / line history",
+    "fr": "Historique de la sélection / ligne"
+  },
+  "Find selection": {
+    "en": "Find selection",
+    "fr": "Rechercher la sélection"
+  },
+  "Compare Git revisions": {
+    "en": "Compare Git revisions",
+    "fr": "Comparer les révisions Git"
+  },
+  "Compare revisions": {
+    "en": "Compare revisions",
+    "fr": "Comparer les révisions"
+  },
+  "Refresh history": {
+    "en": "Refresh history",
+    "fr": "Actualiser l’historique"
+  },
+  "Load older revisions": {
+    "en": "Load older revisions",
+    "fr": "Charger les révisions précédentes"
+  },
+  "Revision": {
+    "en": "Revision",
+    "fr": "Révision"
+  },
+  "Date": {
+    "en": "Date",
+    "fr": "Date"
+  },
+  "Author": {
+    "en": "Author",
+    "fr": "Auteur"
+  },
+  "Message": {
+    "en": "Message",
+    "fr": "Message"
+  },
+  "Left": {
+    "en": "Left",
+    "fr": "Gauche"
+  },
+  "Right": {
+    "en": "Right",
+    "fr": "Droite"
+  },
+  "Choose a revision": {
+    "en": "Choose a revision",
+    "fr": "Choisir une révision"
+  },
+  "Compare with current buffer": {
+    "en": "Compare with current buffer",
+    "fr": "Comparer avec le tampon actuel"
+  },
+  "Compare with parent": {
+    "en": "Compare with parent",
+    "fr": "Comparer avec le parent"
+  },
+  "Use as left revision": {
+    "en": "Use as left revision",
+    "fr": "Utiliser à gauche"
+  },
+  "Use as right revision": {
+    "en": "Use as right revision",
+    "fr": "Utiliser à droite"
+  },
+  "No committed history for this file or selection.": {
+    "en": "No committed history for this file or selection.",
+    "fr": "Aucun historique enregistré pour ce fichier ou cette sélection."
+  },
+  "Loading history...": {
+    "en": "Loading history...",
+    "fr": "Chargement de l’historique..."
+  },
+  "Wait for history to finish loading": {
+    "en": "Wait for history to finish loading",
+    "fr": "Attendez la fin du chargement de l’historique"
+  },
+  "Choose a revision from history": {
+    "en": "Choose a revision from history",
+    "fr": "Choisissez une révision de l’historique"
+  },
+  "Choose two revisions from history": {
+    "en": "Choose two revisions from history",
+    "fr": "Choisissez deux révisions de l’historique"
+  },
+  "File history provider is not available": {
+    "en": "File history provider is not available",
+    "fr": "Le fournisseur d’historique n’est pas disponible"
+  },
+  "History document is no longer open": {
+    "en": "History document is no longer open",
+    "fr": "Le document de l’historique n’est plus ouvert"
+  },
+  "Selection changed. Refresh the history view.": {
+    "en": "Selection changed. Refresh the history view.",
+    "fr": "La sélection a changé. Actualisez l’historique."
+  },
+  "History source changed. Refresh the history view.": {
+    "en": "History source changed. Refresh the history view.",
+    "fr": "La source de l’historique a changé. Actualisez l’historique."
+  },
+  "Selected lines differ from HEAD or are ambiguous. Compare with HEAD before viewing line history.": {
+    "en": "Selected lines differ from HEAD or are ambiguous. Compare with HEAD before viewing line history.",
+    "fr": "Les lignes sélectionnées diffèrent de HEAD ou sont ambiguës. Comparez avec HEAD avant de consulter leur historique."
+  },
+  "Git could not read local file history": {
+    "en": "Git could not read local file history",
+    "fr": "Git ne peut pas lire l’historique local du fichier"
+  },
+  "Git could not trace these lines in local history": {
+    "en": "Git could not trace these lines in local history",
+    "fr": "Git ne peut pas suivre ces lignes dans l’historique local"
+  },
+  "This selection has no committed history": {
+    "en": "This selection has no committed history",
+    "fr": "Cette sélection n’a pas d’historique enregistré"
+  },
+  "History changed. Refresh the history view.": {
+    "en": "History changed. Refresh the history view.",
+    "fr": "L’historique a changé. Actualisez la vue."
+  },
+  "Historical filename could not be resolved": {
+    "en": "Historical filename could not be resolved",
+    "fr": "Le nom historique du fichier ne peut pas être déterminé"
+  },
+  "Choose a valid Git revision": {
+    "en": "Choose a valid Git revision",
+    "fr": "Choisissez une révision Git valide"
+  },
+  "Historical Git revision is unavailable locally": {
+    "en": "Historical Git revision is unavailable locally",
+    "fr": "La révision Git n’est pas disponible localement"
+  },
+  "Empty version": {
+    "en": "Empty version",
+    "fr": "Version vide"
   }
 }

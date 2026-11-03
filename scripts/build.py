@@ -15,6 +15,8 @@ def main():
     parser.add_argument('--cyui',type=Path,help='Optional clean checkout at editor/cyui-source.lock.json revision')
     parser.add_argument('--build-dir',type=Path,help='Separate build directory for a clean configuration')
     parser.add_argument('--cyui-development',action='store_true',help='Explicit opt-in to an unpublished local CyUI checkout')
+    parser.add_argument('--deps',type=Path,help='Use an existing checksum-pinned dependency cache')
+    parser.add_argument('--public-updates',action='store_true',help='Enable public GitHub updates in release binaries (no authentication)')
     args=parser.parse_args()
     env=dict(os.environ);cmake=shutil.which('cmake');ninja=shutil.which('ninja')
     if sys.platform=='win32':
@@ -34,7 +36,7 @@ def main():
     build=(args.build_dir or ROOT/'runtime'/(('core-build' if args.core_only else 'build')+('-vs' if sys.platform=='win32' else ''))).resolve()
     build.mkdir(parents=True,exist_ok=True);log=build/'build.log'
     generator=['-G','Visual Studio 17 2022','-A','x64'] if sys.platform=='win32' else ['-G','Ninja',f'-DCMAKE_MAKE_PROGRAM={ninja or "ninja"}']
-    commands=[[cmake,'-S',str(ROOT),'-B',str(build),*generator,f'-DCMAKE_BUILD_TYPE={args.configuration}',f'-DCYUI_DIR={args.cyui.resolve() if args.cyui else ""}',f'-DCYCODE_CYUI_DEVELOPMENT={"ON" if args.cyui_development else "OFF"}',f'-DCYCODE_READER_BUILD_GUI={"OFF" if args.core_only else "ON"}','-DBUILD_TESTING=ON'],
+    commands=[[cmake,'-S',str(ROOT),'-B',str(build),*generator,f'-DCMAKE_BUILD_TYPE={args.configuration}',f'-DCYUI_DIR={args.cyui.resolve() if args.cyui else ""}',f'-DCYCODE_EDITOR_DEPS={args.deps.resolve() if args.deps else ROOT/"runtime/deps"}',f'-DCYCODE_READER_PUBLIC_UPDATES={"ON" if args.public_updates else "OFF"}',f'-DCYCODE_CYUI_DEVELOPMENT={"ON" if args.cyui_development else "OFF"}',f'-DCYCODE_READER_BUILD_GUI={"OFF" if args.core_only else "ON"}','-DBUILD_TESTING=ON'],
               [cmake,'--build',str(build),'--config',args.configuration,'--parallel','4']]
     with log.open('w',encoding='utf-8') as stream:
         for command in commands:

@@ -62,6 +62,18 @@ def prepare(source, destination):
             if entry[0] == 'palette.get(glyph.color), codepoint);':
                 edits['TextEditor.cpp'][i]=('palette.get('+fallback+'), codepoint);',entry[1].replace(': glyph.color),',': '+fallback+'),'))
         edits['TextEditor.cpp']=[entry for entry in edits['TextEditor.cpp'] if entry[0]!='#include <set>']
+
+    # Display-only Reader search spans. This modifies the one build-local backend,
+    # never CyUI's downloaded source, document markers, cursors or Undo history.
+    edits['TextEditor.h'] += [
+        ('\tvoid SetLanguage(const Language* language);', '\tvoid SetLanguage(const Language* language);\n\tvoid SetReaderSearchMatches(std::vector<DocSelection> ranges, ImU32 color) { readerSearch=std::move(ranges);readerSearchColor=color;readerSearchVersion=transactions.getVersion(); }\n\tsize_t GetReaderSearchMatchCount() const { return readerSearchVersion==transactions.getVersion() ? readerSearch.size() : 0; }'),
+        ('\tvoid renderSelections();','\tvoid renderSelections();\n\tvoid renderReaderSearch();\n\tstd::vector<DocSelection> readerSearch;\n\tImU32 readerSearchColor=0;\n\tsize_t readerSearchVersion=~size_t(0);')
+    ]
+    edits['TextEditor.cpp'] += [
+        ('\t\trenderSelections();','\t\trenderReaderSearch();\n\t\trenderSelections();'),
+        ('\t\trenderScrollbarMiniMap();','\t\trenderScrollbarMiniMap();\n\t\tif (readerSearchVersion==transactions.getVersion()) {\n\t\t\tconst auto origin=ImGui::GetWindowPos();\n\t\t\tconst auto window=ImGui::GetCurrentWindow();\n\t\t\tconst auto rail=ImGui::GetWindowScrollbarRect(window,ImGuiAxis_Y);\n\t\t\tfor (const auto &match : readerSearch) {\n\t\t\t\tif (match.start.line>=document.size()) continue;\n\t\t\t\tconst auto row=document[match.start.line].row;\n\t\t\t\tif (config.showMiniMap && row>=firstMiniMapRow && row<lastMiniMapRow) {\n\t\t\t\t\tconst auto y=origin.y+(row-firstMiniMapRow)*miniMapRowHeight;\n\t\t\t\t\tdrawList->AddRectFilled(ImVec2(origin.x+miniMapOffset,y),ImVec2(origin.x+miniMapOffset+miniMapWidth,y+std::max(1.f,miniMapRowHeight*.65f)),readerSearchColor);\n\t\t\t\t}\n\t\t\t\tif (window->ScrollbarY) {\n\t\t\t\t\tconst float y=rail.Min.y+rail.GetHeight()*float(row)/float(std::max(size_t(1),typeSetter.getRowCount()));\n\t\t\t\t\tdrawList->PushClipRect(rail.Min,rail.Max,false);drawList->AddRectFilled(ImVec2(rail.Min.x,y),ImVec2(rail.Max.x,y+std::max(2.f,fontScaleDpi)),readerSearchColor);drawList->PopClipRect();\n\t\t\t\t}\n\t\t\t}\n\t\t}')
+    ]
+
     destination.mkdir(parents=True, exist_ok=True)
     for name, replacements in edits.items():
         content = (source/name).read_text('utf-8')
@@ -147,6 +159,16 @@ void TextEditor::SetSyntaxTokens(const std::vector<SemanticToken>& tokens) {
     syntaxVersion=transactions.getVersion();
 }
 '''
+
+        if name == 'TextEditor.cpp':
+            # Reuse the backend's folding/wrapping-aware selection geometry.
+            original=content[content.index('void TextEditor::renderSelections() {'):content.index('//\n//\tTextEditor::renderTextMarkers')]
+            original=original[:original.rfind('}')+1]
+            overlay=original.replace('renderSelections()', 'renderReaderSearch()').replace('for (const auto& cursor : cursors)', 'if (readerSearchVersion!=transactions.getVersion()) return;\n\tfor (const auto& cursor : readerSearch)')
+            overlay=overlay.replace('cursor.hasSelection()', 'cursor.start!=cursor.end').replace('cursor.getSelectionStart()', 'cursor.start').replace('cursor.getSelectionEnd()', 'cursor.end')
+            overlay=overlay.replace('palette.get(Color::selection)', 'ImGui::GetColorU32(readerSearchColor, .28f)')
+            content+='\n'+overlay+'\n'
+
         if name == 'TextEditor.h':
             content = content.replace('void SetSemanticTokens(const std::vector<SemanticToken>& tokens);', 'void SetSemanticTokens(const std::vector<SemanticToken>& tokens);\n\tvoid SetSyntaxTokens(const std::vector<SemanticToken>& tokens);')
         if shared and name == 'TextEditor.cpp':

@@ -1,8 +1,15 @@
 # CyCodeReader
 
+<p align="center">
+  <img src="icons/CyCodeReader.png" alt="CyCodeReader logo" width="160" height="160">
+</p>
+
 An independent native C++20 code/text editor built with CyUI, SDL3 and Dear ImGui.
 Files open directly without loading CyCode, solutions, language servers, project
 tools. CyToolsCore supplies the integrated SDK/MCP companion. Repository: https://github.com/MrMybal/CyCodeReader.
+
+Windows x64 downloads: [GitHub Releases](https://github.com/MrMybal/CyCodeReader/releases).
+Version 0.1.1 is the first public beta; see [release notes and known limits](Docs/Releases/v0.1.1.md).
 
 `editor/` is also the shared source library consumed by CyCode: one implementation
 of the CyUI editor adapter, lexical/Tree-sitter overlays, icons, snippets and native file I/O.
@@ -19,12 +26,14 @@ for a real native window. Launch another instance to keep separate file sets.
 | Ctrl+N / Ctrl+O | New document / open files |
 | Ctrl+S / Ctrl+Shift+S / Ctrl+Alt+S | Save / Save As / Save all |
 | Ctrl+W / Ctrl+Tab | Close / next document |
-| Ctrl+F / Ctrl+H / F3 | Find / replace / next match |
+| Ctrl+F / Ctrl+H / F3 / Shift+F3 | Find window / replace / next / previous match |
+| Ctrl+Shift+F | Search every open document, including unsaved buffers |
 | Ctrl+G | Go to line |
 | Ctrl+P / Ctrl+Shift+P | Open-file / action palette |
 
 The widget provides undo/redo, multiple cursors, folding, bracket matching,
-indentation and selection. View offers wrapping, whitespace, a minimap, text size,
+indentation and selection. The default layout shows the minimap, keeps the file sidebar hidden, and uses a
+compact icon toolbar with the logo alone. View offers wrapping, whitespace, text size,
 six themes and English/French. C/C++/Unreal, C#, HLSL/GLSL, Python, Lua, JSON and
 Markdown use shared lexical rules. Rust, Java, JS/JSX, TS/TSX, HTML and CSS use
 incremental Tree-sitter parsing, including HTML script/style regions. Syntax works
@@ -38,7 +47,45 @@ No-op saves retain original bytes;
 edited saves retain the detected newline convention. Disk conflicts preserve the
 live buffer, Save As checks existing/open targets, and saves use guarded atomic
 replacement. Unsaved documents prompt before close/reload. Preferences are under
-data/reader; crash recovery is not implemented.
+data/reader in development/portable builds and `%LOCALAPPDATA%/CyCodeReader/reader`
+in installed builds; crash recovery is not implemented.
+
+Windows distribution preparation now provides a per-user installer and a portable
+ZIP, plus a native updater for public GitHub Releases. Online checks are disabled
+in preparation builds; no token or private-release access is used. See
+[distribution and public update preparation](Docs/Distribution.md).
+
+Ctrl+F/Ctrl+H open a dedicated modeless find/replace window with case, whole-word,
+selection, wrap and extended-escape options. Search results highlight the text and
+mark the minimap/scrollbar. Ctrl+Shift+F searches all open documents with excerpts,
+filters and a syntax preview. See [search and default layout](Docs/Search.md).
+
+## File comparison and Git
+
+**Compare** compares two live tabs, a selected disk file or the last saved version.
+The shared CyUI diff offers side-by-side/unified layouts, syntax colors, line
+numbers, search and change navigation. Unsaved text is included; source documents
+and disk files remain unchanged. Outdated snapshots can be refreshed.
+
+The bundled native **Git file comparisons** plugin detects the active file's
+repository and adds a searchable **Git** menu: compare the buffer with HEAD or
+the index, or inspect staged changes from HEAD to index. The code/line context
+menu also exposes file and selection history, following renames, with inline comparisons
+against a parent, the current buffer or another selected revision. Split comparisons
+share one scrolling canvas so their rows move together. Git must be installed
+in PATH; no network access or credentials are needed. See
+[comparison behavior, plugin contract and limits](Docs/Comparison.md).
+
+## Quick filters
+
+The File, Edit, Search, Compare, Encoding, View, Syntax, Extensions and Git menus include
+CyUI search fields. Filter syntaxes by name or extension (`.hlsl`, `.glsl`), and
+filter open files by names or full paths. Options, plugin contributions and
+open-document search results have independent filters too. Matching ignores
+Latin case/accents and supports multiple words, in English and French.
+Ctrl+F focuses a filtered panel's field; in the editor it keeps document find.
+Escape clears the query. Filtering never commits a hidden property draft or
+changes the live document. See [filter behavior and keyboard routing](Docs/Filtering.md).
 
 ## Build
 
@@ -72,11 +119,11 @@ checkout without altering the normal revision lock:
 python scripts/build.py --cyui ../CyImgui_Interface --cyui-development --build-dir runtime/build-code-languages-vs
 ```
 
-The current dependency commit is local until CyUI is pushed. Publish CyUI before
-using the new Reader source lock on another machine. The validated local cache
-already contains the exact committed revision.
+The build resolves the exact revision in editor/cyui-source.lock.json. Publish
+a local-only CyUI revision before depending on it from another machine; the
+validated local cache contains the committed shared Diff correction.
 
-The UI selects **Core, Code, CodeEditor, Commands, Inspector and Diagnostics**.
+The UI selects **Core, Code, CodeEditor, Commands, Inspector, Diagnostics and Diff**.
 Only one ImGui and one TextEditor backend are compiled. Audio, Gallery, demos,
 CEF and unused interface modules are disabled. Source/model ownership and the
 remaining native compatibility hooks are described in
@@ -89,6 +136,18 @@ locales/ui.json is deployed beside the build executable. To make a portable fold
 ```sh
 cmake --install runtime/build-vs --config Release --prefix dist
 ```
+
+To create both Windows release artifacts with an Inno Setup compiler:
+
+```sh
+python scripts/package_windows.py --iscc "C:/path/to/Inno Setup/ISCC.exe"
+```
+
+The raw CMake install is a staging folder; `package_windows.py` creates the edition
+markers, runtime files and portable manifest. After the repository is public,
+`scripts/build.py --public-updates` enables public update checks in release builds.
+The release workflow does this automatically for public tagged builds. Online
+acceptance will be performed after publication; see [the release guide](Docs/Distribution.md).
 
 The file/snippet tests need neither CyUI nor any GUI dependency:
 

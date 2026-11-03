@@ -1,4 +1,5 @@
 #include "Core.h"
+#include "Search.h"
 #include "cycode/Paths.h"
 #include <algorithm>
 #include <cctype>
@@ -25,15 +26,15 @@ Json Core::dispatch(const std::string &method,const Json &params) {
     if (method=="plugins.configure") return plugins_.configure(params.at("plugin"),params.at("options"));
     if (method=="search.openDocuments") {
         const auto query=params.at("query").get<std::string>();if (query.empty() || query.size()>4096) throw std::runtime_error("Search query must contain 1 to 4096 bytes");
-        Json matches=Json::array();bool truncated=false;const bool sensitive=params.value("caseSensitive",true);
-        auto lower=[](std::string text) { for (auto &c : text) if (static_cast<unsigned char>(c)<128) c=char(std::tolower(static_cast<unsigned char>(c)));return text; };
-        const auto needle=sensitive ? query : lower(query);
-        for (const auto &[id,live] : documents_) { const auto text=sensitive ? live->document.text() : lower(live->document.text());size_t at=0;
-            while ((at=text.find(needle,at))!=std::string::npos) {
-                if (matches.size()>=2000) { truncated=true;break; }
-                const auto start=text.rfind('\n',at);matches.push_back({{"id",id},{"revision",live->revision},{"offset",at},{"line",1+std::count(text.begin(),text.begin()+at,'\n')},{"column",at-(start==std::string::npos ? 0 : start+1)+1}});at+=needle.size();
-            }if (truncated) break;
-        }return {{"matches",matches},{"truncated",truncated}};
+        Json matches=Json::array();bool truncated=false;
+        const bool sensitive=params.value("caseSensitive",true),words=params.value("wholeWord",false);
+        for (const auto &[id,live] : documents_) {
+            if (params.contains("document") && params.at("document")!=id) continue;
+            const auto found=findTextMatches(live->document.text(),query,sensitive,words,2000-matches.size());
+            for (const auto &m : found.matches) matches.push_back({{"id",id},{"revision",live->revision},{"offset",m.offset},{"line",m.line},{"column",m.column}});
+            if (found.truncated) { truncated=true;break; }
+        }
+        return {{"matches",matches},{"truncated",truncated}};
     }
     const auto id=params.at("id").get<size_t>();const auto found=documents_.find(id);if (found==documents_.end()) throw std::runtime_error("Document is no longer open");auto &live=*found->second;
     if (method=="documents.read") return describe(live,true);
@@ -45,7 +46,7 @@ Json Core::dispatch(const std::string &method,const Json &params) {
     else if (method=="documents.close") { if (live.document.dirty() && !params.value("discard",false)) throw std::runtime_error("Document has unsaved changes");documents_.erase(found);return {{"closed",id}}; }
     else if (method=="text.transform") live.document.replace(transformText(live.document.text(),params.at("operation")));
     else if (method=="plugins.invoke") {
-        auto result=plugins_.invoke(params.at("plugin"),params.at("command"),{{"text",live.document.text()},{"path",pathUtf8(live.document.path())},{"revision",live.revision}});
+        auto result=plugins_.invoke(params.at("plugin"),params.at("command"),{{"text",live.document.text()},{"path",pathUtf8(live.document.path())},{"revision",live.revision},{"encoding",live.document.encodingId()}});
         if (result.contains("text")) live.document.replace(result.at("text"));refresh();return {{"document",describe(live,true)},{"result",result}};
     } else throw std::runtime_error("Unknown Reader operation: "+method);
     refresh();return describe(live,true);

@@ -51,7 +51,7 @@ void Reader::startSdk() {
 #else
             const auto pid=getpid();
 #endif
-            const auto directory=options_.installation/"data/bridge"/std::to_string(pid);
+            const auto directory=readerDataDirectory(options_.installation)/"bridge"/std::to_string(pid);
             bridge_=std::make_unique<Bridge>(core_,directory/"native.json");sdkDescriptor_=directory/"core.json";
         }
         python_.clear();
@@ -72,69 +72,57 @@ void Reader::startSdk() {
     } catch (const std::exception &e) { sdkError_=e.what();serviceLogs_.append(cyui::LogLevel::error,sdkError_,"CyToolsCore"); }
 }
 void Reader::extensionPanels() {
-    if (searchPanel_) {
-        const bool visible=ImGui::Begin((std::string(tr("Search open documents"))+"###reader-search").c_str(),&searchPanel_);
-        if (visible) {
-            ImGui::InputText(tr("Search text"),&searchQuery_);
-            ImGui::BeginDisabled(searchQuery_.empty());
-            if (cyui::primaryButton(tr("Find all"))) {
-                searchMatches_=core_.dispatch("search.openDocuments",{{"query",searchQuery_}});
-                searchRows_.clear();searchNavigation_.clear();
-                for (const auto &match : searchMatches_.value("matches",Json::array())) {
-                    const auto tab=find(match.at("id"));if (!tab) continue;
-                    const auto id=uiId("search/"+std::to_string(tab->id)+"/"+match.at("revision").dump()+"/"+match.at("offset").dump());
-                    const auto source=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path());
-                    searchRows_.push_back({id,cyui::LogLevel::info,source,searchQuery_,match.at("line"),match.at("column")});
-                    searchNavigation_.emplace(id,match);
-                }
-            }ImGui::EndDisabled();
-            if (searchMatches_.value("truncated",false)) cyui::callout(cyui::Tone::warning,tr("Search results limited to 2000 matches."));
-            const auto request=cyui::diagnosticList("##reader-search-results",searchRows_,{0,0});
-            if (searchNavigation_.contains(request)) {
-                const auto &match=searchNavigation_.at(request);const auto tab=find(match.at("id"));
-                if (tab && match.at("revision")==tab->live->revision) {
-                    const auto &text=tab->document.text();const auto end=match.at("offset").get<size_t>();
-                    const auto line=text.rfind('\n',end);size_t glyphs=0;
-                    for (size_t byte=line==std::string::npos ? 0 : line+1;byte<end;++byte)
-                        if ((static_cast<unsigned char>(text[byte])&0xc0)!=0x80) ++glyphs;
-                    active_=tab->id;tab->focus=true;tab->editor.SetCursor({match.at("line").get<size_t>()-1,glyphs});
-                } else { searchMatches_=Json::object();searchRows_.clear();searchNavigation_.clear(); }
-            }
-        }ImGui::End();
-    }
-    if (sdk_.valid() && sdk_.wait_for(std::chrono::seconds(0))==std::future_status::ready) { const auto result=sdk_.get();sdkError_=result.output.empty() ? tr("The Reader SDK service stopped.") : result.output;serviceLogs_.append(cyui::LogLevel::error,sdkError_,"CyToolsCore"); }
     if (pluginsPanel_) {
         const bool visible=ImGui::Begin((std::string(tr("Extensions"))+"###reader-plugins").c_str(),&pluginsPanel_);
         if (visible) {
             const auto state=core_.plugins().describe();
             cyui::textDim("%s",tr("Plugins load at startup. Restart Reader after changing manifests or libraries."));
             if (state.at("plugins").empty()) cyui::emptyState(tr("Extensions"),tr("Place plugin manifests and libraries in the Reader plugins folder."),cyui::icon::code);
+            registerFilterOwner(pluginsFilter_);
+            cyui::panelHeader("Extensions",nullptr,&pluginsFilter_);
+            size_t matchingPlugins=0;
             for (const auto &plugin : state.at("plugins")) {
-                ImGui::PushID(plugin.at("id").get_ref<const std::string&>().c_str());
-                if (ImGui::CollapsingHeader(plugin.at("name").get_ref<const std::string&>().c_str(),ImGuiTreeNodeFlags_DefaultOpen)) {
-                    cyui::textDim("%s | %s",plugin.at("id").get_ref<const std::string&>().c_str(),plugin.at("version").get_ref<const std::string&>().c_str());
-                    for (const auto &command : plugin.at("commands")) {
-                        if (command.value("kind","")=="syntax") continue;
+                const auto pluginId=plugin.at("id").get<std::string>(),name=plugin.at("name").get<std::string>();
+                const auto context=name+" "+pluginId;
+                auto &view=pluginOptions_[pluginId];view.synchronize(plugin);
+                auto commandMatches=[&](const Json &command) { return command.value("kind","")!="syntax" && command.value("kind","")!="service" && pluginsFilter_.matches(command.at("title"),context+" "+command.at("id").get<std::string>()); };
+                auto languageMatches=[&](const Json &language) {
+                    auto keywords=context+" "+language.at("id").get<std::string>();
+                    for (const auto &ext : language.at("extensions")) keywords+=" "+ext.get<std::string>();
+                    return pluginsFilter_.matches(language.at("name"),keywords);
+                };
+                bool any=pluginsFilter_.matches(name,pluginId);
+                for (const auto &command : plugin.at("commands")) any|=commandMatches(command);
+                for (const auto &language : plugin.at("languages")) any|=languageMatches(language);
+                for (const auto &property : view.properties) any|=cyui::propertyMatches(pluginsFilter_,property,context.c_str());
+                if (any) ++matchingPlugins;
+                ImGui::PushID(pluginId.c_str());
+                if (cyui::beginFilteredSection(name.c_str(),pluginsFilter_,any)) {
+                    cyui::textDim("%s | %s",pluginId.c_str(),plugin.at("version").get_ref<const std::string&>().c_str());
+                    for (const auto &command : plugin.at("commands")) if (commandMatches(command)) {
                         ImGui::BeginDisabled(!active() || active()->editor.IsReadOnlyEnabled());
-                        if (cyui::button(command.at("title").get_ref<const std::string&>().c_str())) execute("plugin",{{"plugin",plugin.at("id")},{"command",command.at("id")}});
+                        if (cyui::button(command.at("title").get_ref<const std::string&>().c_str())) execute("plugin",{{"plugin",pluginId},{"command",command.at("id")}});
                         ImGui::EndDisabled();
                     }
-                    const auto pluginId=plugin.at("id").get<std::string>();
-                    auto &view=pluginOptions_[pluginId];view.synchronize(plugin);
                     const auto edits=cyui::inspector("##plugin-options",view.state,view.properties,view.revision,
-                        [&](auto id,const auto &value) { return view.validate(id,value); });
+                        [&](auto id,const auto &value) { return view.validate(id,value); },{&pluginsFilter_,context.c_str()});
                     view.commit(core_.plugins(),pluginId,edits);
-                    for (const auto &language : plugin.at("languages")) cyui::textDim("%s",language.at("name").get_ref<const std::string&>().c_str());
-                }ImGui::PopID();
+                    for (const auto &language : plugin.at("languages")) if (languageMatches(language)) cyui::textDim("%s",language.at("name").get_ref<const std::string&>().c_str());
+                    cyui::endSection();
+                } else cancelInspectorDrafts(view.state);
+                ImGui::PopID();
             }
+            if (!matchingPlugins && !state.at("plugins").empty()) cyui::textDim("%s",tr("No matching extensions"));
             for (const auto &issue : state.at("errors")) cyui::callout(cyui::Tone::warning,issue.dump().c_str());
             if (!pluginResult_.empty()) {
                 ImGui::Separator();
                 if (cyui::button(tr("Copy result"))) ImGui::SetClipboardText(pluginResult_.c_str());
+                pluginOutputChild_=ImGui::GetID("##plugin-result");
                 pluginOutput_.draw("##plugin-result",cyui::dp(0,180));
             }
-        }ImGui::End();
-    }
+        } else for (auto &[id,view] : pluginOptions_) cancelInspectorDrafts(view.state);
+        ImGui::End();
+    } else for (auto &[id,view] : pluginOptions_) cancelInspectorDrafts(view.state);
     if (mcpPanel_) {
         const bool visible=ImGui::Begin("CyToolsCore / MCP",&mcpPanel_);
         if (visible) {
@@ -159,19 +147,21 @@ void Reader::extensionPanels() {
     if (optionsPanel_) {
         const bool visible=ImGui::Begin((std::string(tr("Options"))+"###reader-options").c_str(),&optionsPanel_);
         if (visible) {
+            registerFilterOwner(optionsFilter_);
+            cyui::panelHeader("Options",nullptr,&optionsFilter_);
             const Json current={{"language",locale_},{"theme",theme_},{"density",density_},{"scale",textScale_}};
             if (optionsModel_!=current) { optionsModel_=current;++optionsRevision_; }
             std::vector<cyui::Property> properties;
             auto choice=[&](const char *key,const char *label,std::string value,std::vector<std::string> choices) {
-                cyui::Property property;property.id=uiId(std::string("options/")+key);property.label=tr(label);
+                cyui::Property property;property.id=uiId(std::string("options/")+key);property.label=label;
                 property.value=std::move(value);property.choices=std::move(choices);properties.push_back(std::move(property));
             };
             choice("language","Language",locale_,{"en","fr"});
             choice("theme","Theme",theme_,{"graphite","mid-grey","light-grey","amber-night","violet","navy"});
             choice("density","Density",density_,{"compact","comfortable"});
-            cyui::Property scale;scale.id=uiId("options/scale");scale.label=tr("Text size");scale.value=double(textScale_);
+            cyui::Property scale;scale.id=uiId("options/scale");scale.label="Text size";scale.value=double(textScale_);
             scale.bounded=true;scale.minimum=.8;scale.maximum=2.;properties.push_back(scale);
-            for (const auto &proposal : cyui::inspector("##reader-options",optionsState_,properties,optionsRevision_)) {
+            for (const auto &proposal : cyui::inspector("##reader-options",optionsState_,properties,optionsRevision_,{},{&optionsFilter_,"Options"})) {
                 if (!proposal.edit.committed()) continue;
                 if (proposal.id==uiId("options/language")) locale_=std::get<std::string>(proposal.edit.value);
                 else if (proposal.id==uiId("options/theme")) theme_=std::get<std::string>(proposal.edit.value);
@@ -179,21 +169,25 @@ void Reader::extensionPanels() {
                 else if (proposal.id==uiId("options/scale")) textScale_=float(std::clamp(std::get<double>(proposal.edit.value),.8,2.));
                 applyAppearance();
             }
-            if (ImGui::CollapsingHeader(tr("Licenses"))) {
-                ImGui::TextWrapped("%s",tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT."));
-                std::error_code projectLicenseError;
-                for (const auto *name : {"LICENSE", "COPYRIGHT"}) {
-                    const auto file=options_.installation/name;
-                    if (std::filesystem::is_regular_file(file,projectLicenseError) && ImGui::TreeNode(name)) {
-                        const auto text=readTextFileBytes(file);ImGui::TextWrapped("%s",text.c_str());ImGui::TreePop();
-                    }
-                }
-                std::error_code ec;for (const auto &file : std::filesystem::directory_iterator(options_.installation/"licenses",ec)) {
-                    if (file.path().extension()!=".txt") continue;
-                    if (ImGui::TreeNode(file.path().filename().string().c_str())) { const auto text=readTextFileBytes(file.path());ImGui::TextUnformatted(text.c_str());ImGui::TreePop(); }
-                }
+            std::vector<std::filesystem::path> licenses;std::error_code ec;
+            for (const auto &file : std::filesystem::directory_iterator(options_.installation/"licenses",ec)) {
+                if (file.path().extension()==".txt") licenses.push_back(file.path());
             }
-        }ImGui::End();
-    }
+            for (const auto *name : {"LICENSE", "COPYRIGHT"}) {
+                const auto file=options_.installation/name;
+                if (std::filesystem::is_regular_file(file,ec)) licenses.push_back(file);
+            }
+            bool matchingLicense=optionsFilter_.matches("CyCodeReader GPL-3.0-only Copyright", "Licenses "+cyui::tr("Licenses"));
+            for (const auto &file : licenses) matchingLicense|=optionsFilter_.matches(pathUtf8(file.filename()),"Licenses "+cyui::tr("Licenses"));
+            if (cyui::beginFilteredSection("Licenses",optionsFilter_,matchingLicense,false)) {
+                ImGui::TextWrapped("%s",cyui::tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT."));
+                for (const auto &file : licenses) if (optionsFilter_.matches(pathUtf8(file.filename()),"Licenses "+cyui::tr("Licenses"))) {
+                    if (ImGui::TreeNode(pathUtf8(file.filename()).c_str())) { const auto text=readTextFileBytes(file);ImGui::TextUnformatted(text.c_str());ImGui::TreePop(); }
+                }
+                cyui::endSection();
+            }
+        } else cancelInspectorDrafts(optionsState_);
+        ImGui::End();
+    } else cancelInspectorDrafts(optionsState_);
 }
 }

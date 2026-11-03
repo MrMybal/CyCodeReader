@@ -1,7 +1,8 @@
 # Reader extensions
 
 Place manifests and optional native libraries in the `plugins` folder beside the
-deployed Reader. The build deploys two examples there; source manifests live under
+deployed Reader. The build deploys two examples and the Git comparison provider;
+source manifests live under
 plugins/ and the C++ example under examples/. Restart after adding/changing plugins.
 The manager reports loaded commands/languages/options and separate load errors.
 
@@ -72,8 +73,10 @@ remains editable. Select the syntax again to retry after correcting the provider
 The sample native plugin provides `.cynative` coloring through this exact path;
 CTest loads the compiled DLL and checks its colors in the common native editor.
 
-Reader serializes calls under its core mutex, keeps libraries loaded for its
-lifetime, and unregisters definitions before destroying services. This is trusted
+Reader snapshots callbacks/options under its core mutex and serializes native
+calls with a per-plugin execution mutex. Prepared background invocations pin the
+library without holding the document mutex. Reader waits for its workers and
+unregisters syntax definitions before destroying services. This is trusted
 in-process code: callbacks must return promptly. Hot unload, a sandbox, importing
 arbitrary Tree-sitter DLLs and a remote marketplace are not provided. Syntax
 plugins do not automatically add language-server completion or compiler services.
@@ -82,3 +85,64 @@ The normal build now pins the expanded CyUI catalogue commit in
 editor/cyui-source.lock.json; no development flag is required. The explicit
 `--cyui-development` option is only for further unpublished local changes.
 The dependency commit must be pushed to CyUI before another machine can fetch it.
+
+## File comparison providers
+
+ABI 1 also supports optional `fileComparisons` metadata. The bundled implementation
+is `plugins/git.json` and `plugins/git/GitPlugin.cpp`. Its service commands are
+hidden from ordinary text-transform buttons and instead appear as file-context
+actions in the provider's searchable menu and command palette:
+
+```json
+{
+  "commands": [
+    {"id": "context", "title": "Detect context", "kind": "service"},
+    {"id": "baseline", "title": "Compare with baseline", "kind": "service"}
+  ],
+  "fileComparisons": {
+    "menu": "Repository",
+    "detect": "context",
+    "actions": [{"command": "baseline", "title": "Compare with baseline"}]
+  }
+}
+```
+
+This is a fragment of an otherwise valid native manifest. The provider must name
+declared `service` commands, with at most 16 distinct comparison actions and 8
+active providers. The detect callback receives the active absolute `path` and
+an options snapshot, and returns `available` plus an `enabled` boolean map keyed
+by comparison command. Optional `message`, `root` and `branch` strings and
+`tracked`, `conflicted`, `detached` booleans describe the context. No available
+context disables its actions, while detection failures remain isolated.
+
+A comparison request receives `path`, current normalized UTF-8 `text`, native
+`encoding` ID, document `revision` and the plugin's `options`. It returns:
+
+```json
+{"comparison":{"path":"/absolute/source.cpp","before":"old\n","after":"new\n",
+               "beforeLabel":"Baseline","afterLabel":"Current buffer"}}
+```
+
+These results do not contain the top-level `text` field used to replace a buffer.
+The host checks path/revision and bounds before presenting a read-only snapshot
+in its one CyUI::Diff view. The native ABI still exchanges UTF-8 JSON only; it
+does not pass C++/ImGui objects or introduce a second document service. Existing
+SDK plugin invocation keeps its original permissions and document guards. See
+[Comparison.md](Comparison.md) for Git behavior, encoding and process limits.
+
+## Optional file-history contributions
+
+`fileComparisons.history` may declare `{ "file":"history", "selection":"selectionHistory", "compare":"revision" }`.
+Each value must name a declared native service command. The host adds file and
+line/selection history actions to its provider menu and actual text/gutter context
+menus, while the toolbar exposes file history. Without this metadata, existing
+comparison plugins retain their existing behavior and C ABI 1.
+
+History calls receive path, encoding, live text, 1-based startLine/endLine and an
+opaque pagination cursor. They return `history:{path,commits,more,cursor}`; each
+commit has id, parents, author, date, subject, path and previousPath. Pages are
+bounded to 100 rows and validated before display. Historical comparisons receive
+beforeRevision/beforePath and optional afterRevision/afterPath, returning the
+existing comparison object. An empty afterRevision means the current buffer;
+an empty beforeRevision means empty text for a root commit. The bundled Git
+provider owns all Git traversal and filename resolution; the host remains generic.

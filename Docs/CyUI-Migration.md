@@ -1,9 +1,25 @@
 # Modular CyUI migration
 
-The current source lock is CyUI commit `37440e74c412bec5b737f344cd40cf5b1f8ff00f` from
+Current interface revision (2026-11-03): SearchUI owns modeless find/replace and
+open-buffer results; its optional display-only spans are prepared in the existing
+build-local TextEditor adapter. ComparisonUI and HistoryUI call the native
+cyui::diffViewer directly. The single scrolling canvas correction now lives in
+CyUI's Diff module, avoiding delayed synchronization between two child windows.
+Reader's duplicate renderer has been removed; DiffView only prepares bounded
+DiffDocument inputs. HistoryUI hosts generic native plugin history commands.
+See Search.md and Comparison.md.
+
+Earlier addition (2026-11-03): Reader now also selects **Diff** for live/saved/file
+comparisons and native provider results. It reuses CyUI::DiffDocument/diffViewer,
+including source colors, unified/split presentation and change navigation. Code
+is already in the dependency closure, so no duplicate widget, ImGui instance or
+new backend is added. Earlier descriptions below record the migration before
+file comparisons existed. See Comparison.md for the new view and Git provider.
+
+The current source lock is CyUI commit `a228501d9418550ce68d2d67b70cebbb8fa3ee2a` from
 https://github.com/MrMybal/CyUI. It includes the shared 101-mode catalogue, plugin
-syntax engines and Logs mode. The commit is local pending an explicit push;
-the validated local dependency cache contains that exact clean revision.
+syntax engines, Logs mode and the native Diff scrolling correction. The commit is published on CyUI main; the validated local dependency cache
+contains that exact clean revision.
 The original migration notes below describe the earlier 10e3646 baseline.
 Source remains in the ignored dependency cache; no developer checkout is reset.
 
@@ -134,3 +150,17 @@ plugin-owned display names remain intact; some module controls stay English.
 Native C++ syntax APIs are covered here; new Python bindings, a remote
 marketplace, importing Notepad++ UDL XML/DLLs and forced plugin cancellation are
 not implemented. See Docs/Plugins.md for the exact extension contract.
+
+
+## Core filtering adoption
+
+The lock now includes CyUI's committed localization and filtering APIs. Reader
+consumes Core's TextFilter/filterBox/filterMenu and InspectorOptions directly;
+there are no changes to the library checkout. The former ASCII-only filename
+predicate and hand-written menu drawing are replaced. Reader retains command
+execution, model revisions, paths, language registration and draft cancellation.
+The exact production selection remains Core, Code, CodeEditor, Commands,
+Inspector and Diagnostics, with the same single ImGui/TextEditor integration.
+The earlier mixed-label limitation is resolved by synchronizing the Reader locale
+and registering its English/French strings with Core. Plugin-owned labels and
+user content remain app data. Docs/Filtering.md records the interactions.

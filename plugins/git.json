@@ -1,0 +1,28 @@
+{
+  "abi": 1,
+  "id": "cy.reader.git",
+  "name": "Git file comparisons",
+  "version": "0.1.0",
+  "library": "reader_git_plugin",
+  "commands": [
+    {"id": "context", "title": "Detect Git working tree", "kind": "service"},
+    {"id": "head", "title": "Compare buffer with HEAD", "kind": "service"},
+    {"id": "index", "title": "Compare buffer with Git index", "kind": "service"},
+    {"id": "staged", "title": "Compare staged changes (HEAD to index)", "kind": "service"},
+    {"id": "history", "title": "File history", "kind": "service"},
+    {"id": "selectionHistory", "title": "Selection history", "kind": "service"},
+    {"id": "revision", "title": "Compare Git revisions", "kind": "service"}
+  ],
+  "fileComparisons": {
+    "menu": "Git",
+    "detect": "context",
+    "history": {"file":"history", "selection":"selectionHistory", "compare":"revision"},
+    "actions": [
+      {"command": "head", "title": "Compare buffer with HEAD"},
+      {"command": "index", "title": "Compare buffer with Git index"},
+      {"command": "staged", "title": "Compare staged changes (HEAD to index)"}
+    ]
+  },
+  "languages": [],
+  "options": []
+}

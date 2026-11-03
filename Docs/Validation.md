@@ -1,5 +1,83 @@
 # Validation
 
+## File comparison and native Git plugin — 2026-11-03
+
+Windows x64 / MSVC 2022 Release compilation and all **15 CTests passed** with the
+locked CyUI revision. The actual CyUI Diff module is selected; no library checkout
+or vendored editor source was changed. A separate core-only build passed **6/6
+CTests** without SDL/ImGui/CyUI. The existing real CyToolsCore HTTP/official MCP
+client acceptance test also passed with the updated native CLI and the existing
+ABI 1 sample plugins.
+
+The native Git DLL passed **8 independent local-repository scenarios**: distinct
+HEAD/index/disk/unsaved buffers, Unicode/spaces/literal pathspecs, untracked and
+staged-deleted files, unborn repositories, linked worktrees/nested repositories,
+detached HEAD, real conflicting branches/index stages, UTF-16/Windows-1252,
+binary/oversized refusal, ambient Git directory/index isolation, missing Git and
+disabled external filter/fsmonitor execution. Index and working-file bytes remain
+unchanged by plugin calls. Git 2.45.1.windows.1 was exercised locally.
+
+The real ImGui Reader comparison view is exercised without SDL video or OS
+windows: two unsaved tabs, saved baseline versus an external disk edit, selected
+file/picker cancellation, line additions/removals, source closure, stale results,
+refresh, read-only documents, the common Core plugin API, menu filtering in French
+and native library lifetime pinning after owner destruction. Both diff layouts
+render in Graphite/light-grey, EN/FR and 100/200% DPI. The standard module tests
+retain their six-theme/density/DPI and branding checks.
+
+See Comparison.md and Plugins.md for use, bounds and callback ownership. No GUI
+application/installer was launched, no user repository/index was modified, and
+no fetch/push/private-release request was performed. Commits/merges/worktrees in
+the tests belong exclusively to temporary fixtures. Full desktop interaction
+and Linux/macOS execution remain unverified under the existing protection issue.
+
+## Application branding — 2026-11-03
+
+The supplied PNG/ICO artwork is integrated without changing the original files.
+Windows Release compilation and all **13 CTests passed**. The module test decodes
+the real logo with SDL's PNG loader, checks transparent/visible pixels and draws
+the branded Reader views in six themes, two densities and 100/150/200% DPI without
+initializing SDL video or opening OS windows.
+Offline PE resource inspection confirms that CyCodeReader, its updater and the
+compiled installer contain the original application icon's **10 resolutions**,
+with matching frame payloads. The rebuilt portable ZIP contains all four supplied
+PNG/ICO files byte for byte; its manifest, CRCs and release SHA-256 sums pass.
+Setup's small wizard image uses the same transparent PNG. The GitHub README uses
+a relative image reference, so it renders from the repository without an external
+image host. The application/installer were not launched, and no push was made.
+Desktop/installer pixel acceptance remains pending with the existing protection
+investigation; the offline checks above do not establish that acceptance.
+
+## Public distribution preparation — 2026-11-03
+
+Windows x64 / MSVC 2022 Release compilation passed with the clean locked CyUI
+revision and the existing checksum-pinned dependency cache. All **13 CTests
+passed**, including two independent offline distribution checks and a real
+ImGui update-panel test without SDL initialization or native OS windows.
+The latter covers English/French, graphite/light-grey, 100/200% DPI, unchanged
+unsaved documents, guarded closure and cancellation of the update handoff.
+Native distribution checks exercise numeric versions, exact edition/asset
+selection, absent/malformed SHA-256 metadata, untrusted API URLs, traversal,
+Windows device names, case collisions, corrupt/compressed archives, manifest
+mismatch, real instance locks, actual filesystem rollback, managed-file removal
+and preservation of preferences/custom plugins. No GitHub request is involved.
+
+The Windows portable ZIP and per-user installer compiled successfully. The
+packager verifies installed resources, app-local MSVC DLLs, ZIP CRCs/manifest,
+file allowlists and final SHA-256 sums. The installer was compiled with the
+official digitally signed Inno Setup 6.7.4 compiler deployed in portable mode;
+the Reader installer/application was not launched or installed.
+`CYCODE_READER_PUBLIC_UPDATES` is **OFF** in these preparation binaries. No local
+GitHub token, credential read or private-release test is implemented/performed.
+See Distribution.md for enabling the public build and the exact release names.
+
+Online download/redirect behavior, hosted release CI, installed upgrade/uninstall,
+full desktop interaction, code signing and clean-machine acceptance remain
+unverified. Full update acceptance will be performed with successive public
+releases after the repository becomes public. The locked CyUI source must also
+be reachable by the release runner. No repository visibility change, commit,
+push, release publication or security-setting change was performed here.
+
 ## Separation milestone (before modular migration)
 
 This repository was extracted from the locally developed CyCodeReader and the
@@ -42,9 +120,10 @@ the build script. The existing protection-related GUI investigation remains open
 no old quarantined CyCode binary is restored. Linux/macOS execution and a public
 binary installer/package remain unverified.
 
-Reader has no language-server completion, project semantic colors, debugger, Git,
+Reader has no language-server completion, project semantic colors, debugger, full Git repository workflows,
 folder-wide search, macro recorder, remote extension marketplace or unsaved-document
-crash recovery. Plugin languages currently use C++/JSON lexical bases; arbitrary
+crash recovery. The new native Git plugin supplies read-only file comparisons,
+not repository management. Plugin languages currently use C++/JSON lexical bases; arbitrary
 external parser engines and per-plugin UI panels remain pending. Native plugins
 are trusted in-process code and cannot be forcibly cancelled or sandboxed. Full
 Notepad++ feature coverage and the newly expanded desktop visual flow remain pending.
@@ -163,3 +242,120 @@ Reader now pins CyUI commit 37440e74c412bec5b737f344cd40cf5b1f8ff00f in the norm
 The local managed dependency cache was updated from the clean commit, without
 changing the developer checkout or pushing either repository. The Reader build
 with that clean pinned source is recorded under runtime/build-modular-vs.
+
+
+## CyUI quick filtering — 2026-11-02
+
+The normal Windows/MSVC build uses the exact clean CyUI filtering revision
+ff023e646c6a3038b3dfbfd53f6d2b4a2f5955e3. Core already provides the filter APIs;
+no optional module, duplicate widget or library source patch was added.
+
+All 10 GUI-enabled Reader CTests passed in runtime/build-modular-vs, including
+new reader_filtering coverage of the actual menu renderer and Reader models:
+
+- Stable action IDs across enabled states, translation and recent-file ordering;
+  a pointer click selects the requested shared syntax, checked state survives,
+  and disabled read-only encoding actions cannot run.
+- English/French multi-word matching, accent folding, accented parent paths,
+  plugin syntax extensions and translated submenu breadcrumbs; accented syntax
+  names remain in their alphabetical group.
+- Menu popup typing/focus and Escape clearing, Ctrl+F/Cmd+F in a filtered panel,
+  Ctrl+F in a document, and Ctrl+Shift+F opening search across open buffers. The
+  latter has priority over the native widget's conflicting Find All shortcut.
+- Hidden property drafts, omitted plugin sections and closed panels cancel
+  without configuring options or changing live document Undo/dirty state.
+- Result-filter cache invalidation and stable 64-bit navigation IDs, including
+  source paths containing literal ## characters. Code-search query semantics
+  and stale-source revision guards are unchanged.
+- The Open dialog preserves contributed language registrations. Actual views
+  render in graphite/light-grey and 100/200% DPI. Existing module tests retain
+  their six themes, two densities and 100/150/200% DPI coverage.
+
+These tests create no OS windows and do not initialize SDL. macOS key behavior
+is simulated in ImGui, not evidence of a macOS build. Linux/macOS execution,
+physical display movement and desktop pixel acceptance remain unverified.
+The rebuilt portable test folder is runtime/package-filtering-check; its
+executable is not launched by the build. Gitleaks audit evidence is recorded
+under the CyCode runtime/audit/reader-filtering folder. No push was performed.
+
+## Reader interface, search and Git history — 2026-11-03
+
+The Windows x64/MSVC GUI-enabled build passes **16/16 CTests** without SDL
+initialization, GPU rendering or native application windows. The new experience
+test draws the actual Reader in EN/FR, graphite/light-grey and 100/200% DPI. It
+checks the default minimap/sidebar configuration, dedicated find, literal and
+extended searches, whole-word/case behavior, UTF-8 positions, selection bounds,
+empty/read-only replacement guards, one-step Undo, unsaved open-document scope,
+stale/closed result invalidation, display-only search spans and actual code
+right-click popup input. A near-match 4 MiB fixture exercises the linear matcher.
+The diff test verifies exactly one scrolling canvas and input over both columns.
+
+The actual loaded Git DLL passes **11 disposable-repository scenarios**, including
+rename-aware metadata and old-path blobs, root/parent/two-revision comparisons,
+line history, unchanged unsaved-range mapping, rejected changed ranges and a
+104-commit two-page traversal with no duplicates. Existing worktree, conflict,
+encoding, binary, size, literal filename and index/disk preservation checks pass.
+Reader's actual history panel and asynchronous stale-selection guards are tested.
+
+Optional CPU raster captures of real ImGui draw data were inspected for the
+default editor, find/replace, search results/preview, context popup, Git history
+and aligned comparison. They use an explicit legacy-test glyph preload for the
+icons/French punctuation loaded dynamically by the desktop renderer. These are
+headless layout evidence, not desktop/OpenGL acceptance. No app/installer was
+launched; the existing protection investigation remains respected. Linux/macOS
+execution, physical monitor movement and interactive desktop acceptance remain
+unverified. Public update checks stay disabled and no credential is embedded.
+
+## Embedded history file diff — 2026-11-03
+
+The Windows GUI-enabled build passes **16/16 CTests** with the embedded history
+diff. The actual Git/ImGui fixture verifies automatic first-row/root diffs, a
+second revision against its parent, inline buffer and two-revision comparisons,
+separate-window expansion, rapid selection with a previous worker still running,
+discarded obsolete buffer replies and source closure. Rendering is exercised in
+EN/FR, graphite/light-grey and 100/200% DPI. Live text, selection and Undo snapshots
+remain unchanged by viewing the diff. The common bounded diff preparation is
+shared with the standalone comparison window; no CyUI checkout or plugin ABI
+change is involved. A CPU raster capture of the actual embedded view was inspected.
+These checks create no OS windows. Desktop/OpenGL and other platforms remain
+unverified under the existing acceptance constraints. Packages are regenerated
+with public updates disabled; no publication, installation or app launch is made.
+
+## Shared CyUI Diff correction — 2026-11-03
+
+Reader pins clean CyUI commit a228501d9418550ce68d2d67b70cebbb8fa3ee2a.
+ComparisonUI and the embedded history preview call native cyui::diffViewer;
+the Reader-only renderer has been removed. DiffView retains source validation
+and bounded document preparation. The CyUI API/state layout is unchanged.
+
+The Windows/MSVC all-module CyUI build passes **8/8 CTests**. The new native
+regression covers one scrolling child, wheel input over either column, vertical
+scrollbar dragging, horizontal offsets with fixed gutters, row navigation,
+explicit scroll restoration, hunk focus and empty documents. It draws split and
+unified views across five themes, both densities, EN/FR and 100/150/200% DPI.
+build_demo.bat succeeds; all ten hidden DX11 gallery captures (five themes and
+two densities) pass and their comparison sheet was visually inspected.
+
+The normal GUI-enabled Reader build with that exact clean commit and development
+mode disabled passes **16/16 CTests**, including the actual comparison/history
+panels and shared canvas input. Optional CPU captures use the rebuilt library.
+Reader and its installer were not launched. Public updates stay disabled;
+the commit is local, with no push or credential added. Linux/macOS and interactive
+Reader desktop acceptance remain unverified. The independent Python CyUI renderer
+is outside this native C++ change.
+
+## Public beta v0.1.1 — 2026-11-03
+
+The Windows x64/MSVC Release build passes **16/16 CTests** at version 0.1.1
+with CYCODE_READER_PUBLIC_UPDATES=ON and development CyUI mode disabled. The
+normal dependency resolver uses the clean exact source pin; CyUI commit
+a228501d9418550ce68d2d67b70cebbb8fa3ee2a is now available on public CyUI main.
+The versioned release notes disclose the remaining desktop/clean-machine,
+installation/uninstallation and online update acceptance work. The beta is a
+GitHub prerelease and is intentionally ignored by the stable update channel.
+
+The release workflow YAML and its publication Python block pass local syntax
+validation. The workflow requires matching numeric tag/CMake versions, a boolean
+prerelease profile and versioned notes. Tagged public builds reconstruct and test
+the packages on Windows/MSVC before uploading the installer, portable ZIP and
+SHA256SUMS.txt. Reader and its installer were not launched during preparation.

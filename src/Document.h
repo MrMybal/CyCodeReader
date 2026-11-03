@@ -14,6 +14,8 @@ class Document {
     bool untitled() const { return path_.empty(); }
     const std::filesystem::path &path() const { return path_; }
     const std::string &text() const { return text_; }
+    const std::string &savedText() const { return saved_; }
+    const std::string &encodingId() const { return encoding_; }
     const char *lineEnding() const { return crlf_ ? "CRLF" : crOnly_ ? "CR" : "LF"; }
     const char *encoding() const;
     void format(const std::string &encoding,const std::string &lineEnding);

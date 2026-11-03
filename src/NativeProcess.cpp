@@ -45,7 +45,8 @@ static std::wstring quote(const std::string &s) {
 ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesystem::path &cwd,
                          std::chrono::milliseconds timeout, std::size_t maxOutput,
                          const std::atomic<bool> *cancellation,
-                         const std::map<std::string,std::string> &overrides) {
+                         const std::map<std::string,std::string> &overrides,
+                         const std::vector<std::string> &removeEnvironment) {
     ProcessResult result;
     if (argv.empty()) {
         result.output = "Missing executable";
@@ -53,6 +54,7 @@ ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesy
     }
     for (const auto &[name,value] : overrides) if (name.empty() || name.find('=')!=std::string::npos || name.find('\0')!=std::string::npos || value.find('\0')!=std::string::npos)
         throw std::runtime_error("Invalid process environment override");
+    for (const auto &name : removeEnvironment) if (name.empty() || name.find_first_of("=\0",0,2)!=std::string::npos) throw std::runtime_error("Invalid removed environment name");
     auto commandArgs = argv;
     auto start = std::chrono::steady_clock::now();
     auto append = [&](const char *data, std::size_t n) {
@@ -105,6 +107,7 @@ ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesy
         }
         FreeEnvironmentStringsW(inherited);
     }
+    for (const auto &name : removeEnvironment) variables.erase(wide(name));
     for (const auto &[name,value] : overrides) variables[wide(name)]=wide(name+"="+value);
     std::vector<wchar_t> environment;
     for (const auto &[key, value] : variables) {
@@ -181,9 +184,10 @@ ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesy
     std::vector<std::string> environmentValues;
     std::vector<char *> environmentPointers;
     std::string executable=commandArgs.front();
-    if (!overrides.empty()) {
+    if (!overrides.empty() || !removeEnvironment.empty()) {
         std::map<std::string,std::string> variables;
         for (auto entry=environ;entry && *entry;++entry) { const std::string value(*entry);const auto at=value.find('=');if (at!=std::string::npos) variables[value.substr(0,at)]=value.substr(at+1); }
+        for (const auto &name : removeEnvironment) variables.erase(name);
         for (const auto &[name,value] : overrides) variables[name]=value;
         for (const auto &[name,value] : variables) environmentValues.push_back(name+"="+value);
         for (auto &value : environmentValues) environmentPointers.push_back(value.data());
@@ -208,7 +212,7 @@ ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesy
         }
         if (!cwd.empty() && chdir(cwd.c_str()) != 0)
             _exit(126);
-        if (overrides.empty()) execvp(args[0], args.data());
+        if (overrides.empty() && removeEnvironment.empty()) execvp(args[0], args.data());
         else execve(executable.c_str(),args.data(),environmentPointers.data());
         _exit(127);
     }
