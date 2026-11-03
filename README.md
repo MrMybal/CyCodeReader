@@ -1,7 +1,7 @@
 # CyCodeReader
 
 <p align="center">
-  <img src="icons/CyCodeReader.png" alt="CyCodeReader logo" width="160" height="160">
+  <img src="https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/icons/CyCodeReader.png?v=0.1.1" alt="CyCodeReader logo" width="160" height="160">
 </p>
 
 An independent native C++20 code/text editor built with CyUI, SDL3 and Dear ImGui.
