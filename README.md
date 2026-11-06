@@ -11,7 +11,7 @@ Files open directly without loading CyCode, solutions, language servers, project
 tools. CyToolsCore supplies the integrated SDK/MCP companion. Repository: https://github.com/MrMybal/CyCodeReader.
 
 Windows x64 downloads: [GitHub Releases](https://github.com/MrMybal/CyCodeReader/releases).
-Version 0.1.2 adds the bundled and online CyDoc manual; see [release notes and known limits](Docs/Releases/v0.1.2.md).
+Version 0.1.3 adds native Verse highlighting and the current bilingual CyDoc reader; see [release notes and known limits](Docs/Releases/v0.1.3.md).
 
 `editor/` is also the shared source library consumed by CyCode: one implementation
 of the CyUI editor adapter, lexical/Tree-sitter overlays, icons, snippets and native file I/O.
@@ -50,7 +50,7 @@ The widget provides undo/redo, multiple cursors, folding, bracket matching,
 indentation and selection. The default layout shows the minimap, keeps the file sidebar hidden, and uses a
 compact icon toolbar with the logo alone. View offers wrapping, whitespace, text size,
 six themes and English/French. C/C++/Unreal, C#, HLSL/GLSL, Python, Lua, JSON and
-Markdown use shared lexical rules. Rust, Java, JS/JSX, TS/TSX, HTML and CSS use
+Markdown and Verse use shared lexical rules. Rust, Java, JS/JSX, TS/TSX, HTML and CSS use
 incremental Tree-sitter parsing, including HTML script/style regions. Syntax works
 without installing Rust, Java or Node.js. Project semantic services remain in CyCode.
 
@@ -121,7 +121,7 @@ no developer checkout is reset or updated. For a fresh configuration use
 
 ### Shared syntax catalogue
 
-The locked CyUI commit provides 101 syntax modes, including HLSL/GLSL, file
+The locked CyUI commit provides 102 syntax modes, including Verse and HLSL/GLSL, file
 associations, whole-line Error/Warning colors for `.log` files and syntax engines
 contributed by plugins. Reader's Language menu consumes this common registry.
 Its richer Unreal/C# adapters and incremental Tree-sitter parsers are preserved.

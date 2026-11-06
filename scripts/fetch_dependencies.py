@@ -34,8 +34,8 @@ def fetch(destination,core_only=False):
 
     if not core_only:
         sys.path.insert(0, str(ROOT/'editor/scripts'))
-        from cyui_dependency import resolve
-        print(f'CyUI: {resolve(destination/"CyUI")}',flush=True)
+        from cyui_dependency import resolve, cache_directory
+        print(f'CyUI: {resolve(cache_directory(destination))}',flush=True)
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)

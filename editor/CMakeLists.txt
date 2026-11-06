@@ -46,8 +46,11 @@ if(CYCODE_EDITOR_BUILD_GUI)
   set(CYUI_MODULES "${CYCODE_EDITOR_UI_MODULES}" CACHE STRING "" FORCE)
   find_package(Python3 COMPONENTS Interpreter REQUIRED)
   option(CYCODE_CYUI_DEVELOPMENT "Use an explicit local development CyUI checkout without changing its source lock" OFF)
+  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/cyui-source.lock.json" CYCODE_CYUI_LOCK)
+  string(JSON CYCODE_CYUI_REVISION GET "${CYCODE_CYUI_LOCK}" revision)
+  string(SUBSTRING "${CYCODE_CYUI_REVISION}" 0 12 CYCODE_CYUI_CACHE_ID)
   execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/cyui_dependency.py"
-    --destination "${CYCODE_EDITOR_DEPS}/CyUI" --source "${CYUI_DIR}" --allow-development "${CYCODE_CYUI_DEVELOPMENT}"
+    --destination "${CYCODE_EDITOR_DEPS}/cyui-${CYCODE_CYUI_CACHE_ID}" --source "${CYUI_DIR}" --allow-development "${CYCODE_CYUI_DEVELOPMENT}"
     OUTPUT_VARIABLE CYUI_DIR OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
   add_subdirectory("${CYUI_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/cyui")
   # CyUI currently has no host-backend option. Keep our existing native hooks in a

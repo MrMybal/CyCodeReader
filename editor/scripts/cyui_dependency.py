@@ -16,6 +16,11 @@ def git(source, *args):
         env=env, text=True, stderr=subprocess.PIPE).strip()
 
 
+def cache_directory(dependencies):
+    lock = json.loads((EDITOR/'cyui-source.lock.json').read_text('utf-8'))
+    return Path(dependencies)/('cyui-' + lock['revision'][:12])
+
+
 def resolve(destination, source=None, allow_development=False):
     lock = json.loads((EDITOR/'cyui-source.lock.json').read_text('utf-8'))
     path = (source or destination).resolve()

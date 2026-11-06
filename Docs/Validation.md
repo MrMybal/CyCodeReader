@@ -1,5 +1,17 @@
 # Validation
 
+## Shared Verse syntax — 2026-11-06
+
+Windows x64 Release Reader compiles against the exact committed CyUI Verse
+revision, with native tests OFF. Both Reader and CyCode use the shared native
+scanner and catalogue. The actual scanner passed 32 compiler-evaluated assertions;
+catalogue/plugin/editor test bodies were checked by MSVC /Zs only, not executed.
+Reader source checks passed (24 Python and 14 JSON files); its paired EN/FR
+manual regenerated with validated anchors, assets, translations and references.
+No GUI, SDK/MCP or native test executable was launched. Runtime plugin/Undo,
+UI/theme/DPI and Linux/macOS acceptance remain pending. Verse compilation and
+an official UEFN language-service integration are not included.
+
 ## File comparison and native Git plugin — 2026-11-03
 
 Windows x64 / MSVC 2022 Release compilation and all **15 CTests passed** with the
