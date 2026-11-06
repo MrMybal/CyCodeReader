@@ -94,6 +94,25 @@ jobs:
           profile = json.loads(Path('packaging/release.json').read_text('utf-8'))
           if type(profile.get('prerelease')) is not bool:
               raise SystemExit('prerelease must be a boolean.')
+          # A reviewed local publication can race the tag-triggered builder.
+          # Keep published files immutable; only skip a complete matching tag.
+          endpoint = f"repos/{os.environ['GH_REPO']}/releases/tags/{tag}"
+          probe = subprocess.run(['gh', 'api', endpoint], text=True, capture_output=True)
+          if probe.returncode == 0:
+              existing = json.loads(probe.stdout)
+              required = {p.name for p in Path('dist').iterdir()}
+              assets = existing.get('assets', [])
+              head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+              source = json.loads(subprocess.check_output(
+                  ['gh', 'api', f"repos/{os.environ['GH_REPO']}/commits/{tag}"], text=True))
+              if (existing['draft'] or existing['prerelease'] != profile['prerelease']
+                  or {a['name'] for a in assets} != required or source['sha'] != head
+                  or any(a['size'] <= 0 or not re.fullmatch(r'sha256:[0-9a-f]{64}', a.get('digest') or '') for a in assets)):
+                  raise SystemExit('Existing release needs review; no published files changed.')
+              print('This source tag is already published with complete assets; keeping the published files.')
+              raise SystemExit(0)
+          if 'HTTP 404' not in probe.stderr:
+              raise SystemExit('Cannot inspect existing release; no publication attempted.')
           command = ['gh', 'release', 'create', tag,
                      *map(str, sorted(Path('dist').iterdir())), '--verify-tag',
                      '--notes-file', f'Docs/Releases/{tag}.md',
