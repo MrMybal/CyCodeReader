@@ -1,0 +1,11 @@
+name: Refresh the shared documentation site
+on:
+  push:
+    branches: [cycode-docs]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  documentation:
+    uses: MrMybal/CyCodeReader/.github/workflows/documentation.yml@main
