@@ -27,3 +27,8 @@ __pycache__/
 
 # Generated reader; sources live in .CyDocBuild.
 /Documentation/
+
+# Native plugin binaries copied by local builds.
+/plugins/*.dll
+/plugins/*.so
+/plugins/*.dylib
