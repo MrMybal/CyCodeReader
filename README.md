@@ -145,7 +145,7 @@ remaining native compatibility hooks are described in
 [the migration notes](Docs/CyUI-Migration.md).
 
 Build outputs remain in runtime/build-vs/Release on Windows, runtime/build elsewhere.
-Building runs CTest but does not install, restore old binaries or open an app.
+Ordinary builds keep native tests disabled and do not install or open an app.
 locales/ui.json is deployed beside the build executable. To make a portable folder:
 
 ```sh
