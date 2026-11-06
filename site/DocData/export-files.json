@@ -1,0 +1,25 @@
+{
+  "format": 2,
+  "generator": "CyDoc",
+  "revision": "6ddf9a582defb2f11fbb3f992afef6f98dcadc93",
+  "files": {
+    "index.html": "5fbabe9861685127cca966d855a0a342da0fd3c060dd98a8da351ceb10f32e17",
+    "DocAI.md": "aa0456e8169b51de44569f6df92f16787bd0828dcdfeb3e6c58ecb9042c22e2e",
+    "Documentation.html": "419215d2ac874bbcb67c98a1d366853e3a791d8f37b22d6d36c2c98f48ff4c1d",
+    "DocData/viewer.css": "0cd7fdce319cf0d1c2728ffeb53e45ffe7d14a5e86746d574649b6a5deb33575",
+    "DocData/viewer.js": "3ddf91c11b09edb32f6a24e7ae034420a40357be1a4c1631a0b1674b75e0b949",
+    "DocData/media-image.js": "182df084c547df55da727c49fee459ff8f1549b646b4299ab72f2201bb3b615c",
+    "DocData/media-gallery.js": "f91ad56532d805a594413784544602a5227a16adc7f7b6b1389718f5049f15e1",
+    "DocData/data.js": "1d39da03207a32d7b6b78f29cee608955384cbd9e2399e3e2f9f842fd205a231",
+    "DocData/manifest.json": "15457cda73dcf3aab79be8203573da57985bc2b0a7b61480dc3de93d03f0a542",
+    "DocData/translation-report.json": "97701006a39e04dcfb8b6c3a01a15c14373ca3739864b8883543fc087d4b2cdd",
+    "DocData/licenses/esbuild.txt": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+    "DocData/licenses/Marked.txt": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c",
+    "DocData/licenses/PrismJS.txt": "2b947f0901a7ffcf08a89957da9783c0e9c6e72cb6ce8e959f501ab5409e4d2b",
+    "DocData/licenses/CyDoc.txt": "60aaa0ed2087332acbaee219c088240f5ddda7e7fe393ad5c162b8c617e62bf0",
+    "DocData/assets/interface-en.svg": "f4c1dd5dd131fdf03b730bf274be7095ac836059c66e3154553fc88c4604e31d",
+    "DocData/assets/app-logo.png": "2146e78b4600abc7aea09e60b2b6c7c2f4d11bbc6d754dc898062c1e7bf9d8b5",
+    "DocData/assets/interface-fr.svg": "f8fbee0b1530e9ac341a1983814c9d0a183e0a4c345e6d11adf3494d181b4d82",
+    "DocData/assets/favicon.svg": "b91cd1c26b9fddf747662b5ea7138c27854560917fd9962f7c4aa50580bb73e9"
+  }
+}
