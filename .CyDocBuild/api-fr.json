@@ -1,0 +1,15 @@
+{
+  "documents_list": "Lister les documents ouverts dans cette instance de Reader.",
+  "documents_read": "Lire un document en mémoire à partir de son identifiant émis.",
+  "documents_open": "Ouvrir un fichier utilisateur avec détection UTF-8/BOM ou UTF-16 BOM, ou un encodage explicite.",
+  "documents_new": "Créer un document natif sans fichier.",
+  "documents_replace": "Remplacer un document à la révision attendue, sans enregistrer sur disque.",
+  "documents_save": "Enregistrer un document nommé à la révision attendue après contrôle du disque.",
+  "documents_format": "Modifier l’encodage ou les fins de ligne en attente à la révision attendue.",
+  "documents_close": "Fermer un document à la révision attendue ; abandonner les changements exige un choix explicite.",
+  "search_open_documents": "Rechercher un texte littéral dans les documents actuellement ouverts.",
+  "text_transform": "Appliquer une transformation de tout le document à la révision attendue.",
+  "plugins_list": "Consulter les plugins, commandes, options, syntaxes et erreurs de chargement.",
+  "plugins_configure": "Valider les types des options déclarées et modifier les préférences du plugin.",
+  "plugins_invoke": "Exécuter une commande de plugin de confiance sur un document avec contrôle de révision."
+}

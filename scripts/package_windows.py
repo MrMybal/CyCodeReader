@@ -33,7 +33,7 @@ def find_cmake(build):
 
 def allowed(name):
     parts = name.split('/')
-    if not name or len(name) > 240 or any(not p or p in {'.', '..'} or p[-1] in '. ' for p in parts):
+    if not name or len(name) > 240 or any(not p or p in {'.', '..', '.CyDocBuild'} or p[-1] in '. ' for p in parts):
         return False
     for part in parts:
         if any(ord(c) < 32 or ord(c) >= 127 or c in '\\:<>"|?*' for c in part):
@@ -45,7 +45,7 @@ def allowed(name):
                      'installed.flag', 'package-files.json', 'LICENSE', 'COPYRIGHT',
                      'THIRD_PARTY_NOTICES.md'} or
             (len(parts) == 1 and name.endswith('.dll')) or
-            (len(parts) > 1 and parts[0] in {'locales', 'licenses', 'plugins', 'app', 'help'}) or
+            (len(parts) > 1 and parts[0] in {'locales', 'licenses', 'plugins', 'app', 'help', 'Documentation'}) or
             name in {'icons/CyCodeReader.png', 'icons/CyCodeReader.ico',
                      'icons/CyCodeReader-document.png', 'icons/CyCodeReader-document.ico'})
 
@@ -69,7 +69,7 @@ def files_in(stage):
 
 
 def write_manifest(stage, app_version):
-    verify_documentation(stage / 'help')
+    verify_documentation(stage / 'Documentation')
     files = sorted(set(files_in(stage)) | {'package-files.json'})
     (stage / 'package-files.json').write_text(
         json.dumps({'version': app_version, 'files': files}, indent=2) + '\n', 'utf-8')

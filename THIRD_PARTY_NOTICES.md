@@ -35,6 +35,6 @@ not wrap a Notepad++ plugin binary.
 
 
 Local help uses [CyDoc](https://github.com/MrMybal/CyDoc), MIT, pinned by
-`documentation/cydoc.lock.json`. The exported help includes its MIT notice
-and the Marked, PrismJS and esbuild notices in its own `licenses/` directory.
+`.CyDocBuild/cydoc.lock.json`. The exported help includes its MIT notice
+and the Marked, PrismJS and esbuild notices in `Documentation/DocData/licenses/`.
 Only image/gallery runtime modules are distributed; no Three.js runtime is included.

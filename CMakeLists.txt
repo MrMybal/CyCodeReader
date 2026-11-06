@@ -134,31 +134,21 @@ if(CYCODE_READER_BUILD_GUI)
     "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader-document.ico")
   target_link_libraries(CyCodeReader PRIVATE cycode_reader_ui)
   option(CYCODE_READER_BUILD_DOCUMENTATION "Generate and distribute the local CyDoc manual" ON)
-  set(CYDOC_DIR "" CACHE PATH "Optional clean CyDoc checkout matching documentation/cydoc.lock.json")
   if(CYCODE_READER_BUILD_DOCUMENTATION)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
-    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/documentation/cydoc.lock.json" CYDOC_LOCK)
-    string(JSON CYDOC_REVISION GET "${CYDOC_LOCK}" revision)
-    string(SUBSTRING "${CYDOC_REVISION}" 0 7 CYDOC_SHORT_REVISION)
-    set(CYDOC_CACHE "${CMAKE_CURRENT_SOURCE_DIR}/runtime/deps/cydoc-${CYDOC_SHORT_REVISION}")
-    set(CYDOC_SOURCE_ARGUMENTS)
-    if(CYDOC_DIR)
-      list(APPEND CYDOC_SOURCE_ARGUMENTS --cydoc-source "${CYDOC_DIR}")
-    endif()
     add_custom_target(CyCodeReader_documentation
-      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_documentation.py" ${CYDOC_SOURCE_ARGUMENTS}
-        --output "${CMAKE_BINARY_DIR}/help" --output "$<TARGET_FILE_DIR:CyCodeReader>/help" --output "${CMAKE_CURRENT_SOURCE_DIR}/help"
+      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/.CyDocBuild/build.py"
+        --output "${CMAKE_BINARY_DIR}/Documentation" --output "$<TARGET_FILE_DIR:CyCodeReader>/Documentation"
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       COMMENT "Compiling the offline CyDoc manual" VERBATIM)
     add_dependencies(cycode_reader_ui CyCodeReader_documentation)
-    target_include_directories(cycode_reader_ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/documentation/native" "${CYDOC_CACHE}/examples/integrations")
+    target_include_directories(cycode_reader_ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/.CyDocBuild/node_modules/cydoc/examples/integrations")
     target_compile_definitions(cycode_reader_ui PRIVATE CYCODE_LOCAL_HELP)
     if(WIN32)
       target_link_libraries(cycode_reader_ui PRIVATE shlwapi)
     endif()
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/help/" DESTINATION help)
-  else()
-    target_include_directories(cycode_reader_ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/documentation/native")
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/Documentation/" DESTINATION Documentation)
+
   endif()
 
   add_dependencies(CyCodeReader reader_sample_plugin reader_git_plugin)

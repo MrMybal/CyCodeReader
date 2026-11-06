@@ -284,7 +284,7 @@ void Reader::execute(const std::string &command,const Json &params) {
                     if (name.find("reader-comparison") != name.npos) { page = "version-control"; break; }
                 }
             }
-            app_help::open(options_.installation, "help", locale_, page,
+            app_help::open(options_.installation, "Documentation", locale_, page,
                 params.value("anchor", page == "tour" ? "interface" : ""), options_.automated,
                 params.value("media", page == "tour" ? "interface-image" : ""));
         }

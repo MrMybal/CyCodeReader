@@ -1,6 +1,6 @@
 # CyCodeReader
 
-[Documentation](https://mrmybal.github.io/CyCodeReader/#/en/overview) · [Documentation en français](https://mrmybal.github.io/CyCodeReader/#/fr/overview)
+[Documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation en français](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/icons/CyCodeReader.png?v=0.1.1" alt="CyCodeReader logo" width="160" height="160">
@@ -251,4 +251,8 @@ SDK task artifacts. See [Docs/MCP.md](Docs/MCP.md) for CLI/service usage and tes
 
 
 Local illustrated English/French help is generated and bundled with GUI builds.
-See [CyDoc documentation and build instructions](Docs/Documentation.md).
+See [documentation toolchain instructions](.CyDocBuild/README.md).
+
+The current manual uses complete English/French task guides and public API contracts.
+Open `Documentation/Documentation.html` directly after generation.
+The shared Pages site also hosts the [CyCode IDE manual](https://mrmybal.github.io/CyCodeReader/cycode/Documentation.html#/en/overview).

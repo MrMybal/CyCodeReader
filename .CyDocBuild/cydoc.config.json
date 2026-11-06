@@ -1,0 +1,55 @@
+{
+  "name": "CyCodeReader",
+  "version": "0.1.2",
+  "logo": "assets/app-logo.png",
+  "defaultLocale": "en",
+  "locales": [
+    {
+      "code": "en",
+      "label": "English"
+    },
+    {
+      "code": "fr",
+      "label": "Français"
+    }
+  ],
+  "homePage": "overview",
+  "content": "manual",
+  "assets": "assets",
+  "out": "../Documentation",
+  "modules": [
+    "image",
+    "gallery"
+  ],
+  "aliases": {
+    "getting-started": "quickstart#first-work",
+    "keyboard-shortcuts": "shortcuts#shortcuts",
+    "plugin-guide": "plugins#extensions",
+    "sdk": "mcp#connection",
+    "reference-copyright": "overview#getting-started",
+    "reference-docs-architecture": "overview#getting-started",
+    "reference-docs-comparison": "comparison-api#contract",
+    "reference-docs-cyui-migration": "overview#getting-started",
+    "reference-docs-distribution": "updates#updates",
+    "reference-docs-documentation": "overview#getting-started",
+    "reference-docs-filtering": "filtering#filters",
+    "reference-docs-images-readme": "overview#getting-started",
+    "reference-docs-mcp": "mcp#connection",
+    "reference-docs-plugins": "plugin-api#contract",
+    "reference-docs-releases-v0-1-1": "overview#getting-started",
+    "reference-docs-releases-v0-1-2": "overview#getting-started",
+    "reference-docs-search": "search#find",
+    "reference-docs-validation": "overview#getting-started",
+    "reference-license": "licences#licence",
+    "reference-readme": "overview#getting-started",
+    "reference-third-party-notices": "overview#getting-started",
+    "reference": "overview#getting-started",
+    "help-routing": "overview#getting-started",
+    "source-api-sources-applicationhelp-h": "overview#getting-started",
+    "source-api-sources-core-h": "overview#getting-started",
+    "source-api-sources-document-h": "overview#getting-started",
+    "source-api-sources-pluginabi-h": "plugin-api#contract",
+    "source-api-sources-contracts-py": "overview#getting-started",
+    "translation-report": "overview#getting-started"
+  }
+}

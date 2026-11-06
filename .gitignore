@@ -24,3 +24,6 @@ __pycache__/
 
 # Complete generated local help; documentation/ contains the authoring sources.
 /help/
+
+# Generated reader; sources live in .CyDocBuild.
+/Documentation/

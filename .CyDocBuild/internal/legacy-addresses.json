@@ -1,0 +1,210 @@
+[
+  {
+    "id": "api-links",
+    "title": "API / MCP"
+  },
+  {
+    "id": "editing",
+    "title": "Editing and files"
+  },
+  {
+    "id": "languages",
+    "title": "Languages and highlighting"
+  },
+  {
+    "id": "limits",
+    "title": "Scope and limits"
+  },
+  {
+    "id": "mcp",
+    "title": "SDK and MCP"
+  },
+  {
+    "id": "overview",
+    "title": "CyCodeReader"
+  },
+  {
+    "id": "plugins",
+    "title": "Plugins"
+  },
+  {
+    "id": "projects",
+    "title": "Projects and tools"
+  },
+  {
+    "id": "quickstart",
+    "title": "Quick start"
+  },
+  {
+    "id": "reference-copyright",
+    "title": "COPYRIGHT"
+  },
+  {
+    "id": "reference-docs-architecture",
+    "title": "Architecture"
+  },
+  {
+    "id": "reference-docs-comparison",
+    "title": "File comparisons and Git plugin"
+  },
+  {
+    "id": "reference-docs-cyui-migration",
+    "title": "Modular CyUI migration"
+  },
+  {
+    "id": "reference-docs-distribution",
+    "title": "Windows distributions and public updates"
+  },
+  {
+    "id": "reference-docs-documentation",
+    "title": "Local documentation with CyDoc"
+  },
+  {
+    "id": "reference-docs-filtering",
+    "title": "Quick filters in Reader"
+  },
+  {
+    "id": "reference-docs-images-readme",
+    "title": "Interface captures"
+  },
+  {
+    "id": "reference-docs-mcp",
+    "title": "CyToolsCore SDK and MCP"
+  },
+  {
+    "id": "reference-docs-plugins",
+    "title": "Reader extensions"
+  },
+  {
+    "id": "reference-docs-releases-v0-1-1",
+    "title": "CyCodeReader v0.1.1 — bêta publique Windows x64"
+  },
+  {
+    "id": "reference-docs-releases-v0-1-2",
+    "title": "CyCodeReader 0.1.2"
+  },
+  {
+    "id": "reference-docs-search",
+    "title": "Search and the default editor layout"
+  },
+  {
+    "id": "reference-docs-validation",
+    "title": "Validation"
+  },
+  {
+    "id": "reference-license",
+    "title": "LICENSE"
+  },
+  {
+    "id": "reference-readme",
+    "title": "CyCodeReader"
+  },
+  {
+    "id": "reference-third-party-notices",
+    "title": "Third-party notices"
+  },
+  {
+    "id": "reference",
+    "title": "Technical reference"
+  },
+  {
+    "id": "search",
+    "title": "Search and navigation"
+  },
+  {
+    "id": "shortcuts",
+    "title": "Keyboard shortcuts"
+  },
+  {
+    "id": "tour",
+    "title": "Visual tour"
+  },
+  {
+    "id": "updates",
+    "title": "Updates"
+  },
+  {
+    "id": "version-control",
+    "title": "Version control"
+  },
+  {
+    "id": "help-routing",
+    "title": "Native help routing"
+  },
+  {
+    "id": "operation-documents-list-documents-list",
+    "title": "documents_list"
+  },
+  {
+    "id": "operation-documents-read-documents-read",
+    "title": "documents_read"
+  },
+  {
+    "id": "operation-documents-open-documents-open",
+    "title": "documents_open"
+  },
+  {
+    "id": "operation-documents-new-documents-new",
+    "title": "documents_new"
+  },
+  {
+    "id": "operation-documents-replace-documents-replace",
+    "title": "documents_replace"
+  },
+  {
+    "id": "operation-documents-save-documents-save",
+    "title": "documents_save"
+  },
+  {
+    "id": "operation-documents-format-documents-format",
+    "title": "documents_format"
+  },
+  {
+    "id": "operation-documents-close-documents-close",
+    "title": "documents_close"
+  },
+  {
+    "id": "operation-search-open-documents-search-open-documents",
+    "title": "search_open_documents"
+  },
+  {
+    "id": "operation-text-transform-text-transform",
+    "title": "text_transform"
+  },
+  {
+    "id": "operation-plugins-list-plugins-list",
+    "title": "plugins_list"
+  },
+  {
+    "id": "operation-plugins-configure-plugins-configure",
+    "title": "plugins_configure"
+  },
+  {
+    "id": "operation-plugins-invoke-plugins-invoke",
+    "title": "plugins_invoke"
+  },
+  {
+    "id": "source-api-sources-applicationhelp-h",
+    "title": "ApplicationHelp.h"
+  },
+  {
+    "id": "source-api-sources-core-h",
+    "title": "Core.h"
+  },
+  {
+    "id": "source-api-sources-document-h",
+    "title": "Document.h"
+  },
+  {
+    "id": "source-api-sources-pluginabi-h",
+    "title": "PluginABI.h"
+  },
+  {
+    "id": "source-api-sources-contracts-py",
+    "title": "contracts.py"
+  },
+  {
+    "id": "translation-report",
+    "title": "Translation status"
+  }
+]
