@@ -1,0 +1,49 @@
+name: Documentation
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: documentation
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate the complete pinned CyDoc reader
+        run: python scripts/build_documentation.py --output runtime/pages
+      - name: Verify owned files, resources and translated routes
+        run: python scripts/verify_documentation.py runtime/pages
+      - name: Verify reader interactions without native applications
+        run: node scripts/verify_documentation_dom.mjs runtime/pages runtime/deps/cydoc-774f2a7
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: runtime/pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy complete reader
+        id: deployment
+        uses: actions/deploy-pages@v4

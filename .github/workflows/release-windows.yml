@@ -21,6 +21,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Validate release tag
         shell: pwsh
         run: |
@@ -37,7 +40,7 @@ jobs:
         run: python scripts/fetch_dependencies.py
         # The locked CyUI revision must be accessible to this runner. No private
         # read token or developer credential is requested or persisted here.
-      - name: Build and run offline native checks
+      - name: Build production application and bundled help
         shell: pwsh
         env:
           REPOSITORY_PRIVATE: ${{ github.event.repository.private }}

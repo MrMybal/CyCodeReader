@@ -82,6 +82,13 @@ MenuModel Reader::menuModel(const std::string &menu) const {
             }
             if (!group.children.empty()) rows.push_back(std::move(group));
         }
+    } else if (menu=="Help") {
+        add(rows,"Documentation","help",{},"F1");
+        add(rows,"Context help","help.context",{},"Shift+F1");
+        add(rows,"Illustrated tour","help.tour");
+        add(rows,"Keyboard shortcuts","help",{{"page","shortcuts"}});
+        add(rows,"Extension documentation","help",{{"page","plugins"}});
+        add(rows,"MCP documentation","help",{{"page","mcp"}});
     } else if (menu=="Extensions") {
         add(rows,"Extension manager","plugins");separator();
         const auto state=const_cast<Core&>(core_).plugins().describe();
@@ -113,7 +120,7 @@ void Reader::runMenuAction(const MenuModel &model,cyui::ItemId id) {
 }
 void Reader::menus() {
     if (!ImGui::BeginMainMenuBar()) return;
-    for (const auto *menu : {"File","Edit","Search","Compare","Encoding","View","Syntax","Extensions"}) {
+    for (const auto *menu : {"File","Edit","Search","Compare","Encoding","View","Syntax","Extensions","Help"}) {
         if (ImGui::BeginMenu(cyui::trLabel(menu).c_str())) {
             const auto model=menuModel(menu);
             auto &filter=menuFilters_[menu];

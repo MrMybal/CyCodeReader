@@ -75,6 +75,7 @@ void Reader::extensionPanels() {
     if (pluginsPanel_) {
         const bool visible=ImGui::Begin((std::string(tr("Extensions"))+"###reader-plugins").c_str(),&pluginsPanel_);
         if (visible) {
+            if (cyui::iconButton(cyui::icon::help,tr("Extension documentation"))) execute("help",{{"page","plugins"}});
             const auto state=core_.plugins().describe();
             cyui::textDim("%s",tr("Plugins load at startup. Restart Reader after changing manifests or libraries."));
             if (state.at("plugins").empty()) cyui::emptyState(tr("Extensions"),tr("Place plugin manifests and libraries in the Reader plugins folder."),cyui::icon::code);
@@ -126,6 +127,7 @@ void Reader::extensionPanels() {
     if (mcpPanel_) {
         const bool visible=ImGui::Begin("CyToolsCore / MCP",&mcpPanel_);
         if (visible) {
+            if (cyui::iconButton(cyui::icon::help,tr("MCP documentation"))) execute("help",{{"page","mcp"}});
             const bool ready=sdk_.valid() && !sdkDescriptor_.empty() && std::filesystem::is_regular_file(sdkDescriptor_);
             cyui::badge(tr(ready ? "SDK service ready" : "SDK service unavailable"),ready ? cyui::Tone::success : cyui::Tone::warning);
 

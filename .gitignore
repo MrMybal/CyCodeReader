@@ -3,6 +3,7 @@
 /build/
 /dist/
 /CyCodeReader.exe
+/CyCodeReaderUpdater.exe
 /CyCodeReader
 __pycache__/
 *.pyc
@@ -20,3 +21,6 @@ __pycache__/
 /.idea/
 /gitleaks-report.*
 *.cycode-save-*
+
+# Complete generated local help; documentation/ contains the authoring sources.
+/help/

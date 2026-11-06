@@ -53,6 +53,8 @@ LABELS.update({
     'Empty version':'Version vide',
 })
 
+LABELS.update({'Help': 'Aide', 'Documentation': 'Documentation', 'Context help': 'Aide contextuelle', 'Illustrated tour': 'Visite illustrée', 'Keyboard shortcuts': 'Raccourcis clavier', 'Extension documentation': 'Documentation des extensions', 'MCP documentation': 'Documentation MCP', 'Editor documentation': 'Documentation de l’éditeur'})
+
 if __name__ == "__main__":
     path=Path(__file__).resolve().parents[1]/"locales/ui.json"
     path.write_text(json.dumps({key:{"en":key,"fr":value} for key,value in LABELS.items()},indent=2,ensure_ascii=False)+"\n",encoding="utf-8")

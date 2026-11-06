@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import tempfile
 import zipfile
+from verify_documentation import verify as verify_documentation
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_SIZE = 256 * 1024 * 1024
@@ -44,7 +45,7 @@ def allowed(name):
                      'installed.flag', 'package-files.json', 'LICENSE', 'COPYRIGHT',
                      'THIRD_PARTY_NOTICES.md'} or
             (len(parts) == 1 and name.endswith('.dll')) or
-            (len(parts) > 1 and parts[0] in {'locales', 'licenses', 'plugins', 'app'}) or
+            (len(parts) > 1 and parts[0] in {'locales', 'licenses', 'plugins', 'app', 'help'}) or
             name in {'icons/CyCodeReader.png', 'icons/CyCodeReader.ico',
                      'icons/CyCodeReader-document.png', 'icons/CyCodeReader-document.ico'})
 
@@ -68,6 +69,7 @@ def files_in(stage):
 
 
 def write_manifest(stage, app_version):
+    verify_documentation(stage / 'help')
     files = sorted(set(files_in(stage)) | {'package-files.json'})
     (stage / 'package-files.json').write_text(
         json.dumps({'version': app_version, 'files': files}, indent=2) + '\n', 'utf-8')

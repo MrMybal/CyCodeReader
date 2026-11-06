@@ -1050,5 +1050,37 @@
   "Empty version": {
     "en": "Empty version",
     "fr": "Version vide"
+  },
+  "Help": {
+    "en": "Help",
+    "fr": "Aide"
+  },
+  "Documentation": {
+    "en": "Documentation",
+    "fr": "Documentation"
+  },
+  "Context help": {
+    "en": "Context help",
+    "fr": "Aide contextuelle"
+  },
+  "Illustrated tour": {
+    "en": "Illustrated tour",
+    "fr": "Visite illustrée"
+  },
+  "Keyboard shortcuts": {
+    "en": "Keyboard shortcuts",
+    "fr": "Raccourcis clavier"
+  },
+  "Extension documentation": {
+    "en": "Extension documentation",
+    "fr": "Documentation des extensions"
+  },
+  "MCP documentation": {
+    "en": "MCP documentation",
+    "fr": "Documentation MCP"
+  },
+  "Editor documentation": {
+    "en": "Editor documentation",
+    "fr": "Documentation de l’éditeur"
   }
 }

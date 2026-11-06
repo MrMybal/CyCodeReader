@@ -149,6 +149,7 @@ void Reader::comparisonPanel() {
     }
     ImGui::SetNextWindowSize(cyui::dp(1000,640),ImGuiCond_FirstUseEver);
     if (ImGui::Begin((std::string(tr("Comparison"))+"###reader-comparison").c_str(),&comparison_.open)) {
+        if (cyui::iconButton(cyui::icon::help,tr("Context help"))) execute("help",{{"page","version-control"}});
         const auto fieldWidth=std::max(cyui::dp(100.f),(ImGui::GetContentRegionAvail().x-ImGui::GetStyle().ItemSpacing.x)*.5f);
         auto choose=[&](const char *label,size_t &id) {
             const auto tab=find(id);const auto preview=tab ? tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path().filename()) : std::string(tr("Choose a document"));

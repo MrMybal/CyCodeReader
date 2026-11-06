@@ -1,5 +1,7 @@
 # CyCodeReader
 
+[Documentation](https://mrmybal.github.io/CyCodeReader/#/en/overview) · [Documentation en français](https://mrmybal.github.io/CyCodeReader/#/fr/overview)
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/icons/CyCodeReader.png?v=0.1.1" alt="CyCodeReader logo" width="160" height="160">
 </p>
@@ -9,7 +11,7 @@ Files open directly without loading CyCode, solutions, language servers, project
 tools. CyToolsCore supplies the integrated SDK/MCP companion. Repository: https://github.com/MrMybal/CyCodeReader.
 
 Windows x64 downloads: [GitHub Releases](https://github.com/MrMybal/CyCodeReader/releases).
-Version 0.1.1 is the first public beta; see [release notes and known limits](Docs/Releases/v0.1.1.md).
+Version 0.1.2 adds the bundled and online CyDoc manual; see [release notes and known limits](Docs/Releases/v0.1.2.md).
 
 `editor/` is also the shared source library consumed by CyCode: one implementation
 of the CyUI editor adapter, lexical/Tree-sitter overlays, icons, snippets and native file I/O.
@@ -162,11 +164,13 @@ markers, runtime files and portable manifest. After the repository is public,
 The release workflow does this automatically for public tagged builds. Online
 acceptance will be performed after publication; see [the release guide](Docs/Distribution.md).
 
-The file/snippet tests need neither CyUI nor any GUI dependency:
+Normal builds keep `BUILD_TESTING=OFF` and do not execute native tests.
+Native tests are deferred while the protection issue is unresolved. After that
+issue is resolved, the explicit opt-in for file/snippet tests needs no GUI dependency:
 
 ```sh
 python scripts/fetch_dependencies.py --core-only
-python scripts/build.py --core-only
+python scripts/build.py --core-only --run-tests
 ```
 
 The native editor needs no CyCode checkout or Python runtime. The MCP companion
@@ -244,3 +248,7 @@ Read-only identities cannot edit/open arbitrary files or invoke plugins. Saving 
 explicit. Plugins require plugins.execute plus workspace.write; opening a supplied
 path requires filesystem.read. Source documents are persistent files and are never
 SDK task artifacts. See [Docs/MCP.md](Docs/MCP.md) for CLI/service usage and tests.
+
+
+Local illustrated English/French help is generated and bundled with GUI builds.
+See [CyDoc documentation and build instructions](Docs/Documentation.md).

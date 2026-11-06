@@ -1,4 +1,5 @@
 #include "Reader.h"
+#include "ApplicationHelp.h"
 #include "LiveEditor.h"
 #include "cycode/EditorLanguage.h"
 #include "cycode/EditorTheme.h"
@@ -271,7 +272,23 @@ void Reader::execute(const std::string &command,const Json &params) {
     std::lock_guard lock(core_.mutex());
     try {
         auto tab=active();
-        if (command.starts_with("history.")) historyAction(command,params);
+        if (command == "help" || command.starts_with("help.")) {
+            std::string page = params.value("page", command == "help" ? "overview" : command.substr(5));
+            if (page == "context") {
+                page = tab ? "editing" : "overview";
+                for (auto *window = ImGui::GetCurrentContext()->NavWindow; window; window = window->ParentWindow) {
+                    const std::string_view name(window->Name);
+                    if (name.find("reader-search") != name.npos || name.find("reader-find") != name.npos) { page = "search"; break; }
+                    if (name.find("reader-plugins") != name.npos) { page = "plugins"; break; }
+                    if (name.find("MCP") != name.npos) { page = "mcp"; break; }
+                    if (name.find("reader-comparison") != name.npos) { page = "version-control"; break; }
+                }
+            }
+            app_help::open(options_.installation, "help", locale_, page,
+                params.value("anchor", page == "tour" ? "interface" : ""), options_.automated,
+                params.value("media", page == "tour" ? "interface-image" : ""));
+        }
+        else if (command.starts_with("history.")) historyAction(command,params);
         else if (command.starts_with("compare.")) compareAction(command,params);
         else if (command.starts_with("transform.")) nativeAction("text.transform",{{"operation",command.substr(10)}});
         else if (command=="plugin") nativeAction("plugins.invoke",params);
@@ -326,6 +343,7 @@ void Reader::shortcuts() {
     const ImGuiKeyChord primary=ImGuiMod_Ctrl;
     if (ImGui::IsPopupOpen(nullptr,ImGuiPopupFlags_AnyPopupId|ImGuiPopupFlags_AnyPopupLevel)) return;
     const std::pair<ImGuiKeyChord,const char *> bindings[]={
+        {ImGuiKey_F1,"help"},{ImGuiMod_Shift|ImGuiKey_F1,"help.context"},
         {primary|ImGuiKey_N,"new"},{primary|ImGuiKey_O,"open"},{primary|ImGuiKey_S,"save"},
         {primary|ImGuiMod_Shift|ImGuiKey_S,"saveAs"},{primary|ImGuiMod_Alt|ImGuiKey_S,"saveAll"},
         {primary|ImGuiKey_W,"close"},{primary|ImGuiKey_F,"find"},{primary|ImGuiKey_H,"replace"},
@@ -471,6 +489,7 @@ void Reader::documents() {
             if (ImGui::MenuItem(tr("Move to new window"))) tab->detached=true;
             if (ImGui::MenuItem(tr("Return to editor"))) ImGui::DockBuilderDockWindow(title(tab).c_str(),editorDock_);
             bool readOnly=tab->editor.IsReadOnlyEnabled(); if (ImGui::MenuItem(tr("Read-only"),nullptr,&readOnly)) tab->editor.SetReadOnlyEnabled(readOnly);
+            if (ImGui::MenuItem(tr("Editor documentation"))) execute("help",{{"page","editing"},{"anchor","documents"}});
             if (ImGui::MenuItem(tr("Close file"))) closing.push_back(tab->id);
             ImGui::EndPopup();
         }
@@ -510,13 +529,14 @@ void Reader::dialogs() {
             const auto id=uiId("document/"+std::to_string(tab->id));
             commands.push_back({id,name,"",tr("Documents")});documentCommands.emplace(id,tab->id);
         }
-        const char *actions[][3]={{"New file","new","Ctrl+N"},{"Open files...","open","Ctrl+O"},
+        const char *actions[][3]={{"Documentation","help","F1"},{"Context help","help.context","Shift+F1"},
+            {"Illustrated tour","help.tour",""},{"New file","new","Ctrl+N"},{"Open files...","open","Ctrl+O"},
             {"Save all","saveAll","Ctrl+Alt+S"},{"Find / replace","find","Ctrl+F"},{"Go to line","goto","Ctrl+G"},{"Search open documents","searchOpen","Ctrl+Shift+F"},
             {"Extensions","plugins",""},{"Compare files","compare.open",""},{"Compare with saved version","compare.saved",""},{"Options","options",""},{"Updates","updates",""},{"CyToolsCore / MCP","mcp",""}};
         for (const auto &action : actions) {
             const auto id=uiId(std::string("action/")+action[1]);
             const std::string command=action[1];
-            const bool enabled=command=="compare.saved" ? active() && !active()->document.untitled() : active() || command=="new" || command=="open" || command=="updates" || command=="compare.open";
+            const bool enabled=command=="compare.saved" ? active() && !active()->document.untitled() : active() || command=="help" || command.starts_with("help.") || command=="new" || command=="open" || command=="updates" || command=="compare.open";
             commands.push_back({id,tr(action[0]),action[2],tr("Actions"),enabled});
             actionsById.emplace(id,action[1]);
         }

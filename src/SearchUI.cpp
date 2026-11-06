@@ -130,6 +130,7 @@ void Reader::searchWindows() {
         ImGui::SetNextWindowSize(cyui::dp(640,300),ImGuiCond_FirstUseEver);
         if (find_.focus) ImGui::SetNextWindowFocus();
         if (ImGui::Begin((std::string(tr("Find / replace"))+"###reader-find-replace").c_str(),&find_.open,ImGuiWindowFlags_NoCollapse)) {
+        if (cyui::iconButton(cyui::icon::help,tr("Context help"))) execute("help",{{"page","search"}});
             int mode=find_.replace ? 1 : 0;const char *modes[]={tr("Find"),tr("Replace")};
             cyui::segmented("##find-tabs",modes,2,&mode,cyui::dp(220));find_.replace=mode==1;
             bool enter=false;
@@ -160,6 +161,7 @@ void Reader::searchWindows() {
         ImGui::SetNextWindowSize(cyui::dp(1000,660),ImGuiCond_FirstUseEver);
         if (searchFocus_) ImGui::SetNextWindowFocus();
         if (ImGui::Begin((std::string(tr("Search open documents"))+"###reader-search").c_str(),&searchPanel_)) {
+        if (cyui::iconButton(cyui::icon::help,tr("Context help"))) execute("help",{{"page","search"}});
             if (searchFocus_) { ImGui::SetKeyboardFocusHere();searchFocus_=false; }
             ImGui::SetNextItemWidth(std::max(cyui::dp(120.f),ImGui::GetContentRegionAvail().x-cyui::dp(300.f)));ImGui::InputTextWithHint("##query",tr("Search text"),&searchQuery_);ImGui::SameLine();
             ImGui::Checkbox(tr("Match case"),&find_.sensitive);ImGui::SameLine();ImGui::Checkbox(tr("Whole word"),&find_.words);

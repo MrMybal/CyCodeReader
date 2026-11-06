@@ -32,3 +32,9 @@ third_party/code-syntax.lock.json. No Scintilla editor or Notepad++ GPL code is
 linked. Preserve licenses/Lexilla.txt, Scintilla.txt and SciTE-Properties.txt with
 distributions using this build. The native ABI example is Reader source; it does
 not wrap a Notepad++ plugin binary.
+
+
+Local help uses [CyDoc](https://github.com/MrMybal/CyDoc), MIT, pinned by
+`documentation/cydoc.lock.json`. The exported help includes its MIT notice
+and the Marked, PrismJS and esbuild notices in its own `licenses/` directory.
+Only image/gallery runtime modules are distributed; no Three.js runtime is included.
