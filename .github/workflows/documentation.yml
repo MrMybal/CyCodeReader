@@ -3,6 +3,7 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -19,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -33,10 +35,17 @@ jobs:
       - name: Verify reader interactions without native applications
         run: node scripts/verify_documentation_dom.mjs runtime/pages runtime/deps/cydoc-774f2a7
 
+      - uses: actions/checkout@v4
+        with:
+          ref: cycode-docs
+          path: runtime/cycode-docs
+          persist-credentials: false
+      - name: Compose both complete readers without application data
+        run: python scripts/compose_pages.py runtime/pages runtime/cycode-docs/site runtime/pages-upload
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: runtime/pages
+          path: runtime/pages-upload
   deploy:
     needs: build
     runs-on: ubuntu-latest

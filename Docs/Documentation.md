@@ -118,3 +118,15 @@ Regenerate and verify the publication artifact from the repository root:
 python scripts/build_documentation.py --output runtime/pages
 python scripts/verify_documentation.py runtime/pages
 ```
+
+## Shared Pages hosting
+
+This existing repository also hosts the public CyCode manual at
+[`/cycode/`](https://mrmybal.github.io/CyCodeReader/cycode/#/en/overview).
+Its `cycode-docs` branch contains only the complete generated CyCode export in
+`site/`. CyCode's private source workflow updates that branch using a dedicated
+write deploy key; no private source token is stored here.
+The Pages workflow always builds Reader from `main`, even when triggered by a
+generated-branch update, then verifies and composes both exports with
+`scripts/compose_pages.py`. The root and nested readers keep independent routes,
+search indexes, images and notices. The bundled offline Reader help is unchanged.
