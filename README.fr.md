@@ -1,13 +1,14 @@
 <table width="100%">
   <tr>
     <td width="300" align="left" valign="top">
+      <a href="https://mrmybal.github.io/CyCodeReader/?lang=fr">Présentation</a><br>
       <a href="https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview">Documentation</a><br>
       <a href="https://github.com/MrMybal/CyCodeReader">GitHub</a><br><br>
       <sub>README</sub><br>
       <a href="README.md">English</a> · <a href="README.fr.md">Français</a>
     </td>
     <td width="400" align="center" valign="middle">
-      <a href="https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview"><img src="icons/CyCodeReader.png" alt="CyCodeReader" width="128"></a><br>
+      <a href="https://mrmybal.github.io/CyCodeReader/?lang=fr"><img src="icons/CyCodeReader.png" alt="CyCodeReader" width="128"></a><br>
       <strong>CyCodeReader</strong>
     </td>
     <td width="300" align="right" valign="top">
@@ -212,6 +213,8 @@ l’accès à une dépendance privée.
 
 ## Références et liens
 
+- [Présentation du logiciel](https://mrmybal.github.io/CyCodeReader/?lang=fr).
+
 - [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview) · [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview).
 - [Notes de version](VERSION.fr.md) · [Téléchargements](https://github.com/MrMybal/CyCodeReader/releases).
 - [Dépôt des sources](https://github.com/MrMybal/CyCodeReader) · [Suivi des problèmes](https://github.com/MrMybal/CyCodeReader/issues).
@@ -223,6 +226,7 @@ l’accès à une dépendance privée.
 - [Commencer ici : instructions du projet](AGENTS.md) — responsabilités, dépendances et règles de plateforme.
 - [Compilation et intégration de l’éditeur partagé](Docs/Development.md) · [Architecture](Docs/Architecture.md).
 - [Plugins Reader](Docs/Plugins.md) · [Fournisseurs de comparaisons](Docs/Comparison.md) · [Contrats SDK/MCP](Docs/MCP.md).
+- [Vitrine et publication statique](website/README.md) — contenu EN/FR, aperçus et composition GitHub Pages.
 - [Chaîne documentaire](.CyDocBuild/README.md) — générer et distribuer le lecteur hors ligne complet.
 
 Ces références techniques sont en anglais.

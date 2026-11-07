@@ -41,10 +41,14 @@ the Windows packager includes that folder. Native updater path validation accept
 Documentation/ and historical help/ payloads. Core-only builds need no Node.
 CYCODE_READER_BUILD_DOCUMENTATION=OFF is a development-only opt-out.
 
-The scripts/ entries are compatibility shims. compose.py combines the verified
-Reader export at / with the generated CyCode export at /cycode/ for the existing
-Pages project. No source checkout or application data belongs in that artifact.
-The GitHub documentation workflow runs the same generation and component checks.
+The scripts/ entries are compatibility shims. compose.py retains the older
+documentation-only composition and its manual validator. The Pages workflow now
+builds the Reader showcase through website/build.py; website/compose_pages.py
+includes the unchanged CyCode export at /cycode/. The complete Reader manual is
+copied under a content-versioned directory, with stable Documentation.html and
+historical root-fragment entry points. No source checkout or application data
+belongs in that artifact. The workflow runs the same generation/component checks
+and verifies both complete readers before deploying. See website/README.md.
 
 DOM checks disable resource/script loading and network. They check routes,
 translation, search, hierarchy, themes, gallery, enlargement and reading state.

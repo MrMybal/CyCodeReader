@@ -1,4 +1,4 @@
-name: Documentation
+name: Website and documentation
 on:
   push:
     branches: [main]
@@ -28,20 +28,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Generate the complete pinned CyDoc reader
-        run: python scripts/build_documentation.py --output runtime/pages
-      - name: Verify owned files, resources and translated routes
-        run: python scripts/verify_documentation.py runtime/pages
-      - name: Verify reader interactions without native applications
-        run: node .CyDocBuild/verify_dom.mjs runtime/pages
+      - name: Generate the showcase and complete pinned CyDoc reader
+        run: python website/build.py
+      - name: Verify translated routes, assets and offline reader
+        run: |
+          python scripts/verify_sources.py
+          python scripts/verify_documentation.py Documentation
+          python website/verify.py dist/website
+      - name: Verify script syntax and reader interactions without native applications
+        run: |
+          node --check website/site.js
+          node .CyDocBuild/verify_dom.mjs Documentation
 
       - uses: actions/checkout@v4
         with:
           ref: cycode-docs
           path: runtime/cycode-docs
           persist-credentials: false
-      - name: Compose both complete readers without application data
-        run: python scripts/compose_pages.py runtime/pages runtime/cycode-docs/site runtime/pages-upload
+      - name: Compose the showcase and both complete readers
+        run: python website/compose_pages.py dist/website runtime/cycode-docs/site runtime/pages-upload
+      - name: Verify the final shared Pages payload
+        run: python website/verify.py runtime/pages-upload --with-cycode
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
@@ -53,6 +60,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy complete reader
+      - name: Deploy showcase and complete readers
         id: deployment
         uses: actions/deploy-pages@v4

@@ -2,6 +2,8 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
+import argparse
+import subprocess
 import hashlib
 import json
 import re
@@ -42,16 +44,17 @@ class Page(HTMLParser):
             self.script_id = None
 
 
-def verify(output):
+def verify(output, with_cycode=False):
     output = output.resolve()
     marker = json.loads((output / 'showcase-files.json').read_text('utf-8'))
     assert marker['format'] == 1
+    assert marker.get('sharedManuals', []) == (['cycode'] if with_cycode else []), 'Wrong standalone/shared artifact mode'
     files = {}
     for path in output.rglob('*'):
         assert not path.is_symlink(), f'Linked output: {path.name}'
-        if path.is_file() and path.name != 'showcase-files.json':
+        if path.is_file() and path != output / 'showcase-files.json':
             name = path.relative_to(output).as_posix()
-            assert name in ('.nojekyll', 'index.html', 'Documentation.html', 'LICENSE.txt', 'COPYRIGHT.txt') or name.startswith(('assets/', 'manual/')), f'Unexpected published file: {name}'
+            assert name in ('.nojekyll', 'index.html', 'Documentation.html', 'LICENSE.txt', 'COPYRIGHT.txt') or name.startswith(('assets/', 'manual/')) or (with_cycode and (name.startswith(('cycode/', 'DocData/')) or name == 'DocAI.md')), f'Unexpected published file: {name}'
             assert not {'.git', '.CyDocBuild', 'runtime', 'data', 'node_modules'} & set(path.relative_to(output).parts), f'Private build material: {name}'
             files[name] = sha(path.read_bytes())
     assert files == marker['files'], 'Output ownership or file hashes differ'
@@ -125,8 +128,22 @@ def verify(output):
         assert (output / config['assets'][name]).read_bytes() == (HERE.parent / relative).read_bytes(), 'Changed source screenshot or logo: ' + name
     assert not re.search(r'\bfetch\s*\(|type=[\"\']module|https?://[^\s]+\.(?:css|js)[\"\']', source), 'Remote/module runtime dependency'
     assert settings['version'] in copy['hero.status']['en'] and settings['version'] in copy['hero.status']['fr']
+    if with_cycode:
+        legacy = original_manual / 'DocData'
+        expected = {path.relative_to(legacy).as_posix(): sha(path.read_bytes())
+                    for path in legacy.rglob('*') if path.is_file() and path.name != 'export-files.json'}
+        actual = {path.relative_to(output / 'DocData').as_posix(): sha(path.read_bytes())
+                  for path in (output / 'DocData').rglob('*') if path.is_file()}
+        assert actual == expected, 'Legacy root reader resources differ'
+        assert (output / 'DocAI.md').read_bytes() == (original_manual / 'DocAI.md').read_bytes()
+        subprocess.run([sys.executable, '-B', str(HERE.parent / '.CyDocBuild/compose.py'),
+                        '--verify-manual', 'CyCode', str(output / 'cycode')], check=True, cwd=HERE.parent)
     print(f'Verified {len(copy)} EN/FR strings, {links} local references, {images} image elements, {len(config["assets"])} versioned assets and {len(manual_files)} unchanged CyDoc files.')
 
 
 if __name__ == '__main__':
-    verify(Path(sys.argv[1]) if len(sys.argv) > 1 else HERE.parent / 'dist/website')
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('site', type=Path, nargs='?', default=HERE.parent / 'dist/website')
+    parser.add_argument('--with-cycode', action='store_true', help='Also verify the historical CyCode manual at /cycode/')
+    args = parser.parse_args()
+    verify(args.site, args.with_cycode)

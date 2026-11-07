@@ -54,8 +54,16 @@ def verify_manual(site, name):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    for name in ('reader','cycode','output'): parser.add_argument(name,type=Path)
+    parser.add_argument('--verify-manual', nargs=2, metavar=('NAME','SITE'), help='Validate one unchanged manual export without composing an artifact')
+    for name in ('reader','cycode','output'): parser.add_argument(name,type=Path,nargs='?')
     args=parser.parse_args()
+    if args.verify_manual:
+        if any((args.reader,args.cycode,args.output)): parser.error('Do not combine manual verification and composition')
+        name,site=args.verify_manual
+        verify_manual(Path(site).resolve(),name)
+        print(name + ': complete manual export verified.')
+        return
+    if not all((args.reader,args.cycode,args.output)): parser.error('reader, cycode and output are required')
     reader,cycode,output=[p.resolve() for p in (args.reader,args.cycode,args.output)]
     if output.exists(): raise RuntimeError('Use a fresh Pages output; preserve existing files')
     for site,name in ((reader,'CyCodeReader'),(cycode,'CyCode')):

@@ -1,13 +1,14 @@
 <table width="100%">
   <tr>
     <td width="300" align="left" valign="top">
+      <a href="https://mrmybal.github.io/CyCodeReader/">Website</a><br>
       <a href="https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview">Documentation</a><br>
       <a href="https://github.com/MrMybal/CyCodeReader">GitHub</a><br><br>
       <sub>README</sub><br>
       <a href="README.md">English</a> · <a href="README.fr.md">Français</a>
     </td>
     <td width="400" align="center" valign="middle">
-      <a href="https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview"><img src="icons/CyCodeReader.png" alt="CyCodeReader" width="128"></a><br>
+      <a href="https://mrmybal.github.io/CyCodeReader/"><img src="icons/CyCodeReader.png" alt="CyCodeReader" width="128"></a><br>
       <strong>CyCodeReader</strong>
     </td>
     <td width="300" align="right" valign="top">
@@ -194,6 +195,8 @@ not automatically grant access to private dependencies.
 
 ## References and links
 
+- [Product website](https://mrmybal.github.io/CyCodeReader/).
+
 - [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
 - [Release notes](Docs/Releases/v0.1.3.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
 - [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
@@ -205,6 +208,7 @@ not automatically grant access to private dependencies.
 - [Start here: project instructions](AGENTS.md) — ownership, dependency and platform rules.
 - [Build and shared-editor integration](Docs/Development.md) · [Architecture](Docs/Architecture.md).
 - [Reader plugins](Docs/Plugins.md) · [Comparison providers](Docs/Comparison.md) · [SDK/MCP contracts](Docs/MCP.md).
+- [Showcase and static publication](website/README.md) — EN/FR content, previews and GitHub Pages composition.
 - [Documentation toolchain](.CyDocBuild/README.md) — generate and ship the complete offline reader.
 
 </details>

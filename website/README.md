@@ -1,8 +1,8 @@
 # CyCodeReader showcase
 
 Static HTML/CSS and a classic JavaScript bundle. The maintained inputs in this
-folder generate a complete local website; they do not change the application or
-the existing Pages deployment. No framework, remote font, CDN, analytics or
+folder generate a complete local website. The existing Pages workflow builds and
+publishes the same showcase together with both documentation readers. No framework, remote font, CDN, analytics or
 runtime API is required. The English page is prerendered; a complete French
 edition uses `?lang=fr`.
 
@@ -81,10 +81,29 @@ configuring hosting; hashed resources alone cannot refresh an already cached pag
 
 Build inputs, local profiles, SDK wheels, application data, binaries and caches
 are excluded. Never publish the source checkout or all of `dist/`/`runtime/`.
-The existing `.github/workflows/documentation.yml` still publishes the current
-documentation-only site, including its historical `/cycode/` reader. The local build
-does not replace that workflow or change hosting. Before publishing the showcase,
-adapt the shared composition to preserve that additional reader as well.
+The existing `.github/workflows/documentation.yml` generates and verifies the
+standalone showcase, then `compose_pages.py` includes the unchanged CyCode manual
+from the `cycode-docs` branch under `/cycode/`. It uploads only the verified shared
+artifact and deploys through the existing GitHub Pages environment.
+
+Public entry points are <https://mrmybal.github.io/CyCodeReader/> (English),
+<https://mrmybal.github.io/CyCodeReader/?lang=fr> (French) and
+`Documentation.html#/en/overview` or `Documentation.html#/fr/overview` for the
+Reader manual. Historical root `#/en/...` and `#/fr/...` links keep opening Reader
+help; the shared artifact also retains root `DocData/` runtime resources and the
+separate `DocAI.md` sidecar for older cached reader pages; `/cycode/Documentation.html` retains the older CyCode documentation links.
+
+To reproduce shared composition with an existing verified CyCode export:
+
+```sh
+python website/compose_pages.py dist/website PATH_TO_CYCODE_EXPORT runtime/pages-upload
+python website/verify.py runtime/pages-upload --with-cycode
+```
+
+Choose a fresh output directory. Composition validates both inputs, preserves the
+CyCode export byte for byte and rejects unexpected files or changed resources.
+`scripts/compose_pages.py` remains available for callers needing the older
+documentation-only composition; it is not the showcase deployment entry point.
 
 ## Interaction and verification
 
