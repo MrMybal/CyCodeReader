@@ -151,6 +151,11 @@ See the [development guide](Docs/Development.md) for build overrides, shared-edi
 integration, packaging and the optional checksum-pinned CyToolsCore setup.
 [Documentation generation](.CyDocBuild/README.md) uses the existing CyDoc toolchain.
 
+Build the [local showcase](website/README.md) with `python website/build.py`.
+Preview using `python website/preview.py --port 4388`, then open
+`http://127.0.0.1:4388/`. The complete `dist/website/` folder contains the
+presentation and its genuine offline HTML manual.
+
 </details>
 
 ---

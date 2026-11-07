@@ -1,0 +1,730 @@
+@charset "UTF-8";
+:root{
+  color-scheme:dark;
+  --bg:#12171a;
+  --surface:#1a2125;
+  --band:#161d21;
+  --border:#303a3f;
+  --text:#edf2f2;
+  --muted:#adbcc0;
+  --accent:#85d6c9;
+  --max:1480px;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.65;
+  font-synthesis:none}
+  *{
+    box-sizing:border-box}
+    html{
+      scroll-behavior:smooth;
+      scroll-padding-top:144px;
+      scrollbar-gutter:stable}
+      body{
+        margin:0;
+        background:var(--bg);
+        color:var(--text);
+        -webkit-font-smoothing:antialiased}
+        body.modal-open{
+          overflow:hidden}
+          a{
+            color:inherit;
+            text-decoration:none}
+            button,select{
+              font:inherit;
+              color:inherit}
+              button{
+                cursor:pointer}
+                button,a,select{
+                  -webkit-tap-highlight-color:transparent}
+                  img{
+                    display:block;
+                    max-width:100%;
+                    height:auto}
+                    a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible{
+                      outline:2px solid var(--accent);
+                      outline-offset:5px}
+                      p{
+                        margin:0 0 1.25rem}
+                        h1,h2,h3{
+                          font-weight:650;
+                          line-height:1.2;
+                          margin:0 0 1.25rem;
+                          text-wrap:balance}
+                          h2{
+                            font-size:clamp(1.8rem,3vw,2.65rem);
+                            letter-spacing:-1.2px}
+                            h3{
+                              font-size:1.2rem;
+                              letter-spacing:-.35px}
+                              figure{
+                                margin:0}
+                                .container{
+                                  width:min(var(--max),calc(100% - 80px));
+                                  margin-inline:auto}
+                                  .skip{
+                                    position:fixed;
+                                    left:16px;
+                                    top:-80px;
+                                    padding:10px 16px;
+                                    background:var(--text);
+                                    color:var(--bg);
+                                    z-index:100}
+                                    .skip:focus{
+                                      top:12px}
+                                      .quiet{
+                                        color:var(--muted);
+                                        font-size:.9rem}
+                                        .eyebrow{
+                                          color:var(--accent);
+                                          font-size:.73rem;
+                                          font-weight:650;
+                                          letter-spacing:.12em;
+                                          margin-bottom:20px}
+                                          .text-link{
+                                            color:var(--accent);
+                                            display:inline-block;
+                                            font-weight:600;
+                                            text-decoration:underline;
+                                            text-underline-offset:5px}
+                                            .text-link:hover{
+                                              color:#b9f5e9}
+                                              .actions{
+                                                display:flex;
+                                                gap:12px;
+                                                flex-wrap:wrap;
+                                                margin:25px 0 18px}
+                                                .button{
+                                                  display:inline-flex;
+                                                  align-items:center;
+                                                  justify-content:center;
+                                                  gap:8px;
+                                                  min-height:46px;
+                                                  border:1px solid var(--border);
+                                                  padding:10px 18px;
+                                                  border-radius:5px;
+                                                  font-weight:600;
+                                                  font-size:.88rem;
+                                                  line-height:1.4;
+                                                  background:transparent;
+                                                  transition:background .18s,border-color .18s}
+                                                  .button:hover{
+                                                    background:#263137;
+                                                    border-color:#708b91}
+                                                    .button.accent{
+                                                      background:var(--accent);
+                                                      border-color:var(--accent);
+                                                      color:#102421}
+                                                      .button.accent:hover{
+                                                        background:#a5eadd}
+                                                        .button.small{
+                                                          min-height:38px;
+                                                          padding:7px 12px;
+                                                          font-size:.8rem}
+                                                          .header{
+                                                            position:sticky;
+                                                            top:0;
+                                                            z-index:20;
+                                                            background:#12171af5;
+                                                            border-bottom:1px solid var(--border);
+                                                            backdrop-filter:blur(12px)}
+                                                            .header-inner{
+                                                              min-height:66px;
+                                                              display:flex;
+                                                              align-items:center;
+                                                              gap:32px}
+                                                              .brand{
+                                                                display:inline-flex;
+                                                                align-items:center;
+                                                                gap:9px;
+                                                                font-size:18px;
+                                                                font-weight:700;
+                                                                letter-spacing:-.6px;
+                                                                white-space:nowrap}
+                                                                .brand img{
+                                                                  object-fit:contain;
+                                                                  flex-shrink:0}
+                                                                  .primary{
+                                                                    display:flex;
+                                                                    gap:25px;
+                                                                    margin-left:auto;
+                                                                    align-items:center;
+                                                                    font-size:.83rem;
+                                                                    font-weight:550}
+                                                                    .primary a:hover,.footer nav a:hover{
+                                                                      color:var(--accent)}
+                                                                      .header-actions{
+                                                                        display:flex;
+                                                                        align-items:center;
+                                                                        gap:14px;
+                                                                        margin-left:12px}
+                                                                        .language{
+                                                                          height:38px;
+                                                                          background:var(--surface);
+                                                                          border:1px solid var(--border);
+                                                                          border-radius:5px;
+                                                                          padding:4px 8px;
+                                                                          font-size:.78rem;
+                                                                          cursor:pointer;
+                                                                          min-width:60px}
+                                                                          .menu-toggle{
+                                                                            display:none;
+                                                                            background:transparent;
+                                                                            border:1px solid var(--border);
+                                                                            border-radius:5px;
+                                                                            min-width:38px;
+                                                                            min-height:38px;
+                                                                            line-height:1;
+                                                                            font-size:20px}
+                                                                            .hero{
+                                                                              display:grid;
+                                                                              grid-template-columns:minmax(0,.76fr) minmax(0,1.52fr);
+                                                                              gap:42px;
+                                                                              align-items:center;
+                                                                              padding-block:34px 28px;
+                                                                              min-height:calc(100svh - 66px)}
+                                                                              .hero h1{
+                                                                                display:flex;
+                                                                                align-items:center;
+                                                                                gap:12px;
+                                                                                font-size:clamp(1.95rem,2.85vw,2.85rem);
+                                                                                letter-spacing:-1.5px;
+                                                                                white-space:nowrap;
+                                                                                margin-bottom:22px}
+                                                                                .hero h1 img{
+                                                                                  width:clamp(40px,3.4vw,54px)}
+                                                                                  .hero h2{
+                                                                                    font-size:clamp(1.55rem,2.1vw,2rem);
+                                                                                    letter-spacing:-.8px;
+                                                                                    max-width:400px;
+                                                                                    margin-bottom:20px}
+                                                                                    .hero .lead{
+                                                                                      color:var(--muted);
+                                                                                      font-size:1.02rem;
+                                                                                      max-width:420px}
+                                                                                      .status{
+                                                                                        font-size:.7rem;
+                                                                                        letter-spacing:.09em;
+                                                                                        font-weight:650;
+                                                                                        color:var(--accent);
+                                                                                        margin-bottom:22px}
+                                                                                        .hero .quiet{
+                                                                                          font-size:.72rem;
+                                                                                          max-width:420px}
+                                                                                          .capture .image-button{
+                                                                                            display:block;
+                                                                                            width:100%;
+                                                                                            padding:0;
+                                                                                            border:1px solid #3a474d;
+                                                                                            border-radius:7px;
+                                                                                            background:#101517;
+                                                                                            overflow:hidden;
+                                                                                            line-height:0;
+                                                                                            box-shadow:0 16px 60px #0002}
+                                                                                            .capture .image-button:hover{
+                                                                                              border-color:#749a9d}
+                                                                                              .capture .image-button img{
+                                                                                                width:100%;
+                                                                                                height:auto;
+                                                                                                object-fit:contain}
+                                                                                                .capture figcaption{
+                                                                                                  font-size:.75rem;
+                                                                                                  color:var(--muted);
+                                                                                                  margin-top:12px;
+                                                                                                  line-height:1.6}
+                                                                                                  .capture figcaption::after{
+                                                                                                    content:' ↗';
+                                                                                                    color:var(--accent);
+                                                                                                    margin-left:5px}
+                                                                                                    #hero-capture .image-button{
+                                                                                                      width:fit-content;
+                                                                                                      max-width:100%;
+                                                                                                      margin-inline:auto}
+                                                                                                      #hero-capture img{
+                                                                                                        width:auto;
+                                                                                                        max-width:100%;
+                                                                                                        max-height:calc(100svh - 164px);
+                                                                                                        object-fit:contain}
+                                                                                                        #hero-capture figcaption{
+                                                                                                          text-align:left}
+                                                                                                          .chapters{
+                                                                                                            position:sticky;
+                                                                                                            top:66px;
+                                                                                                            z-index:15;
+                                                                                                            background:#161d21f7;
+                                                                                                            border-block:1px solid var(--border);
+                                                                                                            backdrop-filter:blur(12px)}
+                                                                                                            .chapter-inner{
+                                                                                                              display:flex;
+                                                                                                              gap:30px;
+                                                                                                              min-height:56px;
+                                                                                                              align-items:center;
+                                                                                                              overflow:auto;
+                                                                                                              scrollbar-width:thin}
+                                                                                                              .chapter-inner a{
+                                                                                                                font-size:.78rem;
+                                                                                                                white-space:nowrap;
+                                                                                                                color:var(--muted);
+                                                                                                                padding:14px 0}
+                                                                                                                .chapter-inner a:hover,.chapter-inner a[aria-current=true]{
+                                                                                                                  color:var(--accent)}
+                                                                                                                  .capture-note{
+                                                                                                                    font-size:.71rem;
+                                                                                                                    color:var(--muted);
+                                                                                                                    margin:16px 0 0}
+                                                                                                                    .section{
+                                                                                                                      padding-block:100px}
+                                                                                                                      .section-intro{
+                                                                                                                        max-width:840px;
+                                                                                                                        margin-bottom:42px}
+                                                                                                                        .intro-text{
+                                                                                                                          color:var(--muted);
+                                                                                                                          font-size:1.04rem}
+                                                                                                                          .band{
+                                                                                                                            background:var(--band);
+                                                                                                                            border-block:1px solid #253036}
+                                                                                                                            .principles{
+                                                                                                                              display:grid;
+                                                                                                                              grid-template-columns:repeat(3,minmax(0,1fr));
+                                                                                                                              gap:38px;
+                                                                                                                              margin:44px 0 28px}
+                                                                                                                              .principles article{
+                                                                                                                                border-top:1px solid #4b6469;
+                                                                                                                                padding-top:24px}
+                                                                                                                                .principles p{
+                                                                                                                                  color:var(--muted);
+                                                                                                                                  font-size:.91rem}
+                                                                                                                                  .split{
+                                                                                                                                    display:grid;
+                                                                                                                                    grid-template-columns:minmax(260px,.72fr) minmax(0,1.3fr);
+                                                                                                                                    align-items:center;
+                                                                                                                                    gap:70px}
+                                                                                                                                    .split.reverse{
+                                                                                                                                      grid-template-columns:minmax(0,1.3fr) minmax(260px,.72fr)}
+                                                                                                                                      .checks{
+                                                                                                                                        list-style:none;
+                                                                                                                                        padding:0;
+                                                                                                                                        margin:24px 0}
+                                                                                                                                        .checks li{
+                                                                                                                                          position:relative;
+                                                                                                                                          padding-left:21px;
+                                                                                                                                          margin-bottom:9px;
+                                                                                                                                          font-size:.9rem}
+                                                                                                                                          .checks li::before{
+                                                                                                                                            content:'↗';
+                                                                                                                                            position:absolute;
+                                                                                                                                            left:0;
+                                                                                                                                            color:var(--accent)}
+                                                                                                                                            .keys{
+                                                                                                                                              display:flex;
+                                                                                                                                              gap:12px;
+                                                                                                                                              flex-wrap:wrap;
+                                                                                                                                              margin-bottom:22px}
+                                                                                                                                              .keys>span{
+                                                                                                                                                display:flex;
+                                                                                                                                                gap:6px}
+                                                                                                                                                kbd{
+                                                                                                                                                  font:12px ui-monospace,SFMono-Regular,Consolas,monospace;
+                                                                                                                                                  border:1px solid #4c5b62;
+                                                                                                                                                  border-bottom-width:2px;
+                                                                                                                                                  border-radius:4px;
+                                                                                                                                                  padding:4px 8px;
+                                                                                                                                                  background:#202a2f;
+                                                                                                                                                  color:#d6e5e6}
+                                                                                                                                                  .tabs{
+                                                                                                                                                    display:flex;
+                                                                                                                                                    gap:4px;
+                                                                                                                                                    margin-bottom:14px;
+                                                                                                                                                    flex-wrap:wrap}
+                                                                                                                                                    .tabs button{
+                                                                                                                                                      border:1px solid transparent;
+                                                                                                                                                      background:transparent;
+                                                                                                                                                      padding:10px 14px;
+                                                                                                                                                      font-size:.8rem;
+                                                                                                                                                      border-radius:4px;
+                                                                                                                                                      min-height:42px;
+                                                                                                                                                      color:var(--muted)}
+                                                                                                                                                      .tabs button[aria-selected=true]{
+                                                                                                                                                        color:var(--text);
+                                                                                                                                                        background:#26373b;
+                                                                                                                                                        border-color:#455f62}
+                                                                                                                                                        .wide-heading{
+                                                                                                                                                          display:grid;
+                                                                                                                                                          grid-template-columns:1fr 1fr;
+                                                                                                                                                          gap:90px;
+                                                                                                                                                          align-items:end;
+                                                                                                                                                          margin-bottom:38px}
+                                                                                                                                                          .wide-heading>div>p:last-child{
+                                                                                                                                                            color:var(--muted)}
+                                                                                                                                                            #compare>.capture{
+                                                                                                                                                              max-width:1180px;
+                                                                                                                                                              margin:0 auto 24px}
+                                                                                                                                                              #compare>.quiet{
+                                                                                                                                                                max-width:900px;
+                                                                                                                                                                margin:24px auto 0}
+                                                                                                                                                                .language-grid{
+                                                                                                                                                                  display:grid;
+                                                                                                                                                                  grid-template-columns:1fr 1.35fr 1fr;
+                                                                                                                                                                  gap:0;
+                                                                                                                                                                  border-block:1px solid var(--border);
+                                                                                                                                                                  margin:36px 0 28px}
+                                                                                                                                                                  .language-grid article{
+                                                                                                                                                                    padding:30px;
+                                                                                                                                                                    border-left:1px solid var(--border)}
+                                                                                                                                                                    .language-grid article:first-child{
+                                                                                                                                                                      border-left:0;
+                                                                                                                                                                      padding-left:0}
+                                                                                                                                                                      .language-grid h3{
+                                                                                                                                                                        font-size:1rem;
+                                                                                                                                                                        color:var(--accent)}
+                                                                                                                                                                        .language-grid p{
+                                                                                                                                                                          font:14px/2 ui-monospace,SFMono-Regular,Consolas,monospace;
+                                                                                                                                                                          color:var(--muted);
+                                                                                                                                                                          margin:0}
+                                                                                                                                                                          .extension-grid{
+                                                                                                                                                                            display:grid;
+                                                                                                                                                                            grid-template-columns:1fr 1fr;
+                                                                                                                                                                            gap:70px}
+                                                                                                                                                                            .extension-grid h3{
+                                                                                                                                                                              font-size:1.4rem}
+                                                                                                                                                                              .extension-grid .quiet{
+                                                                                                                                                                                font-size:.86rem}
+                                                                                                                                                                                .schema{
+                                                                                                                                                                                  margin-top:50px;
+                                                                                                                                                                                  display:grid;
+                                                                                                                                                                                  grid-template-columns:1fr 36px 1.5fr 36px 1fr;
+                                                                                                                                                                                  gap:12px;
+                                                                                                                                                                                  align-items:center;
+                                                                                                                                                                                  text-align:center}
+                                                                                                                                                                                  .schema div{
+                                                                                                                                                                                    padding:20px 14px;
+                                                                                                                                                                                    border:1px solid var(--border);
+                                                                                                                                                                                    border-radius:5px;
+                                                                                                                                                                                    font-size:.84rem}
+                                                                                                                                                                                    .schema .core{
+                                                                                                                                                                                      border-color:#537b77;
+                                                                                                                                                                                      background:#1d3433;
+                                                                                                                                                                                      color:#c3eee6}
+                                                                                                                                                                                      .schema span{
+                                                                                                                                                                                        color:var(--accent)}
+                                                                                                                                                                                        .faq{
+                                                                                                                                                                                          display:grid;
+                                                                                                                                                                                          grid-template-columns:1fr 1.5fr;
+                                                                                                                                                                                          gap:90px;
+                                                                                                                                                                                          border-top:1px solid var(--border);
+                                                                                                                                                                                          padding-top:62px}
+                                                                                                                                                                                          .faq details{
+                                                                                                                                                                                            border-bottom:1px solid var(--border)}
+                                                                                                                                                                                            .faq summary{
+                                                                                                                                                                                              padding:20px 32px 20px 0;
+                                                                                                                                                                                              cursor:pointer;
+                                                                                                                                                                                              font-size:1rem}
+                                                                                                                                                                                              .faq details p{
+                                                                                                                                                                                                color:var(--muted);
+                                                                                                                                                                                                font-size:.9rem;
+                                                                                                                                                                                                padding:0 20px 10px 0}
+                                                                                                                                                                                                .download-band{
+                                                                                                                                                                                                  background:#1a2a2b;
+                                                                                                                                                                                                  border-block:1px solid #375251}
+                                                                                                                                                                                                  .download{
+                                                                                                                                                                                                    display:grid;
+                                                                                                                                                                                                    grid-template-columns:1.3fr .7fr;
+                                                                                                                                                                                                    gap:100px;
+                                                                                                                                                                                                    align-items:center}
+                                                                                                                                                                                                    .download h2{
+                                                                                                                                                                                                      max-width:620px}
+                                                                                                                                                                                                      .download aside{
+                                                                                                                                                                                                        border-left:1px solid #4e6567;
+                                                                                                                                                                                                        padding-left:40px;
+                                                                                                                                                                                                        font-size:.94rem}
+                                                                                                                                                                                                        .download .text-link{
+                                                                                                                                                                                                          font-size:.84rem;
+                                                                                                                                                                                                          margin-bottom:20px}
+                                                                                                                                                                                                          .footer{
+                                                                                                                                                                                                            display:flex;
+                                                                                                                                                                                                            justify-content:space-between;
+                                                                                                                                                                                                            gap:30px;
+                                                                                                                                                                                                            padding-block:46px}
+                                                                                                                                                                                                            .footer p,.footer small{
+                                                                                                                                                                                                              font-size:.8rem;
+                                                                                                                                                                                                              color:var(--muted);
+                                                                                                                                                                                                              margin:12px 0}
+                                                                                                                                                                                                              .footer nav{
+                                                                                                                                                                                                                display:flex;
+                                                                                                                                                                                                                gap:25px;
+                                                                                                                                                                                                                align-items:center;
+                                                                                                                                                                                                                font-size:.8rem}
+                                                                                                                                                                                                                .lightbox{
+                                                                                                                                                                                                                  width:min(1500px,calc(100vw - 32px));
+                                                                                                                                                                                                                  max-width:calc(100vw - 32px);
+                                                                                                                                                                                                                  max-height:calc(100dvh - 24px);
+                                                                                                                                                                                                                  padding:18px;
+                                                                                                                                                                                                                  background:#171f23;
+                                                                                                                                                                                                                  color:var(--text);
+                                                                                                                                                                                                                  border:1px solid #51656a;
+                                                                                                                                                                                                                  border-radius:8px;
+                                                                                                                                                                                                                  overflow:auto}
+                                                                                                                                                                                                                  .lightbox::backdrop{
+                                                                                                                                                                                                                    background:#05090dee;
+                                                                                                                                                                                                                    backdrop-filter:blur(8px)}
+                                                                                                                                                                                                                    .lightbox-header,.lightbox-footer{
+                                                                                                                                                                                                                      display:flex;
+                                                                                                                                                                                                                      align-items:center;
+                                                                                                                                                                                                                      gap:16px}
+                                                                                                                                                                                                                      .lightbox-header{
+                                                                                                                                                                                                                        justify-content:space-between;
+                                                                                                                                                                                                                        margin-bottom:14px}
+                                                                                                                                                                                                                        .lightbox-header p{
+                                                                                                                                                                                                                          margin:0;
+                                                                                                                                                                                                                          font-size:.9rem;
+                                                                                                                                                                                                                          line-height:1.4}
+                                                                                                                                                                                                                          .lightbox button{
+                                                                                                                                                                                                                            flex-shrink:0;
+                                                                                                                                                                                                                            min-width:44px;
+                                                                                                                                                                                                                            min-height:44px;
+                                                                                                                                                                                                                            border:1px solid #52666b;
+                                                                                                                                                                                                                            border-radius:4px;
+                                                                                                                                                                                                                            background:#26343a;
+                                                                                                                                                                                                                            color:var(--text);
+                                                                                                                                                                                                                            font-size:22px;
+                                                                                                                                                                                                                            line-height:1}
+                                                                                                                                                                                                                            .lightbox-stage{
+                                                                                                                                                                                                                              display:flex;
+                                                                                                                                                                                                                              align-items:center;
+                                                                                                                                                                                                                              justify-content:center;
+                                                                                                                                                                                                                              min-height:100px}
+                                                                                                                                                                                                                              .lightbox-stage img{
+                                                                                                                                                                                                                                width:auto;
+                                                                                                                                                                                                                                height:auto;
+                                                                                                                                                                                                                                max-width:100%;
+                                                                                                                                                                                                                                max-height:calc(100dvh - 190px);
+                                                                                                                                                                                                                                object-fit:contain}
+                                                                                                                                                                                                                                .lightbox-footer{
+                                                                                                                                                                                                                                  margin-top:14px;
+                                                                                                                                                                                                                                  font-size:.78rem;
+                                                                                                                                                                                                                                  color:var(--muted)}
+                                                                                                                                                                                                                                  .lightbox-footer [data-next]{
+                                                                                                                                                                                                                                    margin-left:auto}
+                                                                                                                                                                                                                                    .viewer-hint{
+                                                                                                                                                                                                                                      margin-left:auto}
+                                                                                                                                                                                                                                      .image-counter{
+                                                                                                                                                                                                                                        min-width:42px}
+                                                                                                                                                                                                                                        @media(min-width:1600px){
+                                                                                                                                                                                                                                          .hero{
+                                                                                                                                                                                                                                            gap:65px}
+                                                                                                                                                                                                                                            .hero h2{
+                                                                                                                                                                                                                                              font-size:2.15rem}
+                                                                                                                                                                                                                                              .hero .lead{
+                                                                                                                                                                                                                                                font-size:1.1rem}
+                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                              @media(max-width:1100px){
+                                                                                                                                                                                                                                                .container{
+                                                                                                                                                                                                                                                  width:calc(100% - 48px)}
+                                                                                                                                                                                                                                                  .header-inner{
+                                                                                                                                                                                                                                                    gap:20px}
+                                                                                                                                                                                                                                                    .primary{
+                                                                                                                                                                                                                                                      gap:18px}
+                                                                                                                                                                                                                                                      .header-actions{
+                                                                                                                                                                                                                                                        gap:10px;
+                                                                                                                                                                                                                                                        margin-left:0}
+                                                                                                                                                                                                                                                        .hero{
+                                                                                                                                                                                                                                                          gap:28px;
+                                                                                                                                                                                                                                                          grid-template-columns:minmax(0,.83fr) minmax(0,1.2fr)}
+                                                                                                                                                                                                                                                          .hero h1{
+                                                                                                                                                                                                                                                            font-size:1.8rem;
+                                                                                                                                                                                                                                                            gap:8px;
+                                                                                                                                                                                                                                                            letter-spacing:-1px}
+                                                                                                                                                                                                                                                            .hero h1 img{
+                                                                                                                                                                                                                                                              width:36px}
+                                                                                                                                                                                                                                                              .split,.split.reverse{
+                                                                                                                                                                                                                                                                gap:35px}
+                                                                                                                                                                                                                                                                .section{
+                                                                                                                                                                                                                                                                  padding-block:76px}
+                                                                                                                                                                                                                                                                  .wide-heading,.faq{
+                                                                                                                                                                                                                                                                    gap:45px}
+                                                                                                                                                                                                                                                                    .download{
+                                                                                                                                                                                                                                                                      gap:45px}
+                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                    @media(max-width:800px){
+                                                                                                                                                                                                                                                                      .container{
+                                                                                                                                                                                                                                                                        width:calc(100% - 36px)}
+                                                                                                                                                                                                                                                                        .header-inner{
+                                                                                                                                                                                                                                                                          min-height:62px;
+                                                                                                                                                                                                                                                                          gap:8px}
+                                                                                                                                                                                                                                                                          .brand{
+                                                                                                                                                                                                                                                                            font-size:15px;
+                                                                                                                                                                                                                                                                            gap:7px}
+                                                                                                                                                                                                                                                                            .brand img{
+                                                                                                                                                                                                                                                                              width:25px;
+                                                                                                                                                                                                                                                                              height:25px}
+                                                                                                                                                                                                                                                                              .header-actions{
+                                                                                                                                                                                                                                                                                margin-left:auto;
+                                                                                                                                                                                                                                                                                gap:8px}
+                                                                                                                                                                                                                                                                                .header-actions .github{
+                                                                                                                                                                                                                                                                                  padding:7px 10px}
+                                                                                                                                                                                                                                                                                  .language{
+                                                                                                                                                                                                                                                                                    min-width:55px;
+                                                                                                                                                                                                                                                                                    padding:4px 5px}
+                                                                                                                                                                                                                                                                                    .primary{
+                                                                                                                                                                                                                                                                                      font-size:.8rem}
+                                                                                                                                                                                                                                                                                      .primary a{
+                                                                                                                                                                                                                                                                                        padding:8px 0}
+                                                                                                                                                                                                                                                                                        .js .menu-toggle{
+                                                                                                                                                                                                                                                                                          display:inline-flex;
+                                                                                                                                                                                                                                                                                          align-items:center;
+                                                                                                                                                                                                                                                                                          justify-content:center}
+                                                                                                                                                                                                                                                                                          .js .primary{
+                                                                                                                                                                                                                                                                                            display:none;
+                                                                                                                                                                                                                                                                                            position:absolute;
+                                                                                                                                                                                                                                                                                            left:0;
+                                                                                                                                                                                                                                                                                            right:0;
+                                                                                                                                                                                                                                                                                            top:61px;
+                                                                                                                                                                                                                                                                                            flex-direction:column;
+                                                                                                                                                                                                                                                                                            gap:0;
+                                                                                                                                                                                                                                                                                            align-items:stretch;
+                                                                                                                                                                                                                                                                                            padding:10px 20px;
+                                                                                                                                                                                                                                                                                            background:#1a2428;
+                                                                                                                                                                                                                                                                                            border-bottom:1px solid #4a5b60}
+                                                                                                                                                                                                                                                                                            .js .primary[data-open=true]{
+                                                                                                                                                                                                                                                                                              display:flex}
+                                                                                                                                                                                                                                                                                              .hero{
+                                                                                                                                                                                                                                                                                                grid-template-columns:1fr;
+                                                                                                                                                                                                                                                                                                gap:24px;
+                                                                                                                                                                                                                                                                                                padding-block:35px 28px;
+                                                                                                                                                                                                                                                                                                min-height:0}
+                                                                                                                                                                                                                                                                                                .hero-copy{
+                                                                                                                                                                                                                                                                                                  max-width:620px}
+                                                                                                                                                                                                                                                                                                  .hero h1{
+                                                                                                                                                                                                                                                                                                    font-size:clamp(1.8rem,5.9vw,2.8rem);
+                                                                                                                                                                                                                                                                                                    gap:12px;
+                                                                                                                                                                                                                                                                                                    white-space:normal}
+                                                                                                                                                                                                                                                                                                    .hero h1 img{
+                                                                                                                                                                                                                                                                                                      width:44px}
+                                                                                                                                                                                                                                                                                                      .hero h2{
+                                                                                                                                                                                                                                                                                                        font-size:1.7rem;
+                                                                                                                                                                                                                                                                                                        max-width:520px}
+                                                                                                                                                                                                                                                                                                        .hero .lead{
+                                                                                                                                                                                                                                                                                                          max-width:600px}
+                                                                                                                                                                                                                                                                                                          .hero .quiet{
+                                                                                                                                                                                                                                                                                                            max-width:none}
+                                                                                                                                                                                                                                                                                                            .hero .actions{
+                                                                                                                                                                                                                                                                                                              margin-top:24px}
+                                                                                                                                                                                                                                                                                                              #hero-capture{
+                                                                                                                                                                                                                                                                                                                width:100%}
+                                                                                                                                                                                                                                                                                                                #hero-capture .image-button{
+                                                                                                                                                                                                                                                                                                                  width:100%}
+                                                                                                                                                                                                                                                                                                                  #hero-capture img{
+                                                                                                                                                                                                                                                                                                                    width:100%;
+                                                                                                                                                                                                                                                                                                                    max-height:none}
+                                                                                                                                                                                                                                                                                                                    .chapters{
+                                                                                                                                                                                                                                                                                                                      top:62px}
+                                                                                                                                                                                                                                                                                                                      .chapter-inner{
+                                                                                                                                                                                                                                                                                                                        gap:24px;
+                                                                                                                                                                                                                                                                                                                        min-height:48px}
+                                                                                                                                                                                                                                                                                                                        .chapter-inner a{
+                                                                                                                                                                                                                                                                                                                          font-size:.74rem;
+                                                                                                                                                                                                                                                                                                                          padding-block:12px}
+                                                                                                                                                                                                                                                                                                                          .section{
+                                                                                                                                                                                                                                                                                                                            padding-block:60px}
+                                                                                                                                                                                                                                                                                                                            .section-intro{
+                                                                                                                                                                                                                                                                                                                              margin-bottom:28px}
+                                                                                                                                                                                                                                                                                                                              .principles{
+                                                                                                                                                                                                                                                                                                                                grid-template-columns:1fr;
+                                                                                                                                                                                                                                                                                                                                gap:18px;
+                                                                                                                                                                                                                                                                                                                                margin:28px 0}
+                                                                                                                                                                                                                                                                                                                                .principles article{
+                                                                                                                                                                                                                                                                                                                                  padding-top:20px}
+                                                                                                                                                                                                                                                                                                                                  .principles article p{
+                                                                                                                                                                                                                                                                                                                                    margin-bottom:0}
+                                                                                                                                                                                                                                                                                                                                    .split,.split.reverse,.wide-heading,.extension-grid,.faq,.download{
+                                                                                                                                                                                                                                                                                                                                      grid-template-columns:1fr;
+                                                                                                                                                                                                                                                                                                                                      gap:30px}
+                                                                                                                                                                                                                                                                                                                                      .split.reverse>figure{
+                                                                                                                                                                                                                                                                                                                                        order:2}
+                                                                                                                                                                                                                                                                                                                                        .split.reverse>div{
+                                                                                                                                                                                                                                                                                                                                          order:1}
+                                                                                                                                                                                                                                                                                                                                          .wide-heading{
+                                                                                                                                                                                                                                                                                                                                            margin-bottom:28px}
+                                                                                                                                                                                                                                                                                                                                            .wide-heading h2{
+                                                                                                                                                                                                                                                                                                                                              margin-bottom:0}
+                                                                                                                                                                                                                                                                                                                                              .language-grid{
+                                                                                                                                                                                                                                                                                                                                                grid-template-columns:1fr}
+                                                                                                                                                                                                                                                                                                                                                .language-grid article,.language-grid article:first-child{
+                                                                                                                                                                                                                                                                                                                                                  padding:22px 0;
+                                                                                                                                                                                                                                                                                                                                                  border-left:0;
+                                                                                                                                                                                                                                                                                                                                                  border-top:1px solid var(--border)}
+                                                                                                                                                                                                                                                                                                                                                  .language-grid article:first-child{
+                                                                                                                                                                                                                                                                                                                                                    border-top:0}
+                                                                                                                                                                                                                                                                                                                                                    .schema{
+                                                                                                                                                                                                                                                                                                                                                      grid-template-columns:1fr;
+                                                                                                                                                                                                                                                                                                                                                      gap:7px;
+                                                                                                                                                                                                                                                                                                                                                      margin-top:30px}
+                                                                                                                                                                                                                                                                                                                                                      .schema span{
+                                                                                                                                                                                                                                                                                                                                                        transform:rotate(90deg)}
+                                                                                                                                                                                                                                                                                                                                                        .schema div{
+                                                                                                                                                                                                                                                                                                                                                          padding:16px}
+                                                                                                                                                                                                                                                                                                                                                          .download aside{
+                                                                                                                                                                                                                                                                                                                                                            border-left:0;
+                                                                                                                                                                                                                                                                                                                                                            border-top:1px solid #4e6567;
+                                                                                                                                                                                                                                                                                                                                                            padding:24px 0 0}
+                                                                                                                                                                                                                                                                                                                                                            .footer{
+                                                                                                                                                                                                                                                                                                                                                              flex-direction:column;
+                                                                                                                                                                                                                                                                                                                                                              padding-block:32px;
+                                                                                                                                                                                                                                                                                                                                                              gap:10px}
+                                                                                                                                                                                                                                                                                                                                                              .footer nav{
+                                                                                                                                                                                                                                                                                                                                                                flex-wrap:wrap;
+                                                                                                                                                                                                                                                                                                                                                                gap:15px}
+                                                                                                                                                                                                                                                                                                                                                                .lightbox{
+                                                                                                                                                                                                                                                                                                                                                                  padding:12px;
+                                                                                                                                                                                                                                                                                                                                                                  width:calc(100vw - 16px);
+                                                                                                                                                                                                                                                                                                                                                                  max-width:calc(100vw - 16px)}
+                                                                                                                                                                                                                                                                                                                                                                  .lightbox-header{
+                                                                                                                                                                                                                                                                                                                                                                    gap:10px}
+                                                                                                                                                                                                                                                                                                                                                                    .lightbox-header p{
+                                                                                                                                                                                                                                                                                                                                                                      font-size:.8rem}
+                                                                                                                                                                                                                                                                                                                                                                      .lightbox-stage img{
+                                                                                                                                                                                                                                                                                                                                                                        max-height:calc(100dvh - 210px)}
+                                                                                                                                                                                                                                                                                                                                                                        .viewer-hint{
+                                                                                                                                                                                                                                                                                                                                                                          display:none}
+                                                                                                                                                                                                                                                                                                                                                                          .lightbox-footer{
+                                                                                                                                                                                                                                                                                                                                                                            justify-content:space-between}
+                                                                                                                                                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                                                                                                                                                          @media(max-width:390px){
+                                                                                                                                                                                                                                                                                                                                                                            .header-inner{
+                                                                                                                                                                                                                                                                                                                                                                              gap:5px}
+                                                                                                                                                                                                                                                                                                                                                                              .header-actions{
+                                                                                                                                                                                                                                                                                                                                                                                gap:6px}
+                                                                                                                                                                                                                                                                                                                                                                                .brand{
+                                                                                                                                                                                                                                                                                                                                                                                  font-size:14px;
+                                                                                                                                                                                                                                                                                                                                                                                  letter-spacing:-.5px;
+                                                                                                                                                                                                                                                                                                                                                                                  gap:5px}
+                                                                                                                                                                                                                                                                                                                                                                                  .brand img{
+                                                                                                                                                                                                                                                                                                                                                                                    width:23px;
+                                                                                                                                                                                                                                                                                                                                                                                    height:23px}
+                                                                                                                                                                                                                                                                                                                                                                                    .header-actions .github{
+                                                                                                                                                                                                                                                                                                                                                                                      font-size:12px;
+                                                                                                                                                                                                                                                                                                                                                                                      padding:7px 8px}
+                                                                                                                                                                                                                                                                                                                                                                                      .github span{
+                                                                                                                                                                                                                                                                                                                                                                                        display:none}
+                                                                                                                                                                                                                                                                                                                                                                                        .language{
+                                                                                                                                                                                                                                                                                                                                                                                          min-width:48px;
+                                                                                                                                                                                                                                                                                                                                                                                          font-size:12px}
+                                                                                                                                                                                                                                                                                                                                                                                          .menu-toggle{
+                                                                                                                                                                                                                                                                                                                                                                                            min-width:34px}
+                                                                                                                                                                                                                                                                                                                                                                                            .hero h1{
+                                                                                                                                                                                                                                                                                                                                                                                              font-size:1.8rem;
+                                                                                                                                                                                                                                                                                                                                                                                              gap:8px}
+                                                                                                                                                                                                                                                                                                                                                                                              .hero h1 img{
+                                                                                                                                                                                                                                                                                                                                                                                                width:40px}
+                                                                                                                                                                                                                                                                                                                                                                                                .hero .lead{
+                                                                                                                                                                                                                                                                                                                                                                                                  font-size:.97rem}
+                                                                                                                                                                                                                                                                                                                                                                                                  .actions{
+                                                                                                                                                                                                                                                                                                                                                                                                    gap:9px}
+                                                                                                                                                                                                                                                                                                                                                                                                    .actions .button{
+                                                                                                                                                                                                                                                                                                                                                                                                      font-size:.8rem;
+                                                                                                                                                                                                                                                                                                                                                                                                      padding:10px 13px}
+                                                                                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                                                                    @media(prefers-reduced-motion:reduce){
+                                                                                                                                                                                                                                                                                                                                                                                                      html{
+                                                                                                                                                                                                                                                                                                                                                                                                        scroll-behavior:auto}
+                                                                                                                                                                                                                                                                                                                                                                                                        *{
+                                                                                                                                                                                                                                                                                                                                                                                                          transition:none!important}
+                                                                                                                                                                                                                                                                                                                                                                                                        }

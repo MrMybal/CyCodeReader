@@ -167,6 +167,11 @@ l’intégration de l’éditeur partagé, les paquets et la configuration optio
 wheel CyToolsCore verrouillé. La [génération documentaire](.CyDocBuild/README.md)
 utilise la chaîne CyDoc existante. Ces guides techniques sont en anglais.
 
+La [vitrine locale](website/README.md) se génère avec `python website/build.py`.
+Prévisualisation : `python website/preview.py --port 4388`, puis ouvrir
+`http://127.0.0.1:4388/?lang=fr`. Le dossier complet `dist/website/` contient
+la présentation et son véritable manuel HTML hors ligne.
+
 </details>
 
 ---
