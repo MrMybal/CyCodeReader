@@ -1,258 +1,205 @@
-# CyCodeReader
+<table width="100%">
+  <tr>
+    <td width="300" align="left" valign="top">
+      <a href="https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview">Documentation</a><br>
+      <a href="https://github.com/MrMybal/CyCodeReader">GitHub</a><br><br>
+      <sub>README</sub><br>
+      <a href="README.md">English</a> · <a href="README.fr.md">Français</a>
+    </td>
+    <td width="400" align="center" valign="middle">
+      <a href="https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview"><img src="icons/CyCodeReader.png" alt="CyCodeReader" width="128"></a><br>
+      <strong>CyCodeReader</strong>
+    </td>
+    <td width="300" align="right" valign="top">
+      <p><sub>Application license</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
+      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.3.md"><strong>0.1.3</strong></a><br><strong>BETA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.3/CyCodeReader-0.1.3-windows-x64-portable.zip"><strong>Download CyCodeReader</strong></a><br><sub>Windows x64 · portable</sub></p>
+    </td>
+  </tr>
+</table>
 
-[Documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation en français](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview)
+<h1 align="center">CyCodeReader</h1>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/icons/CyCodeReader.png?v=0.1.1" alt="CyCodeReader logo" width="160" height="160">
-</p>
+A native code and text editor for developers who want to open files directly,
+edit with syntax highlighting, search live documents and compare revisions.
+Built with CyUI, it runs independently of the CyCode IDE.
 
-An independent native C++20 code/text editor built with CyUI, SDL3 and Dear ImGui.
-Files open directly without loading CyCode, solutions, language servers, project
-tools. CyToolsCore supplies the integrated SDK/MCP companion. Repository: https://github.com/MrMybal/CyCodeReader.
+> **BETA · 0.1.3**
+>
+> Development continues after the first public beta. Desktop and installation
+> validation is still in progress. Version 0.1.3 adds Verse syntax and updates
+> the English/French CyDoc manual. Read the [release notes and known limitations](Docs/Releases/v0.1.3.md).
 
-Windows x64 downloads: [GitHub Releases](https://github.com/MrMybal/CyCodeReader/releases).
-Version 0.1.3 adds native Verse highlighting and the current bilingual CyDoc reader; see [release notes and known limits](Docs/Releases/v0.1.3.md).
+[![CyCodeReader with C++ syntax highlighting, tabs, toolbar and minimap](Docs/images/editor.png)](Docs/images/editor.png)
 
-`editor/` is also the shared source library consumed by CyCode: one implementation
-of the CyUI editor adapter, lexical/Tree-sitter overlays, icons, snippets and native file I/O.
-Changes to that library can benefit both applications without copying code.
+*Actual v0.1.1 application views rendered from ImGui draw data on sample documents.
+The screenshots illustrate the interface; they do not establish desktop or
+installer acceptance for v0.1.3.*
 
-## Screenshots
+## About CyCodeReader
 
-Views from CyCodeReader v0.1.1 using sample C++ documents. Select a preview to
-view the full-size image.
+Open files from the command line, the multi-file dialog or drag and drop. Work
+with dockable tabs, move a document into a real native window on another display,
+or launch another instance for a separate set of files. Python and a CyCode
+checkout are not needed to edit text.
 
-[![Code editor with syntax highlighting, tabs and minimap](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/editor.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/editor.png)
+Search and replace in the active document or search every open buffer, including
+untitled and unsaved text. Compare live tabs, a disk file or a saved baseline
+without modifying either source. The bundled Git plugin adds file/selection
+history and comparisons with HEAD, the index and other revisions; Git must be
+installed in PATH. Reader does not provide the IDE's commit/build/debug workflow.
 
-| Find and replace | Search across open documents |
+| Find and replace | Search open documents |
 | :---: | :---: |
-| [![Dedicated find and replace window with minimap match markers](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/find-replace.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/find-replace.png) | [![Search results across open documents with a source preview](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/search-documents.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/search-documents.png) |
-| **Side-by-side comparison** | **Git history with inline diff** |
-| [![Side-by-side file comparison with syntax colors and inline changes](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/compare.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/compare.png) | [![File revision history and the selected commit diff](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/git-history.png)](https://raw.githubusercontent.com/MrMybal/CyCodeReader/main/Docs/images/git-history.png) |
+| [![Separate find/replace window with minimap match markers](Docs/images/find-replace.png)](Docs/images/find-replace.png) | [![Search results across live documents with a source preview](Docs/images/search-documents.png)](Docs/images/search-documents.png) |
+| **Read-only comparison** | **Git file history** |
+| [![Side-by-side syntax-colored comparison](Docs/images/compare.png)](Docs/images/compare.png) | [![Sample file revisions and the selected commit diff](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Use
+## Features
 
-Open several files from the command line, the multi-file dialog or drag and drop.
-Documents are dockable tabs; drag a tab outside or choose **Move to new window**
-for a real native window. Launch another instance to keep separate file sets.
+- **Editing:** Undo/Redo, multiple cursors, folding, bracket matching, indentation,
+  snippets, minimap, wrapping and whitespace controls; six themes and EN/FR UI.
+- **Syntax:** 102 shared CyUI modes, including C/C++/Unreal, C#, Rust, Java,
+  JavaScript/TypeScript, HTML/CSS, Python, Lua, JSON, Markdown, HLSL, GLSL and Verse.
+  Log syntax distinguishes Error and Warning lines. Syntax works without language
+  toolchains; semantic completion, compilation and UEFN integration are not included.
+- **Find and compare:** literal find/replace, open-document results with previews,
+  split/unified diffs, change navigation and local Git history.
+- **File formats:** UTF-8/BOM, UTF-16 LE/BE BOM, explicit Windows-1252 and LF/CRLF/CR
+  conversion. Saving is explicit; guarded atomic writes check external changes
+  and refuse lossy encoding conversions. Text files are limited to 4 MiB.
+- **Extensions:** manifests and native ABI 1 plugins contribute commands, typed
+  options and syntax, including native syntax engines and comparison providers.
+  Restart is required; native plugins run as trusted code in the process.
+- **Automation and help:** optional CyToolsCore SDK/MCP accesses the same live
+  documents and revision guards. F1 opens the local illustrated CyDoc manual.
+  The private Python/SDK companion is installed separately.
+
+Search is literal with ASCII case folding. Recursive folder search, regex
+replacement, macros, arbitrary external run commands, crash recovery, complete
+session/Undo restoration and a plugin marketplace remain unavailable. Reader
+plugins use their own ABI; Notepad++ and CyCode plugin binaries are not compatible.
+See [capabilities and limits](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/limits).
 
 | Shortcut | Action |
-|---|---|
+| --- | --- |
 | Ctrl+N / Ctrl+O | New document / open files |
-| Ctrl+S / Ctrl+Shift+S / Ctrl+Alt+S | Save / Save As / Save all |
+| Ctrl+S / Ctrl+Shift+S / Ctrl+Alt+S | Save / Save As / save all |
 | Ctrl+W / Ctrl+Tab | Close / next document |
-| Ctrl+F / Ctrl+H / F3 / Shift+F3 | Find window / replace / next / previous match |
+| Ctrl+F / Ctrl+H / F3 / Shift+F3 | Find / replace / next / previous match |
 | Ctrl+Shift+F | Search every open document, including unsaved buffers |
 | Ctrl+G | Go to line |
 | Ctrl+P / Ctrl+Shift+P | Open-file / action palette |
 
-The widget provides undo/redo, multiple cursors, folding, bracket matching,
-indentation and selection. The default layout shows the minimap, keeps the file sidebar hidden, and uses a
-compact icon toolbar with the logo alone. View offers wrapping, whitespace, text size,
-six themes and English/French. C/C++/Unreal, C#, HLSL/GLSL, Python, Lua, JSON and
-Markdown and Verse use shared lexical rules. Rust, Java, JS/JSX, TS/TSX, HTML and CSS use
-incremental Tree-sitter parsing, including HTML script/style regions. Syntax works
-without installing Rust, Java or Node.js. Project semantic services remain in CyCode.
+Searchable menus and panels have independent filters for names, paths, extensions
+and plugin options. Ctrl+F targets a focused panel's filter; the editor keeps
+document Find. Escape clears a filter. See the [keyboard guide](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/shortcuts).
 
-UTF-8, UTF-8 BOM and UTF-16 LE/BE BOM are detected automatically. Windows-1252
-is available explicitly through the Open Windows-1252 command and SDK; it is never guessed. The Encoding menu
-converts encodings and LF/CRLF/CR in memory, with an explicit save afterward and
-no lossy replacement of unrepresentable characters. Files are limited to 4 MiB.
-No-op saves retain original bytes;
-edited saves retain the detected newline convention. Disk conflicts preserve the
-live buffer, Save As checks existing/open targets, and saves use guarded atomic
-replacement. Unsaved documents prompt before close/reload. Preferences are under
-data/reader in development/portable builds and `%LOCALAPPDATA%/CyCodeReader/reader`
-in installed builds; crash recovery is not implemented.
+---
 
-Windows distribution preparation now provides a per-user installer and a portable
-ZIP, plus a native updater for public GitHub Releases. Online checks are disabled
-in preparation builds; no token or private-release access is used. See
-[distribution and public update preparation](Docs/Distribution.md).
+## Installation
 
-Ctrl+F/Ctrl+H open a dedicated modeless find/replace window with case, whole-word,
-selection, wrap and extended-escape options. Search results highlight the text and
-mark the minimap/scrollbar. Ctrl+Shift+F searches all open documents with excerpts,
-filters and a syntax preview. See [search and default layout](Docs/Search.md).
+Published builds support **Windows 10/11 x64** and require an **OpenGL 3.3** driver.
+The Windows packages include app-local MSVC runtime DLLs. Linux and macOS remain
+intended source targets; complete desktop operation is unverified and no native
+packages for them are supplied in this release.
 
-## File comparison and Git
+1. [Download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.3/CyCodeReader-0.1.3-windows-x64-portable.zip) or [the per-user installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.3/CyCodeReader-0.1.3-windows-x64-setup.exe).
+2. Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`,
+   keeping all supplied directories beside it; or run Setup for the current user.
+3. Open files and choose a syntax if needed. Install Git separately for its
+   optional file-history tools; configure the private SDK only for MCP use.
 
-**Compare** compares two live tabs, a selected disk file or the last saved version.
-The shared CyUI diff offers side-by-side/unified layouts, syntax colors, line
-numbers, search and change navigation. Unsaved text is included; source documents
-and disk files remain unchanged. Outdated snapshots can be refreshed.
+[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.3)
+accompany both downloads. Portable settings stay in `data/reader`; installed
+settings use `%LOCALAPPDATA%/CyCodeReader/reader`. Public builds check GitHub
+Releases; download and installation require an explicit action. See
+[installation and updates](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/updates).
 
-The bundled native **Git file comparisons** plugin detects the active file's
-repository and adds a searchable **Git** menu: compare the buffer with HEAD or
-the index, or inspect staged changes from HEAD to index. The code/line context
-menu also exposes file and selection history, following renames, with inline comparisons
-against a parent, the current buffer or another selected revision. Split comparisons
-share one scrolling canvas so their rows move together. Git must be installed
-in PATH; no network access or credentials are needed. See
-[comparison behavior, plugin contract and limits](Docs/Comparison.md).
+Open `Documentation/Documentation.html` with its complete `DocData/` directory for
+offline help: no server, CDN or network is required. The [online manual](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview)
+uses the same reader, with navigation, search, images, diagrams and both languages.
 
-## Quick filters
+## Source, build and required libraries
 
-The File, Edit, Search, Compare, Encoding, View, Syntax, Extensions and Git menus include
-CyUI search fields. Filter syntaxes by name or extension (`.hlsl`, `.glsl`), and
-filter open files by names or full paths. Options, plugin contributions and
-open-document search results have independent filters too. Matching ignores
-Latin case/accents and supports multiple words, in English and French.
-Ctrl+F focuses a filtered panel's field; in the editor it keeps document find.
-Escape clears the query. Filtering never commits a hidden property draft or
-changes the live document. See [filter behavior and keyboard routing](Docs/Filtering.md).
+<details>
+<summary>Build CyCodeReader from source</summary>
 
-## Build
-
-Requirements: Python 3.11+, Git, CMake 3.24+ and a C++20 compiler. Windows uses
-Visual Studio 2022 C++; Linux/macOS use Ninja, OpenGL and SDL3 platform development
-libraries. CyUI is fetched from its official repository at the exact commit in
-`editor/cyui-source.lock.json`, using existing Git credentials if required.
+Requirements: Python 3.11+, Git, CMake 3.24+, a C++20 compiler and, for documentation,
+Node.js 22+ with npm. Windows uses Visual Studio 2022 C++; other source targets need
+Ninja, OpenGL and the SDL3 platform development libraries.
 
 ```sh
+git clone https://github.com/MrMybal/CyCodeReader.git
+cd CyCodeReader
 python scripts/fetch_dependencies.py
 python scripts/build.py
 ```
 
-To use a separate clean checkout at that same locked revision, pass `--cyui PATH`
-(or CMake `-DCYUI_DIR=PATH`). A changed revision or tracked local changes are refused;
-no developer checkout is reset or updated. For a fresh configuration use
-`python scripts/build.py --build-dir runtime/build-modular`.
+The resolver fetches the exact CyUI commit from its official repository. An
+optional `--cyui PATH` must select a clean matching checkout; no upstream checkout
+is reset. GUI modules are **Core, Code, CodeEditor, Commands, Inspector, Diagnostics
+and Diff**, with a single ImGui/TextEditor backend. Audio, Gallery, CEF and demos
+are disabled. CyDoc independently selects **image/gallery** for the manual.
 
-### Shared syntax catalogue
+Windows output is `runtime/build-vs/Release`; other source builds use `runtime/build`.
+Ordinary builds keep native tests disabled and do not launch the application.
+`--core-only` builds document/snippet services without SDL/ImGui/CyUI; it does not
+produce the GUI. Editing itself needs no Python runtime.
 
-The locked CyUI commit provides 102 syntax modes, including Verse and HLSL/GLSL, file
-associations, whole-line Error/Warning colors for `.log` files and syntax engines
-contributed by plugins. Reader's Language menu consumes this common registry.
-Its richer Unreal/C# adapters and incremental Tree-sitter parsers are preserved.
-The normal build uses this catalogue without a development flag.
+See the [development guide](Docs/Development.md) for build overrides, shared-editor
+integration, packaging and the optional checksum-pinned CyToolsCore setup.
+[Documentation generation](.CyDocBuild/README.md) uses the existing CyDoc toolchain.
 
-For further unpublished CyUI work, an explicit opt-in accepts a changed local
-checkout without altering the normal revision lock:
+</details>
 
-```sh
-python scripts/build.py --cyui ../CyImgui_Interface --cyui-development --build-dir runtime/build-code-languages-vs
-```
-
-The build resolves the exact revision in editor/cyui-source.lock.json. Publish
-a local-only CyUI revision before depending on it from another machine; the
-validated local cache contains the committed shared Diff correction.
-
-The UI selects **Core, Code, CodeEditor, Commands, Inspector, Diagnostics and Diff**.
-Only one ImGui and one TextEditor backend are compiled. Audio, Gallery, demos,
-CEF and unused interface modules are disabled. Source/model ownership and the
-remaining native compatibility hooks are described in
-[the migration notes](Docs/CyUI-Migration.md).
-
-Build outputs remain in runtime/build-vs/Release on Windows, runtime/build elsewhere.
-Ordinary builds keep native tests disabled and do not install or open an app.
-locales/ui.json is deployed beside the build executable. To make a portable folder:
-
-```sh
-cmake --install runtime/build-vs --config Release --prefix dist
-```
-
-To create both Windows release artifacts with an Inno Setup compiler:
-
-```sh
-python scripts/package_windows.py --iscc "C:/path/to/Inno Setup/ISCC.exe"
-```
-
-The raw CMake install is a staging folder; `package_windows.py` creates the edition
-markers, runtime files and portable manifest. After the repository is public,
-`scripts/build.py --public-updates` enables public update checks in release builds.
-The release workflow does this automatically for public tagged builds. Online
-acceptance will be performed after publication; see [the release guide](Docs/Distribution.md).
-
-Normal builds keep `BUILD_TESTING=OFF` and do not execute native tests.
-Native tests are deferred while the protection issue is unresolved. After that
-issue is resolved, the explicit opt-in for file/snippet tests needs no GUI dependency:
-
-```sh
-python scripts/fetch_dependencies.py --core-only
-python scripts/build.py --core-only --run-tests
-```
-
-The native editor needs no CyCode checkout or Python runtime. The MCP companion
-uses a separate private Python/CyToolsCore installation (below). Source archives are
-version/hash pinned; no downloaded dependencies, runtimes, personal preferences or
-binaries belong in Git.
+---
 
 ## License
 
-CyCodeReader and its original shared `editor/` source library are licensed under
-[GNU GPL v3 only](LICENSE) (`GPL-3.0-only`). Copyright (c) 2026 Cyberalien;
-see [COPYRIGHT](COPYRIGHT). Third-party components retain their own licenses,
-listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-Build folders and CMake installs include LICENSE and COPYRIGHT. Binary recipients
-must also have access to the exact corresponding source, including pinned CyUI,
-shared editor dependencies and build scripts; private dependency access is not
-granted automatically by this notice.
+**CyCodeReader, its original `editor/` library, documentation and examples use
+[GNU GPL v3 only](LICENSE) (`GPL-3.0-only`).** Copyright © 2026 Cyberalien;
+see [COPYRIGHT](COPYRIGHT). Third-party components retain their own terms.
 
-`scripts/verify_reader.py` preserves the hidden desktop acceptance suite and
-`scripts/verify_languages.py` covers Reader syntax. They require a deployed binary
-selected with CYCODE_READER and do not run during builds. Do not run them while the
-existing protection issue remains unresolved. Current evidence and platform limits
-are recorded in [Docs/Validation.md](Docs/Validation.md).
+### Third-party libraries
 
-## Shared editor development
+| Library · source | License · terms | Use / scope |
+| --- | --- | --- |
+| [CyUI](https://github.com/MrMybal/CyUI) | [MIT](licenses/CyUI.txt) | Modular native interface, code editor, searchable commands, diagnostics and comparisons. |
+| [Dear ImGui](https://github.com/ocornut/imgui) · [TextEditor](https://github.com/goossens/ImGuiColorTextEdit) | [MIT](licenses/DearImGui.txt) · [MIT](licenses/TextEditor.txt) | Native widgets and the single editor backend supplied through CyUI. |
+| [SDL3](https://github.com/libsdl-org/SDL) | [zlib](licenses/SDL3.txt) | Native windows, input and rendering integration. |
+| [nlohmann/json](https://github.com/nlohmann/json) | [MIT](licenses/nlohmann-json.txt) | Native JSON models, plugin manifests and bridge messages. |
+| [Tree-sitter](https://github.com/tree-sitter/tree-sitter) | [MIT](licenses/tree-sitter.txt) | Incremental parsing in the shared editor. |
+| [Tree-sitter grammars](https://github.com/tree-sitter) | [Rust](licenses/tree-sitter-rust.txt), [Java](licenses/tree-sitter-java.txt), [JavaScript](licenses/tree-sitter-javascript.txt), [TypeScript](licenses/tree-sitter-typescript.txt), [HTML](licenses/tree-sitter-html.txt), [CSS](licenses/tree-sitter-css.txt) · MIT | Language parsers; preserve each grammar’s notice. |
+| [Lexilla / Scintilla](https://github.com/ScintillaOrg/lexilla) · [SciTE](https://www.scintilla.org/SciTE.html) | [Lexilla](licenses/Lexilla.txt), [Scintilla](licenses/Scintilla.txt), [SciTE](licenses/SciTE-Properties.txt) | Permissive notices for syntax lexers, public headers and keyword data; no Scintilla editor or Notepad++ plugin binary is linked. |
+| CyToolsCore SDK 0.10.1 — private distribution | [MIT](licenses/CyToolsCore.txt) | Optional SDK/MCP companion, supplied separately as the owner’s pinned wheel. |
+| [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) | [MIT](licenses/MCP-Python.txt) | Official MCP transport in the optional Python environment. |
+| [CyDoc](https://github.com/MrMybal/CyDoc) | [MIT](https://github.com/MrMybal/CyDoc/blob/6ddf9a582defb2f11fbb3f992afef6f98dcadc93/LICENSE) | Bundled offline reader with image/gallery modules; no Three.js runtime. |
+| [marked](https://github.com/markedjs/marked) | [MIT](https://github.com/markedjs/marked/blob/v17.0.1/LICENSE.md) | Build-time Markdown compilation. |
+| [PrismJS](https://github.com/PrismJS/prism) | [MIT](https://github.com/PrismJS/prism/blob/v1.30.0/LICENSE) | Build-time documentation highlighting. |
+| [esbuild](https://github.com/evanw/esbuild) | [MIT](https://github.com/evanw/esbuild/blob/v0.25.12/LICENSE.md) | Documentation bundling at build time. |
 
-CyCode consumes this repository at a pinned commit. Its build can select a working
-checkout explicitly with CYCODE_EDITOR_ROOT or --editor-root. Only `editor/` is
-added as a CMake subdirectory; that does not build or install the Reader application.
-Keep the target names and `cycode` namespace stable. See [architecture](Docs/Architecture.md).
+Revisions and hashes are recorded in [dependencies.lock.json](dependencies.lock.json),
+[the CyUI lock](editor/cyui-source.lock.json) and [the CyDoc lock](.CyDocBuild/cydoc.lock.json).
+Retain the [third-party notices](THIRD_PARTY_NOTICES.md) and `licenses/`; this table
+does not replace the complete texts. CyDoc, marked, PrismJS and esbuild notices
+also ship in `Documentation/DocData/licenses/`. Binary recipients must be able to
+obtain the exact corresponding sources and pinned dependencies; this notice does
+not automatically grant access to private dependencies.
 
-## Extensions
+## References and links
 
-The Extensions menu and manager load `plugins/*.json` at startup. Manifests can
-contribute commands, typed options and languages. Language packs define extensions,
-keywords, types, identifiers and comments. In the expanded CyUI build, they can
-also derive from any built-in lexer or provide their own native syntax engine.
-The `.cycfg` data pack and `.cynative` native parser demonstrate both paths.
-See [the plugin contract](Docs/Plugins.md). Per-plugin panels and a remote
-marketplace remain future work.
+- [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
+- [Release notes](Docs/Releases/v0.1.3.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
+- [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
+- [CyCode](https://github.com/MrMybal/CyCode) — the independent IDE consuming this same `editor/` source library.
 
-Native extensions use the versioned C ABI in src/PluginABI.h, exchanging UTF-8 JSON
-without C++ objects. examples/sample_plugin.cpp executes a word-count command;
-plugins/native-sample.json declares it. Data-only commands can expose built-in text
-transforms. Extensions run in-process, are trusted, load once, and require restart
-for library/manifest changes. They are not sandboxed or forcibly interruptible.
-Options are type-checked and persisted with Reader preferences. Load errors appear
-in the manager. See [Docs/Plugins.md](Docs/Plugins.md).
+<details>
+<summary><strong>AI Usage</strong></summary>
 
-Edit > Text tools provides full-document line sorting/deduplication, trailing-space
-cleanup and ASCII case conversion that preserves other UTF-8 bytes. Ctrl+Shift+F
-searches currently open buffers, including unsaved text. Folder search, regex
-replacement, macros, arbitrary external run commands, advanced encodings and full
-Notepad++ feature coverage remain future work.
+- [Start here: project instructions](AGENTS.md) — ownership, dependency and platform rules.
+- [Build and shared-editor integration](Docs/Development.md) · [Architecture](Docs/Architecture.md).
+- [Reader plugins](Docs/Plugins.md) · [Comparison providers](Docs/Comparison.md) · [SDK/MCP contracts](Docs/MCP.md).
+- [Documentation toolchain](.CyDocBuild/README.md) — generate and ship the complete offline reader.
 
-## CyToolsCore / MCP
-
-Install the owner's checksum-pinned SDK wheel in this repository's private runtime:
-
-```sh
-python scripts/setup_sdk.py --sdk-wheel ../CyToolsCore/dist/cytools_core-0.10.1-py3-none-any.whl
-```
-
-The wheel and runtime are not published in this repository. The native Reader starts
-one real CyToolsCore service per instance when that private Python is available;
-CYCODE_READER_PYTHON can select another compatible interpreter. The CyToolsCore/MCP
-panel reports service status and copies separate read-only/editing MCP configurations.
-Each instance has private endpoint/credential files; do not share or commit data/.
-SDK 0.10.1 and official MCP SDK 1.30.0 are used, not a custom job/MCP implementation.
-
-The SDK operates on the same ReaderCore documents as the GUI: list/read/new/open,
-replace/save/close, encoding/newline conversion, search, transformations and plugins.
-Expected revisions, read-only state, dirty-close guards and disk baselines are checked.
-Read-only identities cannot edit/open arbitrary files or invoke plugins. Saving is
-explicit. Plugins require plugins.execute plus workspace.write; opening a supplied
-path requires filesystem.read. Source documents are persistent files and are never
-SDK task artifacts. See [Docs/MCP.md](Docs/MCP.md) for CLI/service usage and tests.
-
-
-Local illustrated English/French help is generated and bundled with GUI builds.
-See [documentation toolchain instructions](.CyDocBuild/README.md).
-
-The current manual uses complete English/French task guides and public API contracts.
-Open `Documentation/Documentation.html` directly after generation.
-The shared Pages site also hosts the [CyCode IDE manual](https://mrmybal.github.io/CyCodeReader/cycode/Documentation.html#/en/overview).
+</details>
