@@ -25,6 +25,7 @@ struct ReaderUpdateTests {
                 reader.execute("new");reader.testAction({{"command","setText"},{"text","unsaved user document\n"}});
                 const auto before=reader.state().at("documents");
                 reader.execute("updates");
+                require(reader.updateCheckOnStartup_,"New installations must check for updates at startup by default");
                 for (const auto *theme : {"graphite","light-grey"}) for (const auto *locale : {"en","fr"}) for (float dpi : {1.f,2.f}) {
                     reader.execute("view.theme",{{"theme",theme}});reader.execute("view.locale",{{"locale",locale}});cyui::applyDpi(dpi);
                     draw(reader);draw(reader);

@@ -54,8 +54,17 @@ jobs:
         run: |
           $compiler = Get-ChildItem 'C:\Program Files*\Inno Setup*\ISCC.exe' -ErrorAction SilentlyContinue | Select-Object -First 1
           if (-not $compiler) { choco install innosetup --no-progress -y; if ($LASTEXITCODE) { exit $LASTEXITCODE } }
+      - name: Check distribution build policy
+        run: python -m unittest discover -s tests -p test_distribution_build.py
       - name: Package installer and portable edition
-        run: python scripts/package_windows.py
+        shell: pwsh
+        env:
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          $arguments = @('scripts/package_windows.py')
+          if ($env:REPOSITORY_PRIVATE -eq 'false') { $arguments += '--require-public-updates' }
+          python @arguments
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Preserve reviewable packages
         uses: actions/upload-artifact@v4
         with:

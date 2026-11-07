@@ -201,7 +201,7 @@ class Reader {
     std::optional<PreparedUpdate> preparedUpdate_,updateOnExit_;
     std::atomic<bool> updateCancel_{false};
     std::atomic<uint64_t> updateProgress_{0};
-    bool updatePanel_=false,updateCheckOnStartup_=false,startupUpdateChecked_=false;
+    bool updatePanel_=false,updateCheckOnStartup_=true,startupUpdateChecked_=false;
     std::string updateMessage_;
     std::string searchQuery_;
     std::string openEncoding_="auto";

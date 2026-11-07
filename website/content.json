@@ -40,8 +40,8 @@
     "fr": "Chapitres de la page"
   },
   "hero.status": {
-    "en": "BETA · 0.1.3 · Windows x64",
-    "fr": "BÊTA · 0.1.3 · Windows x64"
+    "en": "BETA · 0.1.4 · Windows x64",
+    "fr": "BÊTA · 0.1.4 · Windows x64"
   },
   "hero.heading": {
     "en": "Your files. Your workspace.",
@@ -76,8 +76,8 @@
     "fr": "Agrandir la capture de l’éditeur de code"
   },
   "captures.note": {
-    "en": "Application views show v0.1.1 and sample files in English; the current download is v0.1.3.",
-    "fr": "Les vues de l’application montrent la v0.1.1 et des fichiers d’exemple en anglais ; le téléchargement actuel est la v0.1.3."
+    "en": "Application views show v0.1.1 and sample files in English; the current download is v0.1.4.",
+    "fr": "Les vues de l’application montrent la v0.1.1 et des fichiers d’exemple en anglais ; le téléchargement actuel est la v0.1.4."
   },
   "chapter.editor": {
     "en": "Edit",
@@ -460,8 +460,8 @@
     "fr": "Un éditeur natif pour vos fichiers."
   },
   "download.body": {
-    "en": "Version 0.1.3 is available for Windows 10/11 x64. Extract the entire portable ZIP into a writable folder, or use the per-user installer. Keep the supplied resources beside the application.",
-    "fr": "La version 0.1.3 est disponible pour Windows 10/11 x64. Extrayez le ZIP portable complet dans un dossier accessible en écriture, ou utilisez l’installateur par utilisateur. Conservez les ressources fournies à côté de l’application."
+    "en": "Install version 0.1.4 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
+    "fr": "Installez la version 0.1.4 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
   },
   "download.portable": {
     "en": "Portable ZIP",
@@ -484,8 +484,8 @@
     "fr": "Linux et macOS restent des cibles prévues depuis les sources. Cette version ne fournit ni paquets natifs ni validation graphique complète pour ces plateformes."
   },
   "download.updates": {
-    "en": "Public builds check GitHub Releases. Download and installation require an explicit action.",
-    "fr": "Les versions publiques vérifient GitHub Releases. Téléchargement et installation nécessitent une action explicite."
+    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit.",
+    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites."
   },
   "footer.body": {
     "en": "A separate editor. A shared engine.",

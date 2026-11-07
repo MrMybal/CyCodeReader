@@ -37,7 +37,7 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
     try { std::ifstream in(options_.installation/"locales/ui.json"); in>>translations_; } catch (...) {}
     if (!options_.automated) try {
         const auto settings=Json::parse(readTextFileBytes(readerDataDirectory(options_.installation)/"reader/preferences.json"));
-        updateCheckOnStartup_=settings.value("checkUpdatesAtStartup",false);
+        updateCheckOnStartup_=settings.value("checkUpdatesAtStartup",updateCheckOnStartup_);
         theme_=settings.value("theme",theme_); locale_=settings.value("language",locale_);
         density_=settings.value("density",density_);
         textScale_=std::clamp(settings.value("textScale",textScale_),.8f,2.f);

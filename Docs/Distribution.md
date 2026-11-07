@@ -67,10 +67,12 @@ do not install Git or change repository configuration.
 5. Exercise the full online update path with two successive public versions.
    This acceptance is explicitly deferred until the repository is public.
 
-Version 0.1.1 is the first public beta. `packaging/release.json` sets
-`prerelease: true`, and the workflow publishes the versioned notes from
-`Docs/Releases/v<version>.md`. A future stable release must explicitly set this
-field to false. The updater ignores GitHub prereleases, including this beta.
+Version 0.1.1 was the first public beta and used GitHub's prerelease flag.
+The current release profile uses `prerelease: false` so subsequent numeric
+releases are available through `/releases/latest`. The application still has
+beta maturity; this public update-channel flag does not change that status.
+The workflow publishes the notes from `Docs/Releases/v<version>.md`.
+GitHub drafts and releases marked as prereleases remain excluded from updates.
 
 The workflow needs publicly reachable dependencies; local build success does not
 establish hosted CI success. The current CyUI pin must be published/accessibly
@@ -82,7 +84,7 @@ packaging and the installer before computing/uploading its final digest.
 ## Update lifecycle
 
 The Updates panel shows the version/edition, manual checks and optional startup
-checks (off initially). Background workers keep network operations off the UI
+checks (on initially for new installations; existing preferences are retained). Background workers keep network operations off the UI
 thread. Only unauthenticated public `/releases/latest` and stable numeric `vX.Y.Z`
 versions are accepted. Same/older versions, drafts/prereleases and assets for the
 wrong edition are refused. A private repository or absent release produces an

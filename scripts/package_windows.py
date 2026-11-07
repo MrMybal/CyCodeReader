@@ -105,6 +105,15 @@ def find_iscc(explicit):
     return next((Path(p) for p in candidates if p and Path(p).is_file()), None)
 
 
+def validate_build(info, app_version, configuration, require_public_updates=False):
+    if info['version'] != app_version or info['platform'] != 'Windows' or info['architecture'] != 'x64':
+        raise RuntimeError('Package requires a matching Windows x64 build')
+    if configuration != 'Release':
+        raise RuntimeError('Only Release builds may be packaged')
+    if require_public_updates and info.get('publicUpdates') != 'ON':
+        raise RuntimeError('Public release packages require a build with --public-updates')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build', type=Path, default=ROOT / 'runtime/build-vs')
@@ -112,14 +121,13 @@ def main():
     parser.add_argument('--output', type=Path, default=ROOT / 'dist')
     parser.add_argument('--iscc', type=Path)
     parser.add_argument('--portable-only', action='store_true')
+    parser.add_argument('--require-public-updates', action='store_true',
+                        help='Refuse public release packages with GitHub update checks disabled')
     args = parser.parse_args()
     build, output = args.build.resolve(), args.output.resolve()
     info = json.loads((build / 'distribution-build.json').read_text('utf-8'))
     app_version = version()
-    if info['version'] != app_version or info['platform'] != 'Windows' or info['architecture'] != 'x64':
-        raise RuntimeError('Package requires a matching Windows x64 build')
-    if args.configuration != 'Release':
-        raise RuntimeError('Only Release builds may be packaged')
+    validate_build(info, app_version, args.configuration, args.require_public_updates)
     iscc = find_iscc(args.iscc)
     if not args.portable_only and not iscc:
         raise RuntimeError('Inno Setup 6.3+ ISCC.exe is required; select --iscc or --portable-only')
