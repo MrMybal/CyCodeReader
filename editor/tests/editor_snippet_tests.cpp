@@ -57,12 +57,18 @@ static void acceptance() {
             if (config.triggerShortcut & mod) io.AddKeyEvent(mod,false);
         frame(e);frame(e);
         require(!session.active() && requested>before && e.GetNumberOfCursors()==1,
-                "Configured explicit completion did not leave the snippet safely");
+                ("Configured explicit completion did not leave the snippet safely: chord="+
+                    std::to_string(config.triggerShortcut)+" requested="+std::to_string(requested)+
+                    " before="+std::to_string(before)+" active="+std::to_string(session.active())+
+                    " cursors="+std::to_string(e.GetNumberOfCursors())).c_str());
     };
     explicitCompletion();
     begin("${1:name} $1");
     config.triggerShortcut=ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_Space;
-    e.SetAutoCompleteConfig(&config);explicitCompletion();
+    e.SetAutoCompleteConfig(&config);
+    // Dear ImGui resolves shortcut routing between frames. Register the newly
+    // configured chord before injecting it, as in the real preference/input loop.
+    frame(e);frame(e);explicitCompletion();
     e.SetAutoCompleteConfig(nullptr);frame(e);
 }
 int main() {
