@@ -1,26 +1,5 @@
 #pragma once
 #include "Document.h"
 #include "Plugins.h"
-#include <memory>
-#include <mutex>
-namespace cycode::reader {
-struct LiveDocument { size_t id=0;Document document;uint64_t revision=0;bool readOnly=false;std::string observed,observedFormat; };
-class Core {
-public:
-    explicit Core(const std::filesystem::path &plugins={});
-    std::recursive_mutex &mutex() { return mutex_; }
-    std::shared_ptr<LiveDocument> add(Document document={});
-    void remove(size_t id);
-    void refresh();
-    const auto &documents() const { return documents_; }
-    Plugins &plugins() { return plugins_; }
-    Json dispatch(const std::string &,const Json &params=Json::object());
-private:
-    Json describe(const LiveDocument &,bool text=false) const;
-    std::map<size_t,std::shared_ptr<LiveDocument>> documents_;
-    std::recursive_mutex mutex_;
-    Plugins plugins_;
-    size_t nextId_=1;
-    uint64_t revision_=1;
-};
-}
+#include "cycode/text/DocumentSession.h"
+namespace cycode::reader { using Json=nlohmann::json; using Core=cycode::text::DocumentSession; using cycode::text::LiveDocument; }

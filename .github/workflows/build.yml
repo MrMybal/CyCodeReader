@@ -1,4 +1,4 @@
-name: Reader file services
+name: Reader native Core integration
 on: [push, pull_request]
 permissions:
   contents: read
@@ -21,6 +21,15 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ninja-build
       - run: python scripts/fetch_dependencies.py --core-only
-      - run: python scripts/build.py --core-only
+      - run: python scripts/build.py --core-only --run-tests
       # GUI builds resolve the exact CyUI Git revision; private access may require credentials.
       # Cross-platform execution remains unverified until these jobs run.
+      - name: Preserve native integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reader-native-${{ matrix.os }}
+          path: |
+            runtime/tests-core-build*/build.log
+            runtime/tests-core-build*/Testing/Temporary/LastTest.log
+          retention-days: 7
