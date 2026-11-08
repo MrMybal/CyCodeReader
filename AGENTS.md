@@ -1,8 +1,9 @@
 # CyCodeReader development
 
 Read README.md, Docs/Architecture.md and Docs/Validation.md.
-This is the independent native C++20 code/text editor. ReaderCore owns live documents,
-plugins and the native bridge. CyToolsCore owns jobs/identities/permissions/MCP.
+This is the independent native C++20 code/text editor. ReaderCore is a compatibility
+name for CyCode::TextSession; CyCode owns native documents, plugins and transport.
+Reader owns graphical editing, its commands, Undo/Redo and presentation. CyToolsCore owns jobs/identities/permissions/MCP.
 CyCode language servers, project services, Git and debugger remain separate.
 
 - `editor/` owns the shared graphical adapters; CyCode/common now owns Paths,
@@ -21,7 +22,9 @@ CyCode language servers, project services, Git and debugger remain separate.
   or repeatedly open application windows. Do not restore old quarantined binaries.
 - Never commit runtime/, data/, downloaded dependencies, binaries, credentials or
   an unselected project license. Run Gitleaks before publishing.
-- Windows builds/tests are local evidence. Linux/macOS remain unverified until run.
+- The native integration at c4a013b passed seven tests on Windows/Linux/macOS CI.
+  These are headless/service checks, not desktop platform acceptance. Local native
+  execution remains suspended during the antivirus investigation.
 
 - Use the actual CyToolsCore SDK; read its Docs/AgentGuide.md, MCP.md, Protocol.md
   and TaskFiles.md. Keep user documents persistent; never stage them as task artifacts.

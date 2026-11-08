@@ -23,8 +23,6 @@ jobs:
       - run: python tests/test_core_dependency_data.py
       - run: python scripts/fetch_dependencies.py --core-only
       - run: python scripts/build.py --core-only --run-tests
-      # GUI builds resolve the exact CyUI Git revision; private access may require credentials.
-      # Cross-platform execution remains unverified until these jobs run.
       - name: Preserve native integration evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -33,4 +31,48 @@ jobs:
           path: |
             runtime/tests-core-build*/build.log
             runtime/tests-core-build*/Testing/Temporary/LastTest.log
+          retention-days: 7
+
+  presentation:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Linux graphical build SDKs
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxext-dev libxcursor-dev libxrandr-dev libxi-dev libxfixes-dev libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev libdbus-1-dev libudev-dev libdrm-dev libgbm-dev libasound2-dev libpulse-dev
+      - name: macOS Ninja
+        if: runner.os == 'macOS'
+        run: brew install ninja
+      - name: Fetch the exact native and graphical dependencies
+        run: python scripts/fetch_dependencies.py
+      - name: Build production Reader, offline help and all opt-in view/service contracts
+        run: python scripts/build.py --build-tests
+      - name: Exercise actual shared-editor and Reader views without OS windows
+        shell: bash
+        run: |
+          suffix=""
+          if [ "$RUNNER_OS" = "Windows" ]; then suffix="-vs"; fi
+          ctest --test-dir "runtime/tests-build$suffix" -C Release --output-on-failure --no-tests=error --output-junit reader-view-results.xml
+      - name: Preserve view/native integration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reader-views-${{ matrix.os }}
+          path: |
+            runtime/tests-build*/build.log
+            runtime/tests-build*/reader-view-results.xml
+            runtime/tests-build*/Testing/Temporary/LastTest.log
           retention-days: 7
