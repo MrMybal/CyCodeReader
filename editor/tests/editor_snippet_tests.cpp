@@ -48,13 +48,20 @@ static void acceptance() {
     auto explicitCompletion=[&] {
         const auto before=requested;
         auto &io=ImGui::GetIO();
+        auto eventModifier=[&](ImGuiKey mod) {
+            // AddKeyEvent receives physical modifiers. Dear ImGui swaps Ctrl /
+            // Command for macOS before exposing the logical shortcut modifiers.
+            if (io.ConfigMacOSXBehaviors && (mod==ImGuiMod_Ctrl || mod==ImGuiMod_Super))
+                return static_cast<ImGuiKey>(mod==ImGuiMod_Ctrl ? ImGuiMod_Super : ImGuiMod_Ctrl);
+            return mod;
+        };
         for (const auto mod : {ImGuiMod_Ctrl,ImGuiMod_Shift,ImGuiMod_Alt,ImGuiMod_Super})
-            if (config.triggerShortcut & mod) io.AddKeyEvent(mod,true);
+            if (config.triggerShortcut & mod) io.AddKeyEvent(eventModifier(mod),true);
         const auto key=static_cast<ImGuiKey>(config.triggerShortcut & ~ImGuiMod_Mask_);
         io.AddKeyEvent(key,true);frame(e);
         io.AddKeyEvent(key,false);
         for (const auto mod : {ImGuiMod_Ctrl,ImGuiMod_Shift,ImGuiMod_Alt,ImGuiMod_Super})
-            if (config.triggerShortcut & mod) io.AddKeyEvent(mod,false);
+            if (config.triggerShortcut & mod) io.AddKeyEvent(eventModifier(mod),false);
         frame(e);frame(e);
         require(!session.active() && requested>before && e.GetNumberOfCursors()==1,
                 ("Configured explicit completion did not leave the snippet safely: chord="+
