@@ -161,7 +161,7 @@ void Reader::historyPanel() {
         if (!history_.message.empty()) ImGui::TextWrapped("%s",tr(history_.message.c_str()));
         if (const auto tab=find(history_.document);!tab || pathUtf8(tab->document.path())!=history_.path || history_.selection && tab->live->revision!=history_.revision) cyui::callout(cyui::Tone::warning,tr("History source changed. Refresh the history view."));
         std::vector<int> visible;
-        for (size_t i=0;i<history_.commits.size();++i) { const auto &c=history_.commits[i];if (history_.filter.matches(c.at("subject"),c.at("id").get<std::string>()+" "+c.at("author").get<std::string>()+" "+c.at("date").get<std::string>())) visible.push_back(static_cast<int>(i)); }
+        for (size_t i=0;i<history_.commits.size();++i) { const auto &c=history_.commits[i];if (history_.filter.matches(c.at("subject").get_ref<const std::string &>(),c.at("id").get<std::string>()+" "+c.at("author").get<std::string>()+" "+c.at("date").get<std::string>())) visible.push_back(static_cast<int>(i)); }
         const auto bodyHeight=ImGui::GetContentRegionAvail().y;
         if (ImGui::BeginTable("##history",4,ImGuiTableFlags_RowBg|ImGuiTableFlags_Resizable|ImGuiTableFlags_ScrollY,{0,std::max(cyui::dp(100.f),bodyHeight*history_.listFraction)})) {
             ImGui::TableSetupColumn(tr("Revision"),ImGuiTableColumnFlags_WidthFixed,cyui::dp(96));ImGui::TableSetupColumn(tr("Date"),ImGuiTableColumnFlags_WidthFixed,cyui::dp(160));ImGui::TableSetupColumn(tr("Author"),ImGuiTableColumnFlags_WidthFixed,cyui::dp(140));ImGui::TableSetupColumn(tr("Message"));ImGui::TableSetupScrollFreeze(0,1);ImGui::TableHeadersRow();
