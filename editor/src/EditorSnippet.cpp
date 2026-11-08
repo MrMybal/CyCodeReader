@@ -76,7 +76,11 @@ bool EditorSnippet::input() {
     if (!active()) return false;
     if (!validCursors()) { cancel();return false; }
     const auto &io=ImGui::GetIO();
-    if (io.KeyCtrl && !io.KeyAlt && !io.KeySuper && !io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_Space,false)) { cancel();return false; }
+    // Match the configured backend chord, including macOS defaults and host
+    // overrides. Cancel mirrors before allowing the widget to request completion.
+    const auto shortcut=editor_->GetAutoCompleteShortcut();
+    const auto key=static_cast<ImGuiKey>(shortcut & ~ImGuiMod_Mask_);
+    if (key!=ImGuiKey_None && io.KeyMods==(shortcut & ImGuiMod_Mask_) && ImGui::IsKeyPressed(key,false)) { cancel();return false; }
     if (!io.KeyCtrl && !io.KeyAlt && !io.KeySuper && ImGui::IsKeyPressed(ImGuiKey_Escape,false)) { cancel();editor_->SetCursor(editor_->GetMainCursorPosition());return true; }
     if (!io.KeyCtrl && !io.KeyAlt && !io.KeySuper && ImGui::IsKeyPressed(ImGuiKey_Tab,false)) {
         if (io.KeyShift) { if (current_) --current_;select(); }

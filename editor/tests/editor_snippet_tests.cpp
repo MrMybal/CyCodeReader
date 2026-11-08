@@ -45,9 +45,24 @@ static void acceptance() {
     e.SetReadOnlyEnabled(false);begin("${1:name} $1");
     size_t requested=0;TextEditor::AutoCompleteConfig config;config.triggerOnTyping=false;config.triggerDelay=std::chrono::milliseconds(0);
     config.callback=[&](TextEditor::AutoCompleteState &state) { ++requested;state.suggestions={"new_completion"}; };e.SetAutoCompleteConfig(&config);
-    ImGui::GetIO().AddKeyEvent(ImGuiMod_Ctrl,true);ImGui::GetIO().AddKeyEvent(ImGuiKey_Space,true);frame(e);
-    ImGui::GetIO().AddKeyEvent(ImGuiKey_Space,false);ImGui::GetIO().AddKeyEvent(ImGuiMod_Ctrl,false);frame(e);frame(e);
-    require(!session.active() && requested>0 && e.GetNumberOfCursors()==1,"Explicit completion did not leave the snippet safely");
+    auto explicitCompletion=[&] {
+        const auto before=requested;
+        auto &io=ImGui::GetIO();
+        for (const auto mod : {ImGuiMod_Ctrl,ImGuiMod_Shift,ImGuiMod_Alt,ImGuiMod_Super})
+            if (config.triggerShortcut & mod) io.AddKeyEvent(mod,true);
+        const auto key=static_cast<ImGuiKey>(config.triggerShortcut & ~ImGuiMod_Mask_);
+        io.AddKeyEvent(key,true);frame(e);
+        io.AddKeyEvent(key,false);
+        for (const auto mod : {ImGuiMod_Ctrl,ImGuiMod_Shift,ImGuiMod_Alt,ImGuiMod_Super})
+            if (config.triggerShortcut & mod) io.AddKeyEvent(mod,false);
+        frame(e);frame(e);
+        require(!session.active() && requested>before && e.GetNumberOfCursors()==1,
+                "Configured explicit completion did not leave the snippet safely");
+    };
+    explicitCompletion();
+    begin("${1:name} $1");
+    config.triggerShortcut=ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_Space;
+    e.SetAutoCompleteConfig(&config);explicitCompletion();
     e.SetAutoCompleteConfig(nullptr);frame(e);
 }
 int main() {

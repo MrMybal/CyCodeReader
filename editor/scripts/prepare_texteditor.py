@@ -66,6 +66,8 @@ def prepare(source, destination):
     # Display-only Reader search spans. This modifies the one build-local backend,
     # never CyUI's downloaded source, document markers, cursors or Undo history.
     edits['TextEditor.h'] += [
+        ('\tinline void SetAutoCompleteConfig(const AutoCompleteConfig* autoCompleteConfig) { autocomplete.setConfig(autoCompleteConfig); }',
+         '\tinline void SetAutoCompleteConfig(const AutoCompleteConfig* autoCompleteConfig) { autocomplete.setConfig(autoCompleteConfig); }\n\tImGuiKeyChord GetAutoCompleteShortcut() const { return autocomplete.getTriggerShortcut(); }'),
         ('\tvoid SetLanguage(const Language* language);', '\tvoid SetLanguage(const Language* language);\n\tvoid SetReaderSearchMatches(std::vector<DocSelection> ranges, ImU32 color) { readerSearch=std::move(ranges);readerSearchColor=color;readerSearchVersion=transactions.getVersion(); }\n\tsize_t GetReaderSearchMatchCount() const { return readerSearchVersion==transactions.getVersion() ? readerSearch.size() : 0; }'),
         ('\tvoid renderSelections();','\tvoid renderSelections();\n\tvoid renderReaderSearch();\n\tstd::vector<DocSelection> readerSearch;\n\tImU32 readerSearchColor=0;\n\tsize_t readerSearchVersion=~size_t(0);')
     ]
