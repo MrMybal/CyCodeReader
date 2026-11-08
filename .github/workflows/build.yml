@@ -20,6 +20,7 @@ jobs:
       - name: Install Ninja
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - run: python tests/test_core_dependency_data.py
       - run: python scripts/fetch_dependencies.py --core-only
       - run: python scripts/build.py --core-only --run-tests
       # GUI builds resolve the exact CyUI Git revision; private access may require credentials.
