@@ -86,11 +86,11 @@ void Reader::extensionPanels() {
                 const auto pluginId=plugin.at("id").get<std::string>(),name=plugin.at("name").get<std::string>();
                 const auto context=name+" "+pluginId;
                 auto &view=pluginOptions_[pluginId];view.synchronize(plugin);
-                auto commandMatches=[&](const Json &command) { return command.value("kind","")!="syntax" && command.value("kind","")!="service" && pluginsFilter_.matches(command.at("title"),context+" "+command.at("id").get<std::string>()); };
+                auto commandMatches=[&](const Json &command) { return command.value("kind","")!="syntax" && command.value("kind","")!="service" && pluginsFilter_.matches(command.at("title").get_ref<const std::string &>(),context+" "+command.at("id").get<std::string>()); };
                 auto languageMatches=[&](const Json &language) {
                     auto keywords=context+" "+language.at("id").get<std::string>();
                     for (const auto &ext : language.at("extensions")) keywords+=" "+ext.get<std::string>();
-                    return pluginsFilter_.matches(language.at("name"),keywords);
+                    return pluginsFilter_.matches(language.at("name").get_ref<const std::string &>(),keywords);
                 };
                 bool any=pluginsFilter_.matches(name,pluginId);
                 for (const auto &command : plugin.at("commands")) any|=commandMatches(command);
@@ -182,7 +182,7 @@ void Reader::extensionPanels() {
             bool matchingLicense=optionsFilter_.matches("CyCodeReader GPL-3.0-only Copyright", "Licenses "+cyui::tr("Licenses"));
             for (const auto &file : licenses) matchingLicense|=optionsFilter_.matches(pathUtf8(file.filename()),"Licenses "+cyui::tr("Licenses"));
             if (cyui::beginFilteredSection("Licenses",optionsFilter_,matchingLicense,false)) {
-                ImGui::TextWrapped("%s",cyui::tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT."));
+                ImGui::TextWrapped("%s",cyui::tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.").c_str());
                 for (const auto &file : licenses) if (optionsFilter_.matches(pathUtf8(file.filename()),"Licenses "+cyui::tr("Licenses"))) {
                     if (ImGui::TreeNode(pathUtf8(file.filename()).c_str())) { const auto text=readTextFileBytes(file);ImGui::TextUnformatted(text.c_str());ImGui::TreePop(); }
                 }
