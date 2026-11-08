@@ -8,6 +8,20 @@ For user tasks, use the [English manual](https://mrmybal.github.io/CyCodeReader/
 or [French manual](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
 Platform/runtime evidence is maintained separately in [Validation.md](Validation.md).
 
+## Native Core dependency
+
+core-source.lock.json pins the shared native CyCode source API. The build selects
+TextSession, TextBridge, Process and Snippets; it does not compile the project
+Engine, SDL/ImGui/CyUI or language backends in --core-only mode. Only pinned JSON
+is fetched for that profile. Reader's compatibility headers forward to those
+native services; there are no local Document/Search/Bridge implementations.
+The application keeps graphical Undo/Redo, preferences and distribution policy.
+
+Use --core-root <CyCode> for an explicit compatible development checkout. Default
+builds resolve the immutable lock and refuse modified dependency caches. Native
+tests require --run-tests and remain suspended locally during the antivirus
+investigation; the dedicated GitHub workflow runs them on Windows/Linux/macOS.
+
 ## Build
 
 Requirements: Python 3.11+, Git, CMake 3.24+ and a C++20 compiler. Windows uses

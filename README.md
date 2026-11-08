@@ -140,6 +140,8 @@ python scripts/fetch_dependencies.py
 python scripts/build.py
 ```
 
+Reader also resolves the native CyCode source API pinned in core-source.lock.json. Documents, encodings, live search, text plugins, processes and local transport are shared Core components. The standalone profile needs JSON only and keeps project/language services out of its build.
+
 The resolver fetches the exact CyUI commit from its official repository. An
 optional `--cyui PATH` must select a clean matching checkout; no upstream checkout
 is reset. GUI modules are **Core, Code, CodeEditor, Commands, Inspector, Diagnostics
@@ -203,7 +205,8 @@ not automatically grant access to private dependencies.
 - [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
 - [Release notes](Docs/Releases/v0.1.4.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
 - [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
-- [CyCode](https://github.com/MrMybal/CyCode) — the independent IDE consuming this same `editor/` source library.
+- [CyCode Core](https://github.com/MrMybal/CyCode) — the shared native document/project engine.
+- [CyCodeIDE](https://github.com/MrMybal/CyCodeIDE) — the IDE consuming Core and this same graphical `editor/` library.
 
 <details>
 <summary><strong>AI Usage</strong></summary>

@@ -164,6 +164,11 @@ les tests natifs et ne lancent pas l’application. `--core-only` compile les se
 de documents/extraits sans SDL/ImGui/CyUI ; il ne produit pas l’interface. L’édition
 elle-même ne nécessite aucun runtime Python.
 
+Reader utilise aussi l’API source native CyCode épinglée dans core-source.lock.json.
+Documents, encodages, recherche active, plugins texte, processus et transport local
+sont des composants du Core. Le profil autonome demande seulement JSON et ne
+compile pas les services de projet ou de langage.
+
 Le [guide de développement](Docs/Development.md) détaille les options de compilation,
 l’intégration de l’éditeur partagé, les paquets et la configuration optionnelle du
 wheel CyToolsCore verrouillé. La [génération documentaire](.CyDocBuild/README.md)
@@ -219,7 +224,8 @@ l’accès à une dépendance privée.
 - [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview) · [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview).
 - [Notes de version](VERSION.fr.md) · [Téléchargements](https://github.com/MrMybal/CyCodeReader/releases).
 - [Dépôt des sources](https://github.com/MrMybal/CyCodeReader) · [Suivi des problèmes](https://github.com/MrMybal/CyCodeReader/issues).
-- [CyCode](https://github.com/MrMybal/CyCode) — l’IDE indépendant qui consomme la même bibliothèque source `editor/`.
+- [CyCode Core](https://github.com/MrMybal/CyCode) — le moteur natif commun pour les documents et projets.
+- [CyCodeIDE](https://github.com/MrMybal/CyCodeIDE) — l’IDE qui utilise Core et la même bibliothèque graphique `editor/`.
 
 <details>
 <summary><strong>AI Usage</strong></summary>
