@@ -1,3 +1,14 @@
+# Shared native dependency extraction
+
+Reader now consumes CyCode/common API 1 for Paths, TextFile and Snippet.
+The six former local files were removed. Target names and the cycode namespace
+remain compatible. A host supplying CyCode::Files reuses those targets; standalone
+Reader resolves its pinned core-source.lock.json and configures only common/.
+This does not yet replace ReaderCore documents/search/bridge with Engine services.
+For local companion branches, build with `python scripts/build.py --core-only
+--core-root <CyCode> --deps <native-dependency-cache>`. The default resolver uses
+the exact revision in core-source.lock.json; no UI source download is needed.
+
 # Architecture
 
 The original application artwork lives in icons/CyCodeReader.png/.ico, with a

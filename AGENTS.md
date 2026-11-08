@@ -5,8 +5,9 @@ This is the independent native C++20 code/text editor. ReaderCore owns live docu
 plugins and the native bridge. CyToolsCore owns jobs/identities/permissions/MCP.
 CyCode language servers, project services, Git and debugger remain separate.
 
-- `editor/` is the single shared source library consumed by CyCode too. Preserve
-  its `cycode_*` CMake targets and namespace; incompatible changes need an API bump.
+- `editor/` owns the shared graphical adapters; CyCode/common now owns Paths,
+  TextFile and Snippet. Do not recreate local copies. Preserve
+  the existing `cycode_*` CMake targets and namespace; incompatible changes need an API bump.
 - Use the locked official CyUI revision (optional clean CYUI_DIR override). Read
   docs/AI_GUIDE.md and MODULES.md; use explicit module targets, palette roles and dp.
   Do not edit CyUI or upstream downloaded sources. Widget patches live in
