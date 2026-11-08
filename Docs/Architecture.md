@@ -24,9 +24,12 @@ cycodereader-native/1 descriptor. Revisions, disk guards, read-only checks, boun
 responses and EOF shutdown are enforced by the shared native owner. CyToolsCore
 still owns jobs, identities, permissions and MCP; no parallel scheduler is added.
 
-Seven native tests passed on Windows/Linux/macOS at Reader 9cbd8d3 with Core
-28c455b, including actual IPC, plugins, encodings, disk/revision conflicts and Git.
-The subsequent component selection/retirement changes require their own run.
+Reader 671c588 with Core 84e4c78 passed all 17 service/view tests on Windows x64,
+Ubuntu x64 and macOS arm64, plus the separate seven-case headless build. Actual
+plugins, encodings, guarded edits, IPC/EOF, shared editor/syntax, comparison/history,
+filtering and platform/custom snippet completion chords are exercised on runners.
+The existing C++ text plugin ABI is unchanged. This does not establish GPU, IME
+or physical desktop acceptance. See Docs/Validation.md for exact provenance.
 Local application/test execution stays suspended while antivirus removals remain
 unresolved. Production compilation and data checks are separate evidence.
 

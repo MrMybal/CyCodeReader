@@ -1,5 +1,28 @@
 # Validation
 
+## Shared Core extraction — 2026-11-08
+
+Reader 671c588b924f9da2655843f64615b6b6bc7076e6 pins Core
+84e4c7831afeab27406a958a957db23fe005eae8. All 17 native/service/view CTests pass
+on Windows x64, Ubuntu x64 and macOS arm64, and the separate seven-case headless
+graph also passes. Exact run:
+https://github.com/MrMybal/CyCodeReader/actions/runs/42493128377
+
+The suite exercises actual shared documents/codecs, data/native plugins, revision
+and disk guards, real CLI/loopback EOF cleanup, Git environment isolation,
+comparison/history, editor Undo/Redo, syntax, snippets, filtering and CyUI views.
+Catalogue assertions now match the pinned 102 built-in modes including Verse.
+Snippet completion follows the actual backend chord; tests cover default/custom
+chords and macOS physical-to-logical modifier mapping. JSON/string conversions
+and translated varargs were corrected for portable C++ behavior.
+
+Windows production Reader and minimal native component builds also pass locally,
+with tests OFF. No native app, CLI, updater, debugger or test executable was run
+locally. Source/data checks, local compilation and runner execution are separate
+evidence. Headless view loops do not prove OS windows, GPU drivers, IME, actual
+multi-monitor behavior or every distribution package. Original active Reader
+sources remain untouched; these changes are on codex/core-common.
+
 ## Shared Verse syntax — 2026-11-06
 
 Windows x64 Release Reader compiles against the exact committed CyUI Verse
