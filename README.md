@@ -13,8 +13,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Application license</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.5.md"><strong>0.1.5</strong></a><br><strong>BETA</strong></p>
-      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.5/CyCodeReader-0.1.5-windows-x64-setup.exe"><strong>Install CyCodeReader</strong></a><br><sub>Windows x64 · installer</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.5/CyCodeReader-0.1.5-windows-x64-portable.zip">Portable ZIP</a></p>
+      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.6.md"><strong>0.1.6</strong></a><br><strong>BETA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-setup.exe"><strong>Install CyCodeReader</strong></a><br><sub>Windows x64 · installer</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip">Portable ZIP</a></p>
     </td>
   </tr>
 </table>
@@ -25,18 +25,19 @@ A native code and text editor for developers who want to open files directly,
 edit with syntax highlighting, search live documents and compare revisions.
 Built with CyUI, it runs independently of the CyCode IDE.
 
-> **BETA · 0.1.5**
+> **BETA · 0.1.6**
 >
-> Version 0.1.5 adds JetBrains Mono, Ctrl + mouse-wheel text zoom and a palette
-> inspired by Rider, with orange strings and green comments. It fixes search-preview
-> highlighting and removes a fixed two-second shutdown delay. Desktop and installer
-> validation remains in progress. Read the [release notes and known limitations](Docs/Releases/v0.1.5.md).
+> Version 0.1.6 fixes the Windows update-helper argument handoff and retains the
+> code font, zoom, palette and search improvements from 0.1.5. If 0.1.4 or 0.1.5
+> reports **Invalid update arguments**, close Reader and run the current installer
+> manually once. Desktop and installer validation remains in progress. Read the
+> [release notes and recovery instructions](Docs/Releases/v0.1.6.md).
 
 [![CyCodeReader with C++ syntax highlighting, tabs, toolbar and minimap](Docs/images/editor.png)](Docs/images/editor.png)
 
 *Actual v0.1.1 application views rendered from ImGui draw data on sample documents.
 The screenshots illustrate the interface; they do not establish desktop or
-installer acceptance for v0.1.5, and predate its new code font and palette.*
+installer acceptance for v0.1.6, and predate its new code font and palette.*
 
 ## About CyCodeReader
 
@@ -110,12 +111,12 @@ The Windows packages include app-local MSVC runtime DLLs. Linux and macOS remain
 intended source targets; complete desktop operation is unverified and no native
 packages for them are supplied in this release.
 
-1. [Download the Windows installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.5/CyCodeReader-0.1.5-windows-x64-setup.exe), run Setup for the current user, then open CyCodeReader from the Start menu.
-2. If you prefer a portable copy, [download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.5/CyCodeReader-0.1.5-windows-x64-portable.zip). Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`, keeping all supplied directories beside it.
+1. [Download the Windows installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-setup.exe), run Setup for the current user, then open CyCodeReader from the Start menu.
+2. If you prefer a portable copy, [download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip). Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`, keeping all supplied directories beside it.
 3. Open files and choose a syntax if needed. Install Git separately for its
    optional file-history tools; configure the private SDK only for MCP use.
 
-[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.5)
+[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.6)
 accompany both downloads. Portable settings stay in `data/reader`; installed
 settings use `%LOCALAPPDATA%/CyCodeReader/reader`. Public builds check GitHub
 Releases at startup by default on new installations. An available version is
@@ -206,7 +207,7 @@ not automatically grant access to private dependencies.
 - [Product website](https://mrmybal.github.io/CyCodeReader/).
 
 - [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
-- [Release notes](Docs/Releases/v0.1.5.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
+- [Release notes](Docs/Releases/v0.1.6.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
 - [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
 - [CyCode](https://github.com/MrMybal/CyCode) — the independent IDE consuming this same `editor/` source library.
 

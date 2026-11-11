@@ -56,6 +56,11 @@ After normal guarded closure, CyCodeReaderUpdater waits for all instances and
 applies the edition-specific package. PortableUpdate.cpp validates/extracts a
 bounded stored ZIP and replaces only manifest-owned files with rollback. Installed
 updates run the per-user setup. All distribution services remain SDL/ImGui-free.
+WindowsCommandLine.h owns the backslash/quote encoding used by native processes,
+the updater handoff and Reader restart. updateHelperCommandLine builds and
+validates the launch metadata without executing it; trailing directory separators
+cannot consume the SHA-256/parent arguments. Older installed launchers need one
+manual upgrade before this corrected code handles subsequent updates.
 
 
 ReaderCore owns shared LiveDocument entries, native revisions, plugin registrations

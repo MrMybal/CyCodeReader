@@ -14,5 +14,9 @@ bool publicUpdatesEnabled();
 ReaderRelease parseRelease(const nlohmann::json &json,Distribution mode);
 std::optional<ReaderRelease> checkForUpdate(Distribution mode,const std::atomic<bool> &cancel);
 PreparedUpdate downloadUpdate(const ReaderRelease &,const std::filesystem::path &installation,const std::atomic<bool> &cancel,std::atomic<uint64_t> &progress);
+#ifdef _WIN32
+// Builds the exact helper command without launching it (also used by regression tests).
+std::wstring updateHelperCommandLine(const PreparedUpdate &,uint32_t parent);
+#endif
 void launchUpdate(const PreparedUpdate &);
 } // namespace cycode::reader

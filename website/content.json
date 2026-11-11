@@ -40,8 +40,8 @@
     "fr": "Chapitres de la page"
   },
   "hero.status": {
-    "en": "BETA · 0.1.5 · Windows x64",
-    "fr": "BÊTA · 0.1.5 · Windows x64"
+    "en": "BETA · 0.1.6 · Windows x64",
+    "fr": "BÊTA · 0.1.6 · Windows x64"
   },
   "hero.heading": {
     "en": "Your files. Your workspace.",
@@ -460,8 +460,8 @@
     "fr": "Un éditeur natif pour vos fichiers."
   },
   "download.body": {
-    "en": "Install version 0.1.5 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
-    "fr": "Installez la version 0.1.5 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
+    "en": "Install version 0.1.6 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
+    "fr": "Installez la version 0.1.6 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
   },
   "download.portable": {
     "en": "Portable ZIP",
@@ -484,8 +484,8 @@
     "fr": "Linux et macOS restent des cibles prévues depuis les sources. Cette version ne fournit ni paquets natifs ni validation graphique complète pour ces plateformes."
   },
   "download.updates": {
-    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit.",
-    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites."
+    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit. If version 0.1.4 or 0.1.5 reports Invalid update arguments, close Reader and install 0.1.6 manually once; the older launcher cannot repair its own handoff.",
+    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites. Si la version 0.1.4 ou 0.1.5 affiche Invalid update arguments, fermez Reader et installez la 0.1.6 manuellement une fois ; l’ancien lanceur ne peut pas corriger sa propre transmission."
   },
   "footer.body": {
     "en": "A separate editor. A shared engine.",

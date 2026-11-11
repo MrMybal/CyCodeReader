@@ -1,5 +1,23 @@
 # Validation
 
+## Windows update handoff correction — 2026-11-11
+
+An installed 0.1.4 report recorded Invalid update arguments. Its downloaded
+0.1.5 installer matches the published SHA-256 exactly. Source analysis identifies
+the unescaped trailing directory separator returned by SDL_GetBasePath: it
+escapes the closing quote and consumes subsequent helper arguments. Failure
+happens before package application; source user paths are not part of this report.
+
+The production handoff now shares native-process Windows argument quoting and
+validates its paths/digest/parent before launching. The existing distribution
+fixture adds twelve compiler-evaluated checks on the actual quote helper, plus
+Windows parser round-trip bodies covering trailing separators, spaces, Unicode,
+UNC/root paths and intact digest/parent tokens. The native fixture is checked by
+MSVC /Zs only; its Windows parser, installer, helper/restart and filesystem bodies
+are not linked or run. Production Release compilation keeps BUILD_TESTING=OFF.
+Full installed/portable online handoff and platform acceptance remain pending
+under the antivirus suspension. No application or installer is launched.
+
 ## Release 0.1.5 preparation — 2026-11-11
 
 The Windows x64 public Release build now uses the clean published CyUI

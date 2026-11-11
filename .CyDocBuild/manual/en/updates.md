@@ -5,7 +5,7 @@ description: Use the portable or installed edition update flow.
 section: Using Reader
 order: 180
 parent: overview
-revision: 3
+revision: 4
 ---
 
 ## Editions {#updates}
@@ -15,3 +15,9 @@ Extract the complete portable ZIP into a writable folder and keep `portable.flag
 Public release builds check GitHub Releases in the background at startup by default on new installations. A newer compatible version opens the Updates panel. Use **Download update**, then **Close and install update** after reviewing the version. Existing preferences are preserved; **Updates → Check for updates at startup** enables or disables future startup checks. Manual checks remain available in this panel. There is no separate update download to choose on GitHub. Development/preparation builds may disable checks. No private GitHub credentials are collected by Reader's updater. Review the available version and checksum-verified download before accepting an update.
 
 Portable updates use their compatible ZIP/native helper; installed editions use their installer path. Save or discard documents and close other instances when requested. Cancel preserves the running work. Application closure/restart and update acceptance are explicit actions; opening this manual never installs anything. Linux/macOS updating is not provided.
+
+## Recover from an older update launcher {#recovery}
+
+If Reader 0.1.4 or 0.1.5 shows **Invalid update arguments**, the update helper stopped before installing anything. Close Reader and manually run the current Windows installer at your existing installed location once. The corrected launcher is included from 0.1.6; the older executable cannot fix its own handoff by downloading another package.
+
+For a portable copy, close Reader and replace its program files with the complete corrected portable ZIP in the existing folder, preserving `data/` and custom plugins. Use the matching edition. Existing preferences are retained. You do not need to uninstall Reader first.

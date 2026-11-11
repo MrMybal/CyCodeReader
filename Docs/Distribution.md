@@ -81,6 +81,20 @@ need the exact corresponding GPL sources and dependency notices as in README.md.
 Code signing is not configured. If added, sign the application/helper before
 packaging and the installer before computing/uploading its final digest.
 
+## Recover from an older update launcher
+
+Versions 0.1.4 and 0.1.5 can show **Invalid update arguments** before installation
+when the installation directory ends in a backslash. The old launcher quotes the
+path without escaping its final backslash, so Windows absorbs the following
+digest/parent arguments. Download verification happens earlier and is unaffected.
+
+Install the corrective Windows setup manually once at the existing installed
+location after closing Reader. For a portable copy, replace the program files
+with the complete corrected ZIP in the existing folder, preserving `data/` and
+custom plugins. The old launcher cannot repair itself from a newly downloaded
+package because it still constructs the failing helper command. No user data
+is replaced when the helper refuses its arguments.
+
 ## Update lifecycle
 
 The Updates panel shows the version/edition, manual checks and optional startup
@@ -93,7 +107,9 @@ unavailable-public-release message, without authentication fallback.
 WinHTTP validates HTTPS certificates, permits only explicit GitHub/CDN redirect
 hosts, disables authentication/cookies, bounds sizes/timeouts and supports
 cancellation. The asset's exact size and GitHub `sha256:` digest are mandatory.
-The helper hashes the package again immediately before applying it. Release
+The helper hashes the package again immediately before applying it.
+The Windows handoff now uses the same backslash-aware argument quoting as native
+process execution; paths with spaces, Unicode and trailing separators stay intact. Release
 `SHA256SUMS.txt` also supports manual verification.
 
 **Close and install update** follows Reader's existing unsaved-document prompts.

@@ -1,4 +1,5 @@
 #include "NativeProcess.h"
+#include "WindowsCommandLine.h"
 #include <algorithm>
 #include <map>
 #include <thread>
@@ -24,22 +25,7 @@ static std::wstring wide(const std::string &s) {
     return result;
 }
 static std::wstring quote(const std::string &s) {
-    std::wstring result = L"\"";
-    unsigned slashes = 0;
-    for (wchar_t c : wide(s)) {
-        if (c == L'\\') {
-            ++slashes;
-            continue;
-        }
-        if (c == L'\"')
-            result.append(slashes * 2 + 1, L'\\');
-        else
-            result.append(slashes, L'\\');
-        slashes = 0;
-        result += c;
-    }
-    result.append(slashes * 2, L'\\');
-    return result + L'\"';
+    return detail::quoteWindowsArgument(wide(s));
 }
 #endif
 ProcessResult runProcess(const std::vector<std::string> &argv, const std::filesystem::path &cwd,

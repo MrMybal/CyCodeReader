@@ -1,6 +1,7 @@
 #include "Updates.h"
 #include "PortableUpdate.h"
 #include "NativeProcess.h"
+#include "WindowsCommandLine.h"
 #include "cycode/Paths.h"
 #include <chrono>
 #include <fstream>
@@ -13,7 +14,7 @@
 namespace {
 void restart(const std::filesystem::path &installation) {
     const auto executable=installation/L"CyCodeReader.exe";
-    std::wstring command=L"\""+executable.wstring()+L"\"";
+    auto command=cycode::detail::quoteWindowsArgument(executable.wstring());
     STARTUPINFOW startup{};startup.cb=sizeof(startup);PROCESS_INFORMATION process{};
     if (!CreateProcessW(executable.c_str(),command.data(),nullptr,nullptr,FALSE,0,nullptr,installation.c_str(),&startup,&process)) throw std::runtime_error("Update installed, but Reader could not restart");
     CloseHandle(process.hThread);CloseHandle(process.hProcess);

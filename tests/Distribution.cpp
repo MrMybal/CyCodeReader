@@ -1,5 +1,6 @@
 #include "Distribution.h"
 #include "Updates.h"
+#include "WindowsCommandLine.h"
 #include "PortableUpdate.h"
 #include "cycode/Paths.h"
 #include "cycode/TextFile.h"
@@ -8,10 +9,26 @@
 #include <functional>
 #ifdef _WIN32
 #include <windows.h>
+#include <shellapi.h>
 #endif
 
 using namespace cycode;using namespace cycode::reader;using Json=nlohmann::json;
 namespace {
+// Compiler-evaluated checks on the production quoting owner; no executable runs.
+using cycode::detail::quoteWindowsArgument;
+static_assert(quoteWindowsArgument(L"")==L"\"\"");
+static_assert(quoteWindowsArgument(L"plain")==L"\"plain\"");
+static_assert(quoteWindowsArgument(L"two words")==L"\"two words\"");
+static_assert(quoteWindowsArgument(L"\\")==L"\"\\\\\"");
+static_assert(quoteWindowsArgument(L"\\\\")==L"\"\\\\\\\\\"");
+static_assert(quoteWindowsArgument(L"C:\\")==L"\"C:\\\\\"");
+static_assert(quoteWindowsArgument(L"C:\\Reader Folder\\")==L"\"C:\\Reader Folder\\\\\"");
+static_assert(quoteWindowsArgument(L"C:\\Reader Folder\\\\")==L"\"C:\\Reader Folder\\\\\\\\\"");
+static_assert(quoteWindowsArgument(L"\\\\host\\share\\")==L"\"\\\\host\\share\\\\\"");
+static_assert(quoteWindowsArgument(L"quoted\"value")==L"\"quoted\\\"value\"");
+static_assert(quoteWindowsArgument(L"slash\\\"quote")==L"\"slash\\\\\\\"quote\"");
+static_assert(quoteWindowsArgument(L"dossier été\\")==L"\"dossier été\\\\\"");
+
 void require(bool condition,const char *message) { if (!condition) throw std::runtime_error(message); }
 void refuses(const std::function<void()> &action) { bool failed=false;try { action(); } catch (...) { failed=true; }require(failed,"Unsafe update accepted"); }
 void write(const std::filesystem::path &path,const std::string &text) { std::filesystem::create_directories(path.parent_path());std::ofstream(path,std::ios::binary)<<text; }
@@ -29,6 +46,28 @@ Json release() {
 }
 int main(int argc,char **argv) {
     try {
+#ifdef _WIN32
+        // Parse the exact production handoff through Windows without starting any process.
+        for (const auto *directory : {LR"(C:\Users\Fixture User\AppData\Local\Programs\CyCodeReader\)",
+                                     LR"(D:\Outils été\CyCodeReader\\)", LR"(C:\)",
+                                     LR"(\\server\share\CyCodeReader\)", LR"(D:\Reader without final slash)"}) {
+            PreparedUpdate update;
+            update.helper=LR"(C:\Users\Fixture User\AppData\Local\CyCodeReader\updates\{fixture}\CyCodeReaderUpdater.exe)";
+            update.package=LR"(C:\Users\Fixture User\AppData\Local\CyCodeReader\updates\{fixture}\package setup.exe)";
+            update.installation=directory;update.sha256=std::string(64,'a');update.mode=Distribution::installed;
+            auto command=updateHelperCommandLine(update,4242);
+            int count=0;auto parsed=CommandLineToArgvW(command.c_str(),&count);
+            require(parsed!=nullptr,"Cannot parse updater handoff fixture");
+            std::vector<std::wstring> actual;for (int i=0;i<count;++i) actual.emplace_back(parsed[i]);LocalFree(parsed);
+            const std::vector<std::wstring> expected={update.helper.wstring(),L"--package",update.package.wstring(),
+                L"--installation",update.installation.wstring(),L"--sha256",std::wstring(64,L'a'),L"--parent",L"4242"};
+            require(actual==expected,"Updater handoff lost a path or swallowed digest/parent arguments");
+            refuses([&] { updateHelperCommandLine(update,0); });
+            update.sha256="invalid";refuses([&] { updateHelperCommandLine(update,4242); });
+            update.sha256=std::string(64,'a');update.installation=L"relative";
+            refuses([&] { updateHelperCommandLine(update,4242); });
+        }
+#endif
         require(argc==2,"Fixture directory required");const auto fixtures=utf8Path(argv[1]);
         require(newerRelease("v1.10.0","1.9.9") && !newerRelease("v0.1.0","0.1.0") && !newerRelease("v0.0.9","0.1.0"),"Numeric version comparison failed");
         for (const auto *version : {"", "1.0", "1.0.0.0", "01.2.3", "1.2.3-beta", "1.2.3+build", "1.2.-3", "65536.0.0"}) refuses([&] { releaseVersion(version); });

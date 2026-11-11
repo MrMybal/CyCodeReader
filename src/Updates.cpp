@@ -1,4 +1,5 @@
 #include "Updates.h"
+#include "WindowsCommandLine.h"
 #include "cycode/Paths.h"
 #include <algorithm>
 #include <chrono>
@@ -141,11 +142,26 @@ PreparedUpdate downloadUpdate(const ReaderRelease &release,const std::filesystem
     (void)release;(void)installation;(void)cancel;(void)progress;throw std::runtime_error("Application updates currently require Windows x64");
 #endif
 }
+#ifdef _WIN32
+std::wstring updateHelperCommandLine(const PreparedUpdate &update,uint32_t parent) {
+    if (!parent || !update.helper.is_absolute() || !update.package.is_absolute() ||
+        !update.installation.is_absolute() || !hexDigest(update.sha256))
+        throw std::runtime_error("Invalid update handoff metadata");
+    auto quote=[](const std::filesystem::path &path) {
+        const auto value=path.wstring();
+        if (value.find(L'"')!=std::wstring::npos || value.find(L'\0')!=std::wstring::npos)
+            throw std::runtime_error("Invalid update path");
+        return detail::quoteWindowsArgument(value);
+    };
+    return quote(update.helper)+L" --package "+quote(update.package)+
+        L" --installation "+quote(update.installation)+L" --sha256 "+wide(update.sha256)+
+        L" --parent "+std::to_wstring(parent);
+}
+#endif
 void launchUpdate(const PreparedUpdate &update) {
 #ifdef _WIN32
     if (distribution(update.installation)!=update.mode || update.mode==Distribution::development) throw std::runtime_error("Distribution changed before update");
-    auto quote=[](const std::filesystem::path &p) { const auto value=p.wstring();if (value.find(L'"')!=std::wstring::npos) throw std::runtime_error("Invalid update path");return L"\""+value+L"\""; };
-    std::wstring command=quote(update.helper)+L" --package "+quote(update.package)+L" --installation "+quote(update.installation)+L" --sha256 "+wide(update.sha256)+L" --parent "+std::to_wstring(GetCurrentProcessId());
+    auto command=updateHelperCommandLine(update,GetCurrentProcessId());
     STARTUPINFOW startup{};startup.cb=sizeof(startup);PROCESS_INFORMATION process{};
     if (!CreateProcessW(update.helper.c_str(),command.data(),nullptr,nullptr,FALSE,CREATE_NO_WINDOW,nullptr,update.helper.parent_path().c_str(),&startup,&process)) throw std::runtime_error("Cannot start the update helper");
     CloseHandle(process.hThread);CloseHandle(process.hProcess);

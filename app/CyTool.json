@@ -3,7 +3,7 @@
   "protocolVersion": "1.0",
   "id": "cy.code.reader",
   "name": "CyCodeReader",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Live native code/text documents and extension commands through CyToolsCore.",
   "vendor": "Cyberalien",
   "author": "Cyberalien",
