@@ -134,7 +134,6 @@ runtime. See [third-party notices](../THIRD_PARTY_NOTICES.md).
 ## Prepared and published versions
 
 config.json version follows the source/CMake version. publishedVersion identifies
-the already available release used by releases/setup/portable links. During 0.1.7
-preparation, these links remain on published 0.1.6; the hero explicitly announces
-the preparation status. The builder validates the release/download version pair.
+the available release used by releases/setup/portable links. Both versions are
+0.1.7 for this release. The builder validates the release/download version pair.
 Building a local showcase does not authorize deployment or enable any workflow.

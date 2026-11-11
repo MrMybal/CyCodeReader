@@ -5,12 +5,12 @@ description: Modifiez de grands fichiers avec le stockage natif et des pages asy
 section: Utiliser Reader
 order: 35
 parent: editing
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Ouvrir et naviguer {#paged}
 
-La version 0.1.7, en cours de préparation, ouvre les fichiers de plus de 4 Mio en mode
+La version 0.1.7 ouvre les fichiers de plus de 4 Mio en mode
 **Texte paginé UTF-8**. Les installateurs publics 0.1.6 précèdent cette fonctionnalité.
 L’import et l’indexation s’effectuent en arrière-plan ; l’onglet annonce l’opération
 ou son erreur. UTF-8 invalide, binaire, UTF-16 et Windows-1252 explicite sont refusés

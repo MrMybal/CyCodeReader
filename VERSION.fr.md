@@ -2,7 +2,7 @@
 
 [English](Docs/Releases/v0.1.7.md) · [README français](README.fr.md)
 
-11 novembre 2026 · **BÊTA — préparation locale, non publiée** · Windows x64.
+11 novembre 2026 · **BÊTA** · Windows x64.
 
 ## Core natif partagé et grands fichiers UTF-8
 
@@ -35,12 +35,19 @@ L’import et l’indexation peuvent prendre du temps. L’exposition SDK/MCP et
 récupération durable attendent un contrat natif commun de session ; les travaux
 paginés non enregistrés restent volatils. Voir [PagedText](Docs/PagedText.md).
 
+## Téléchargements
+
+- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-setup.exe).
+- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-portable.zip).
+- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/SHA256SUMS.txt).
+- [Récupération depuis le lanceur 0.1.4/0.1.5](Docs/Releases/v0.1.6.fr.md).
+
 ## Distribution et vérification
 
 La compilation locale Release garde les tests natifs désactivés et les mises à
 jour publiques activées. ZIP portable, installateur par utilisateur et empreintes
-SHA-256 sont préparés localement, sans publication. Les téléchargements publics
-restent en 0.1.6. Les contrôles sources/données, compilation seule des scénarios,
+SHA-256 accompagnent la release publique. Cette version numérique utilise le
+canal de mise à jour public ; sa maturité reste bêta. Les contrôles sources/données, compilation seule des scénarios,
 paquets et manuel bilingue sont consignés dans [Validation](Docs/Validation.md).
 
 Application, assistant, CLI, installateur et tests natifs ne sont pas exécutés

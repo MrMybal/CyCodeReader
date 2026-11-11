@@ -40,8 +40,8 @@
     "fr": "Chapitres de la page"
   },
   "hero.status": {
-    "en": "BETA · 0.1.7 in preparation · Windows x64",
-    "fr": "BÊTA · 0.1.7 en préparation · Windows x64"
+    "en": "BETA · 0.1.7 · Windows x64",
+    "fr": "BÊTA · 0.1.7 · Windows x64"
   },
   "hero.heading": {
     "en": "Your files. Your workspace.",
@@ -144,8 +144,8 @@
     "fr": "Enregistrer explicitement"
   },
   "editor.three.body": {
-    "en": "Version 0.1.7 adds asynchronous native paging for UTF-8 files above 4 MiB, with Undo/Redo, search and full guarded saves. Small files keep the ordinary editor. Paged mode has explicit feature and recovery limits; the public download remains 0.1.6.",
-    "fr": "La 0.1.7 ajoute des pages natives asynchrones pour les UTF-8 de plus de 4 Mio, avec Annuler/Rétablir, recherche et sauvegardes intégrales contrôlées. Les petits fichiers gardent l’éditeur ordinaire. Le mode paginé a des limites de fonctions et de récupération explicites ; le téléchargement public reste la 0.1.6."
+    "en": "Version 0.1.7 adds asynchronous native paging for UTF-8 files above 4 MiB, with Undo/Redo, search and full guarded saves. Small files keep the ordinary editor. Paged mode has explicit feature and recovery limits. See the large-file guide.",
+    "fr": "La 0.1.7 ajoute des pages natives asynchrones pour les UTF-8 de plus de 4 Mio, avec Annuler/Rétablir, recherche et sauvegardes intégrales contrôlées. Les petits fichiers gardent l’éditeur ordinaire. Le mode paginé a des limites de fonctions et de récupération explicites. Consultez le guide des grands fichiers."
   },
   "editor.guide": {
     "en": "Editing and saving guide",
@@ -432,8 +432,8 @@
     "fr": "Quels formats de texte peut-on enregistrer ?"
   },
   "faq.two.a": {
-    "en": "UTF-8, UTF-8 BOM, UTF-16 LE/BE BOM, explicit Windows-1252, and LF/CRLF/CR line endings. Files are limited to 4 MiB. Lossy conversions are refused; saving is a separate action.",
-    "fr": "UTF-8, UTF-8 BOM, UTF-16 LE/BE BOM, Windows-1252 explicite et fins de ligne LF/CRLF/CR. Les fichiers sont limités à 4 Mio. Les conversions destructives sont refusées ; enregistrer reste une action distincte."
+    "en": "UTF-8, UTF-8 BOM, UTF-16 LE/BE BOM, explicit Windows-1252, and LF/CRLF/CR line endings. Ordinary files are limited to 4 MiB; larger UTF-8 uses the paged profile with its own feature limits. Lossy conversions are refused; saving is a separate action.",
+    "fr": "UTF-8, UTF-8 BOM, UTF-16 LE/BE BOM, Windows-1252 explicite et fins de ligne LF/CRLF/CR. Les fichiers ordinaires sont limités à 4 Mio ; les UTF-8 plus grands utilisent le profil paginé et ses limites de fonctions. Les conversions destructives sont refusées ; enregistrer reste une action distincte."
   },
   "faq.three.q": {
     "en": "What is still missing?",
@@ -460,8 +460,8 @@
     "fr": "Un éditeur natif pour vos fichiers."
   },
   "download.body": {
-    "en": "Install version 0.1.6 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
-    "fr": "Installez la version 0.1.6 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
+    "en": "Install version 0.1.7 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
+    "fr": "Installez la version 0.1.7 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
   },
   "download.portable": {
     "en": "Portable ZIP",
@@ -484,8 +484,8 @@
     "fr": "Linux et macOS restent des cibles prévues depuis les sources. Cette version ne fournit ni paquets natifs ni validation graphique complète pour ces plateformes."
   },
   "download.updates": {
-    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit. If version 0.1.4 or 0.1.5 reports Invalid update arguments, close Reader and install 0.1.6 manually once; the older launcher cannot repair its own handoff.",
-    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites. Si la version 0.1.4 ou 0.1.5 affiche Invalid update arguments, fermez Reader et installez la 0.1.6 manuellement une fois ; l’ancien lanceur ne peut pas corriger sa propre transmission."
+    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit. If version 0.1.4 or 0.1.5 reports Invalid update arguments, close Reader and install 0.1.7 manually once; the older launcher cannot repair its own handoff.",
+    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites. Si la version 0.1.4 ou 0.1.5 affiche Invalid update arguments, fermez Reader et installez la 0.1.7 manuellement une fois ; l’ancien lanceur ne peut pas corriger sa propre transmission."
   },
   "footer.body": {
     "en": "A separate editor. A shared engine.",

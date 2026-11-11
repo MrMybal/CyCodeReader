@@ -13,8 +13,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Licence de l’application</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.6.fr.md"><strong>0.1.6</strong></a><br><strong>BÊTA</strong></p>
-      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip">ZIP portable</a></p>
+      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.1.7</strong></a><br><strong>BÊTA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-portable.zip">ZIP portable</a></p>
     </td>
   </tr>
 </table>
@@ -26,19 +26,21 @@ leurs fichiers directement, les modifier avec une coloration syntaxique, cherche
 dans les documents et comparer des révisions. Construit avec CyUI, il fonctionne
 indépendamment de l’IDE CyCode.
 
-> **BÊTA · 0.1.6**
+> **BÊTA · 0.1.7**
 >
-> La version 0.1.6 corrige les arguments de l’assistant de mise à jour Windows
-> et conserve les améliorations de police, zoom, couleurs et recherche de la 0.1.5.
-> Si la 0.1.4 ou la 0.1.5 affiche **Invalid update arguments**, fermez Reader puis
-> lancez manuellement l’installateur actuel une fois. La validation interactive et
-> de l’installation reste en cours. Consultez les [notes et la récupération](Docs/Releases/v0.1.6.fr.md).
+> La 0.1.7 ajoute les services natifs Core partagés et l’édition paginée des grands
+> UTF-8, en conservant la correction de mise à jour 0.1.6, JetBrains Mono, le zoom
+> et la palette de code. Le mode paginé a des limites de fonctions et de récupération.
+> La validation du bureau et de l’installation reste à effectuer. Consultez les
+> [notes de version](VERSION.fr.md). Si la 0.1.4 ou la 0.1.5 affiche **Invalid update arguments**,
+> fermez Reader et installez manuellement la version actuelle une fois ; voir le
+> [guide de récupération](Docs/Releases/v0.1.6.fr.md).
 
 [![CyCodeReader avec coloration C++, onglets, barre d’outils et minimap](Docs/images/editor.png)](Docs/images/editor.png)
 
 *Vues réelles de l’application v0.1.1, rendues à partir des données ImGui sur des
 documents d’exemple. Ces images illustrent l’interface ; elles ne valident pas
-le fonctionnement sur le bureau ou l’installateur de la v0.1.6 et précèdent sa nouvelle police et sa palette.*
+le fonctionnement sur le bureau ou l’installateur de la v0.1.7 et précèdent sa nouvelle police et sa palette.*
 
 ## À propos de CyCodeReader
 
@@ -61,14 +63,12 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 | **Comparaison en lecture seule** | **Historique de fichier Git** |
 | [![Comparaison côte à côte avec coloration syntaxique](Docs/images/compare.png)](Docs/images/compare.png) | [![Révisions d’un fichier d’exemple et différences du commit sélectionné](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Préparation de la 0.1.7 (non publiée)
+## Core natif partagé en 0.1.7
 
 Les sources épinglent Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
 et CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. L’éditeur paginé
 natif partagé ouvre les grands UTF-8 avec pages asynchrones, Annuler/Rétablir,
-recherche et sauvegardes intégrales en streaming. Les binaires publics 0.1.6
-précèdent cette intégration. La version des sources est 0.1.7 bêta ; les liens
-de téléchargement restent ceux de la 0.1.6 publiée. Voir les [notes 0.1.7](VERSION.fr.md)
+recherche et sauvegardes intégrales en streaming. Voir les [notes 0.1.7](VERSION.fr.md)
 et [architecture, budgets et contrats manquants](Docs/PagedText.md).
 
 ## Fonctionnalités
@@ -131,13 +131,13 @@ Les DLL du runtime MSVC sont fournies avec les paquets Windows. Linux et macOS
 restent des cibles prévues depuis les sources ; leur fonctionnement graphique
 complet n’est pas validé et cette version ne propose aucun paquet natif pour eux.
 
-1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-setup.exe), exécuter Setup pour l’utilisateur courant, puis ouvrir CyCodeReader depuis le menu Démarrer.
-2. Pour une copie portable, [télécharger le ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip). Extraire le ZIP **complet** dans un dossier accessible en écriture et lancer `CyCodeReader.exe`, avec tous les dossiers fournis à côté.
+1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-setup.exe), exécuter Setup pour l’utilisateur courant, puis ouvrir CyCodeReader depuis le menu Démarrer.
+2. Pour une copie portable, [télécharger le ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-portable.zip). Extraire le ZIP **complet** dans un dossier accessible en écriture et lancer `CyCodeReader.exe`, avec tous les dossiers fournis à côté.
 3. Ouvrir les fichiers et choisir une syntaxe si nécessaire. Installer Git
    séparément pour l’historique optionnel ; configurer le SDK privé uniquement
    pour utiliser MCP.
 
-Les [notes de release et sommes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.6)
+Les [notes de release et sommes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.7)
 accompagnent les deux téléchargements. Les réglages portables restent dans
 `data/reader` ; les réglages installés utilisent `%LOCALAPPDATA%/CyCodeReader/reader`.
 Les versions publiques vérifient GitHub Releases au démarrage par défaut pour les nouvelles installations. Une nouvelle

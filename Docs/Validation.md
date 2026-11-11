@@ -1,5 +1,22 @@
 # Validation
 
+## 0.1.7 public package publication — 2026-11-11
+
+The owner authorized push and binary publication after the local preparation
+below. The production executable is unchanged; the release manual removes its
+preparation label and is regenerated into both packages. Windows x64 Release,
+public updates ON and BUILD_TESTING=OFF remain the release profile. Package
+inventory, complete offline EN/FR manual, SHA-256 sums, source/payload secret scans
+and GitHub asset digests are checked for publication. README/showcase source
+links target 0.1.7; the online showcase is not deployed by this publication.
+
+GitHub Actions stays manually disabled. The source commit/tag and release assets
+are published directly, without a workflow run. The published numeric version
+uses prerelease=false for /releases/latest; application maturity remains BETA.
+No application, helper, CLI, installer or native test is executed. Desktop,
+install/update, IDE backend runtime, Linux and macOS acceptance remain unverified
+under the existing antivirus suspension.
+
 ## 0.1.7 local preparation — 2026-11-11
 
 Core is pinned to f5e6261bf8acf22d0b3241622ed4294322724fb9 and CyUI to

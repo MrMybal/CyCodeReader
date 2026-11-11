@@ -1,8 +1,9 @@
-# Native paged text integration (0.1.7 preparation, 2026-11-11)
+# Native paged text integration (0.1.7, 2026-11-11)
 
 Core is pinned to `f5e6261bf8acf22d0b3241622ed4294322724fb9` and CyUI to
 `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. Public v0.1.6 packages predate this
-integration. This change neither publishes a release nor updates an installation.
+integration, which is included in 0.1.7. The limitations below apply to its
+standalone and shared editor profiles.
 
 ## Ownership and threading
 

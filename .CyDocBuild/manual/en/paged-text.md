@@ -5,12 +5,12 @@ description: Edit large files through native storage and asynchronous pages.
 section: Using Reader
 order: 35
 parent: editing
-revision: 2
+revision: 3
 ---
 
 ## Open and navigate {#paged}
 
-Version 0.1.7, currently being prepared, opens files above 4 MiB in **Paged UTF-8** mode.
+Version 0.1.7 opens files above 4 MiB in **Paged UTF-8** mode.
 Public v0.1.6 installers predate this feature. Import and line indexing run in the
 background; the tab announces progress or an import error. Invalid UTF-8, binary,
 UTF-16 and explicit Windows-1252 are refused without converting the source. Small

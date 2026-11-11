@@ -25,12 +25,12 @@ investigation; historical workflows supplied earlier Windows/Linux/macOS evidenc
 ## Paged source integration
 
 See [PagedText.md](PagedText.md) for the shared API, source pair, worker ownership,
-budgets and indispensable Core/CyUI contract gaps. This is an unreleased source
-integration. The existing production build command compiles it with BUILD_TESTING=OFF;
+budgets and indispensable Core/CyUI contract gaps. This integration ships in
+0.1.7. The existing production build command compiles it with BUILD_TESTING=OFF;
 it does not launch a GUI, helper or test. The IDE must explicitly adopt the same
 Core/editor/CyUI revisions; its older locks are not changed by a Reader build.
 
-## Preparing 0.1.7 locally
+## Building 0.1.7 packages locally
 
 The source version is 0.1.7 beta. For the locally prepared public-update-enabled
 Windows packages, use production builds only:
@@ -45,8 +45,9 @@ python website/verify.py runtime/showcase-0.1.7
 These commands compile/package without launching Reader or installing it.
 BUILD_TESTING remains OFF. Native execution is still suspended by the existing
 antivirus restriction. Keep Actions disabled; publication, push and release are
-separate from local preparation. README/showcase downloads retain the published
-0.1.6 links until a release is actually available.
+separate from local preparation. README/showcase source links target the 0.1.7
+release. Deploying the showcase is a separate action; do not enable its workflow
+without explicit authorization.
 
 ## Build
 
