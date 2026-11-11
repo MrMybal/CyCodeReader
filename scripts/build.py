@@ -11,6 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--core-only',action='store_true')
+    parser.add_argument('--core-root',type=Path,help='Explicit CyCode native source checkout; default: pinned source dependency')
     parser.add_argument('--configuration',default='Release')
     parser.add_argument('--cyui',type=Path,help='Optional clean checkout at editor/cyui-source.lock.json revision')
     parser.add_argument('--build-dir',type=Path,help='Separate build directory for a clean configuration')
@@ -42,8 +43,10 @@ def main():
     generator=['-G','Visual Studio 17 2022','-A','x64'] if sys.platform=='win32' else ['-G','Ninja',f'-DCMAKE_MAKE_PROGRAM={ninja or "ninja"}']
     commands=[[cmake,'-S',str(ROOT),'-B',str(build),*generator,f'-DCMAKE_BUILD_TYPE={args.configuration}',f'-DCYUI_DIR={args.cyui.resolve() if args.cyui else ""}',f'-DCYCODE_EDITOR_DEPS={args.deps.resolve() if args.deps else ROOT/"runtime/deps"}',f'-DCYCODE_READER_PUBLIC_UPDATES={"ON" if args.public_updates else "OFF"}',f'-DCYCODE_CYUI_DEVELOPMENT={"ON" if args.cyui_development else "OFF"}',f'-DCYCODE_READER_BUILD_GUI={"OFF" if args.core_only else "ON"}',f'-DBUILD_TESTING={"ON" if args.build_tests else "OFF"}'],
               [cmake,'--build',str(build),'--config',args.configuration,'--parallel','4']]
+    if args.core_root:
+        commands[0].append(f'-DCYCODE_CORE_ROOT={args.core_root.resolve()}')
     if not args.build_tests:
-        commands[1] += ['--target', *(['cycode_reader_core','cycode_reader_distribution'] if args.core_only else ['CyCodeReader'])]
+        commands[1] += ['--target', *(['cycodereader_cli','cycode_reader_distribution','cycode_paged_text'] if args.core_only else ['CyCodeReader'])]
     with log.open('w',encoding='utf-8') as stream:
         for command in commands:
             result=subprocess.run(command,env=env,cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT);stream.flush()

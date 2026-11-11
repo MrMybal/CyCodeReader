@@ -1,5 +1,83 @@
 # Validation
 
+## 0.1.7 local preparation — 2026-11-11
+
+Core is pinned to f5e6261bf8acf22d0b3241622ed4294322724fb9 and CyUI to
+0ba1ba663b4b2bf46d066a32829bc91ea2743cba, both checked against their published
+main revisions at preparation time. Source API 1 and the single native owner
+remain. The shared editor also detects the first CRLF past a page boundary and keeps
+the widget drawing while a native proposal is pending so queued typing is retained.
+The embedding CMake path validates and reuses the host Core owner; its standalone
+resolver remains exact. These three IDE-coordinated changes were reviewed here.
+The shared backend contract documents authoritative commit receipts,
+notification warnings, ambiguous RPC reconciliation and guarded native history.
+Reader does not link Engine or claim execution of the IDE backend.
+
+Windows x64 Release production builds pass for the graphical and headless
+profiles in runtime/build-0.1.7-vs and runtime/build-0.1.7-core-vs. Both use
+BUILD_TESTING=OFF and public updates ON; no generated executable is launched.
+The graph contains one native document/paged/process implementation and one
+ImGui/TextEditor, with no Engine or native test target. The portable ZIP and
+per-user installer are compiled locally in dist/0.1.7, with SHA256SUMS.txt;
+archive contents, managed paths, notices, fonts and documentation are verified.
+The installer is compiled with ISCC, never installed or executed.
+
+Source checks parse 32 Python and 17 JSON files. Five mocked resolver checks and
+three distribution-policy checks pass. Eleven existing/native fixture sources
+pass MSVC /Zs only; no fixture is linked or executed. The bilingual CyDoc manual
+passes integrity, translation, route and DOM checks. The local showcase passes
+its data/link/resource checks and keeps real public 0.1.6 download links while
+describing 0.1.7 as in preparation. UTF-8 and Git whitespace checks pass; the
+reviewed source snapshot has no Gitleaks findings.
+
+GUI, clipboard, installation, update/restart, IDE backend runtime, Linux and macOS
+acceptance remain unexecuted under the existing antivirus suspension. No app,
+helper, CLI, installer or native test is run. No installation is changed, no
+tag or release is created and no workflow is modified or run. Source publication
+for IDE pinning is separate from these local packages.
+Public downloads remain 0.1.6. See [release notes](Releases/v0.1.7.md) and
+[paged-text limits](PagedText.md).
+
+## Native Core and shared paged editor integration — 2026-11-11
+
+Unreleased working sources on Reader main use owner-approved Core
+`a02375f355f8f33e3b21c30e0dbc05924f5c28d7` and CyUI
+`0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. This supersedes the original
+handoff's 1e06e65 Core pin. The existing codex/core-common worktree was inspected
+and its services consolidation was merged into main without changing branches
+or touching its pre-existing AGENTS.md edit. Reader's 0.1.6 updater fix remains.
+
+Windows x64 Release production compilation uses BUILD_TESTING=OFF, development
+CyUI overrides OFF and public updates OFF. The executable is
+`runtime/build-core-paged-vs/Release/CyCodeReader.exe`; the complete compilation
+log is `runtime/build-core-paged-vs/build.log`. No installer/release is published
+and no existing installation is modified. The native headless profile also builds
+production targets with no graphical dependency or project Engine.
+
+Actual source/data checks: 32 Python files and 17 JSON files parse; five mocked
+Core resolver policy checks and three packaging policy checks pass. MSVC /Zs
+checks eleven fixture sources, including the new paged editor fixture, existing
+editor/experience/comparison/filtering/module checks and updater/distribution
+parser cases. They are not linked as tests or executed. The local CyDoc export
+has 78 localised pages and 488 validated routes with complete EN/FR; its DOM
+checks pass without a browser/server or native application. Build-graph inspection
+confirms one native document/paged/process implementation, one ImGui and one
+TextEditor, no Engine and no native test target. UTF-8 source checks pass.
+
+The shared injectable PagedTextBackend contract compiles, with byte continuations,
+UTF-16 selections, prepare/apply acknowledgements, native Undo/Redo, full saves and
+checkpoints; IDE Engine-backend execution is not established by this Reader build.
+The standalone 96 MiB, long-line, BOM/mixed-newline/Unicode, cross-page edit,
+stale-page, read-only, conflict, Undo/Redo and complete-save fixtures are prepared
+and syntax-checked only. Interactive clipboard/cut failures, cancelled typing,
+themes/density/DPI, installation/update, Linux and macOS remain unexecuted under
+the antivirus suspension. No native app, helper, CLI, installer or test is run.
+GitHub Actions remains untouched and disabled; nothing is pushed or tagged.
+
+See [PagedText.md](PagedText.md) for the exact native standalone session/recovery
+and shared streaming-syntax gaps, operation budgets and current paged limitations.
+
+
 ## Windows update handoff correction — 2026-11-11
 
 An installed 0.1.4 report recorded Invalid update arguments. Its downloaded
@@ -71,6 +149,29 @@ These fixture bodies are syntax checked only, without building or running native
 test executables. Visual search/zoom/guides, actual wheel/trackpad events, font
 rendering, runtime package updates, detached windows and Linux/macOS remain
 unverified under the existing antivirus suspension. No GUI or Actions was run.
+
+## Shared Core extraction — 2026-11-08
+
+Reader 671c588b924f9da2655843f64615b6b6bc7076e6 pins Core
+84e4c7831afeab27406a958a957db23fe005eae8. All 17 native/service/view CTests pass
+on Windows x64, Ubuntu x64 and macOS arm64, and the separate seven-case headless
+graph also passes. Exact run:
+https://github.com/MrMybal/CyCodeReader/actions/runs/42493128377
+
+The suite exercises actual shared documents/codecs, data/native plugins, revision
+and disk guards, real CLI/loopback EOF cleanup, Git environment isolation,
+comparison/history, editor Undo/Redo, syntax, snippets, filtering and CyUI views.
+Catalogue assertions now match the pinned 102 built-in modes including Verse.
+Snippet completion follows the actual backend chord; tests cover default/custom
+chords and macOS physical-to-logical modifier mapping. JSON/string conversions
+and translated varargs were corrected for portable C++ behavior.
+
+Windows production Reader and minimal native component builds also pass locally,
+with tests OFF. No native app, CLI, updater, debugger or test executable was run
+locally. Source/data checks, local compilation and runner execution are separate
+evidence. Headless view loops do not prove OS windows, GPU drivers, IME, actual
+multi-monitor behavior or every distribution package. Original active Reader
+sources remain untouched; these changes are on codex/core-common.
 
 ## Shared Verse syntax — 2026-11-06
 

@@ -5,7 +5,7 @@ description: Travaillez avec les documents en mémoire, l’annulation et les ch
 section: Utiliser Reader
 order: 30
 parent: overview
-sourceRevision: 3
+sourceRevision: 4
 ---
 
 ## Documents {#documents}
@@ -16,7 +16,7 @@ L’enregistrement contrôle l’état initial du disque et utilise un remplacem
 
 ## Encodage {#encoding}
 
-UTF-8/BOM et UTF-16 LE/BE BOM sont détectés. Windows-1252 reste explicite. Les [commandes d’encodage](doc:encoding#convert) modifient le format en attente ; enregistrer reste séparé. Les fichiers sont limités à 4 Mio.
+UTF-8/BOM et UTF-16 LE/BE BOM sont détectés. Windows-1252 reste explicite. Les [commandes d’encodage](doc:encoding#convert) modifient le format en attente ; enregistrer reste séparé. Le profil ordinaire est limité à 4 Mio ; les grands UTF-8 utilisent le [profil paginé](doc:paged-text#paged).
 
 ## Disposition {#layout}
 

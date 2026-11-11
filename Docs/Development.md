@@ -8,6 +8,46 @@ For user tasks, use the [English manual](https://mrmybal.github.io/CyCodeReader/
 or [French manual](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
 Platform/runtime evidence is maintained separately in [Validation.md](Validation.md).
 
+## Native Core dependency
+
+core-source.lock.json pins the shared native CyCode source API. The build selects
+Documents, TextSession, TextBridge, Process, Snippets and PagedText; it does not compile the project
+Engine, SDL/ImGui/CyUI or language backends in --core-only mode. Pinned JSON and Monocypher sources
+are fetched for that profile. Reader's compatibility headers forward to those
+native services; there are no local Document/Search/Bridge implementations.
+The application keeps graphical Undo/Redo, preferences and distribution policy.
+
+Use --core-root <CyCode> for an explicit clean checkout at the exact locked revision. Default
+builds resolve the immutable lock and refuse modified dependency caches. Native
+tests require --run-tests and remain suspended locally during the antivirus
+investigation; historical workflows supplied earlier Windows/Linux/macOS evidence. All Actions remain disabled by the owner.
+
+## Paged source integration
+
+See [PagedText.md](PagedText.md) for the shared API, source pair, worker ownership,
+budgets and indispensable Core/CyUI contract gaps. This is an unreleased source
+integration. The existing production build command compiles it with BUILD_TESTING=OFF;
+it does not launch a GUI, helper or test. The IDE must explicitly adopt the same
+Core/editor/CyUI revisions; its older locks are not changed by a Reader build.
+
+## Preparing 0.1.7 locally
+
+The source version is 0.1.7 beta. For the locally prepared public-update-enabled
+Windows packages, use production builds only:
+
+```sh
+python scripts/build.py --build-dir runtime/build-0.1.7-vs --public-updates
+python scripts/package_windows.py --build runtime/build-0.1.7-vs --output dist/0.1.7 --require-public-updates
+python website/build.py --output runtime/showcase-0.1.7 --skip-docs-build
+python website/verify.py runtime/showcase-0.1.7
+```
+
+These commands compile/package without launching Reader or installing it.
+BUILD_TESTING remains OFF. Native execution is still suspended by the existing
+antivirus restriction. Keep Actions disabled; publication, push and release are
+separate from local preparation. README/showcase downloads retain the published
+0.1.6 links until a release is actually available.
+
 ## Build
 
 Requirements: Python 3.11+, Git, CMake 3.24+ and a C++20 compiler. Windows uses

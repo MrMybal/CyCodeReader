@@ -172,7 +172,7 @@ int main(int argc,char **argv) {
             reader.execute("plugin",{{"plugin","fixture"},{"command","sort"}});
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
             const auto catalogue=cyui::codeLanguages();
-            require(std::count_if(catalogue.begin(),catalogue.end(),[](const auto &item) { return item.builtin; })==101,"Reader did not expose the complete shared catalogue");
+            require(std::count_if(catalogue.begin(),catalogue.end(),[](const auto &item) { return item.builtin; })==102,"Reader did not expose the complete shared catalogue");
             require(cyui::codeLanguageForPath("test.cycfg")!=cyui::CodeLanguage::plain,"Reader did not register its plugin language");
             for (const auto *mode : {"log","hlsl","glsl","shell","powershell","yaml","toml","php","swift","ruby","unreal","fixture/config"}) {
                 reader.execute("syntax",{{"language",mode}});

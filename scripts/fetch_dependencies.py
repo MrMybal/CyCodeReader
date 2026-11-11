@@ -13,7 +13,7 @@ def fetch(destination,core_only=False):
     destination.mkdir(parents=True,exist_ok=True)
     lock=json.loads((ROOT/'dependencies.lock.json').read_text('utf-8'))
     for key,item in lock.items():
-        if core_only and key!='json': continue
+        if core_only and key not in {'json','monocypher'}: continue
         target=destination/key;marker=target/'.cycode-dependency'
         if marker.exists():
             if marker.read_text('utf-8')!=item['sha256']: raise RuntimeError(f'{key}: cached revision differs from lock')

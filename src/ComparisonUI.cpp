@@ -19,7 +19,7 @@ void Reader::prepareFileProviders() {
     }
 }
 void Reader::pollFileProviders(bool force) {
-    const auto tab=active();const auto path=tab && !tab->document.untitled() ? pathUtf8(tab->document.path()) : std::string{};
+    const auto tab=active();const auto path=tab && !tab->paged && !tab->untitled() ? pathUtf8(tab->path()) : std::string{};
     for (auto &provider : fileProviders_) {
         if (ready(provider.pending)) {
             try {
@@ -47,9 +47,9 @@ void Reader::pollFileProviders(bool force) {
     }
 }
 bool Reader::providerReady(size_t index,const std::string &command) const {
-    const auto tab=active();if (index>=fileProviders_.size() || !tab || tab->document.untitled()) return false;
+    const auto tab=active();if (index>=fileProviders_.size() || !tab || tab->paged || tab->untitled()) return false;
     const auto &provider=fileProviders_[index];
-    if (provider.document!=tab->id || provider.path!=pathUtf8(tab->document.path()) || !provider.context.value("available",false)) return false;
+    if (provider.document!=tab->id || provider.path!=pathUtf8(tab->path()) || !provider.context.value("available",false)) return false;
     return command.empty() || provider.context.value("enabled",Json::object()).value(command,false);
 }
 void Reader::showComparison(std::string before,std::string after,std::string left,std::string right,size_t leftId,size_t rightId,const std::string &kind) {
@@ -65,22 +65,24 @@ void Reader::showComparison(std::string before,std::string after,std::string lef
 }
 void Reader::compareFile(size_t id,const std::filesystem::path &path) {
     const auto tab=find(id);if (!tab) throw std::runtime_error("Comparison document is no longer open");sync(tab);
+    if (tab->paged) throw std::runtime_error(tr("This command requires an ordinary text document."));
     // Read a separate snapshot, preserving both the open buffer and disk bytes.
-    const auto source=Document::open(path);showComparison(source.text(),tab->document.text(),pathUtf8(source.path()),tab->document.untitled() ? tr("Untitled") : pathUtf8(tab->document.path()),0,id,"file");
+    const auto source=Document::open(path);showComparison(source.text(),tab->document.text(),pathUtf8(source.path()),tab->untitled() ? tr("Untitled") : pathUtf8(tab->path()),0,id,"file");
     comparison_.path=pathUtf8(source.path());comparison_.fileTime=std::filesystem::last_write_time(source.path());comparison_.fileSize=std::filesystem::file_size(source.path());
 }
 void Reader::startProviderComparison(size_t index,const std::string &command,size_t id) {
     if (comparison_.pending.valid()) throw std::runtime_error("Wait for the current comparison to finish");
     if (index>=fileProviders_.size()) throw std::runtime_error("Comparison provider is not available");
-    const auto tab=id ? find(id) : active();if (!tab || tab->document.untitled()) throw std::runtime_error("Save this document before using Git comparisons");
+    const auto tab=id ? find(id) : active();if (!tab || tab->untitled()) throw std::runtime_error("Save this document before using Git comparisons");
+    if (tab->paged) throw std::runtime_error(tr("This command requires an ordinary text document."));
     const auto &provider=fileProviders_[index];
     if (std::none_of(provider.actions.begin(),provider.actions.end(),[&](const auto &a) { return a.at("command")==command; }) && provider.history.value("compare","")!=command) throw std::runtime_error("Unknown provider comparison action");
     sync(tab);core_.refresh();
-    Json input={{"path",pathUtf8(tab->document.path())},{"text",tab->document.text()},{"encoding",tab->document.encodingId()},{"revision",tab->live->revision}};
+    Json input={{"path",pathUtf8(tab->path())},{"text",tab->document.text()},{"encoding",tab->document.encodingId()},{"revision",tab->live->revision}};
     if (command==provider.history.value("compare","")) input.update(historyComparison_);
     comparison_.providerParams=command==provider.history.value("compare","") ? historyComparison_ : Json::object();
     const auto call=core_.plugins().prepare(provider.plugin,command,input);
-    comparison_.kind="provider";comparison_.provider=index;comparison_.command=command;comparison_.right=tab->id;comparison_.rightRevision=tab->live->revision;comparison_.path=pathUtf8(tab->document.path());
+    comparison_.kind="provider";comparison_.provider=index;comparison_.command=command;comparison_.right=tab->id;comparison_.rightRevision=tab->live->revision;comparison_.path=pathUtf8(tab->path());
     comparison_.ready=false;comparison_.open=true;comparison_.message="Loading comparison...";
     comparison_.pending=std::async(std::launch::async,call);
 }
@@ -99,16 +101,18 @@ void Reader::compareAction(const std::string &action,const Json &params) {
     if (!tab) throw std::runtime_error("Open a document before comparing files");
     if (action=="compare.select") { compareSelected_=tab->id;compareLeft_=tab->id;cyui::notify(tr("Document selected for comparison"),cyui::Tone::info);return; }
     if (action=="compare.provider") { startProviderComparison(params.at("provider"),params.at("command"),tab->id);return; }
+    if (tab->paged) throw std::runtime_error(tr("This command requires an ordinary text document."));
     sync(tab);
     if (action=="compare.file") { if (params.contains("path")) compareFile(tab->id,utf8Path(params.at("path")));else showDialog(false,tab->id,true);return; }
     if (action=="compare.saved") {
-        if (tab->document.untitled()) throw std::runtime_error("Save this document before comparing its saved version");
-        showComparison(tab->document.savedText(),tab->document.text(),"Last saved version",pathUtf8(tab->document.path()),0,tab->id,"saved");return;
+        if (tab->untitled()) throw std::runtime_error("Save this document before comparing its saved version");
+        showComparison(tab->document.savedText(),tab->document.text(),"Last saved version",pathUtf8(tab->path()),0,tab->id,"saved");return;
     }
     if (action=="compare.selected" || action=="compare.tabs") {
         const auto left=find(params.value("left",compareSelected_));const auto right=find(params.value("right",tab->id));
         if (!left || !right || left==right) throw std::runtime_error("Choose two different open documents");sync(left);sync(right);
-        showComparison(left->document.text(),right->document.text(),left->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(left->id) : pathUtf8(left->document.path()),right->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(right->id) : pathUtf8(right->document.path()),left->id,right->id,"tabs");
+        if (left->paged || right->paged) throw std::runtime_error(tr("This command requires an ordinary text document."));
+        showComparison(left->document.text(),right->document.text(),left->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(left->id) : pathUtf8(left->path()),right->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(right->id) : pathUtf8(right->path()),left->id,right->id,"tabs");
         compareLeft_=left->id;compareRight_=right->id;return;
     }
     throw std::runtime_error("Unknown comparison action");
@@ -132,7 +136,7 @@ void Reader::comparisonPanel() {
         try {
             const auto result=comparison_.pending.get();if (result.contains("error")) throw std::runtime_error(result.at("error").get<std::string>());
             const auto tab=find(comparison_.right);
-            if (!tab || tab->live->revision!=comparison_.rightRevision || pathUtf8(tab->document.path())!=comparison_.path) throw std::runtime_error("Document changed while loading; refresh the comparison");
+            if (!tab || tab->live->revision!=comparison_.rightRevision || pathUtf8(tab->path())!=comparison_.path) throw std::runtime_error("Document changed while loading; refresh the comparison");
             const auto &diff=result.at("comparison");const auto wanted=comparison_.open;
             if (diff.at("path")!=comparison_.path || diff.at("beforeLabel").get<std::string>().size()>4096 || diff.at("afterLabel").get<std::string>().size()>4096) throw std::runtime_error("Invalid file comparison result");
             const auto before=diff.at("before").get<std::string>(),after=diff.at("after").get<std::string>();
@@ -152,11 +156,12 @@ void Reader::comparisonPanel() {
         if (cyui::iconButton(cyui::icon::help,tr("Context help"))) execute("help",{{"page","version-control"}});
         const auto fieldWidth=std::max(cyui::dp(100.f),(ImGui::GetContentRegionAvail().x-ImGui::GetStyle().ItemSpacing.x)*.5f);
         auto choose=[&](const char *label,size_t &id) {
-            const auto tab=find(id);const auto preview=tab ? tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path().filename()) : std::string(tr("Choose a document"));
+            const auto tab=find(id);const auto preview=tab ? tab->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->path().filename()) : std::string(tr("Choose a document"));
             ImGui::BeginGroup();cyui::textDim("%s",tr(label));ImGui::SetNextItemWidth(fieldWidth);
             if (ImGui::BeginCombo((std::string("##")+label).c_str(),preview.c_str())) {
                 for (const auto &item : tabs_) {
-                    const auto name=item->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(item->id) : pathUtf8(item->document.path());
+                    if (item->paged) continue;
+                    const auto name=item->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(item->id) : pathUtf8(item->path());
                     ImGui::PushID(static_cast<int>(item->id));if (ImGui::Selectable(name.c_str(),item->id==id)) id=item->id;ImGui::PopID();
                 }ImGui::EndCombo();
             }
@@ -164,7 +169,7 @@ void Reader::comparisonPanel() {
         };
         choose("Left document",compareLeft_);ImGui::SameLine();choose("Right document",compareRight_);
         {
-            cyui::ScopedDisabled disabled(comparison_.pending.valid() || !find(compareLeft_) || !find(compareRight_) || compareLeft_==compareRight_);
+            cyui::ScopedDisabled disabled(comparison_.pending.valid() || !find(compareLeft_) || !find(compareRight_) || compareLeft_==compareRight_ || (find(compareLeft_) && find(compareLeft_)->paged) || (find(compareRight_) && find(compareRight_)->paged));
             if (cyui::primaryButton(tr("Compare"))) execute("compare.tabs",{{"left",compareLeft_},{"right",compareRight_},{"id",compareRight_}});
         }
         if (!comparison_.message.empty()) cyui::callout(cyui::Tone::info,tr(comparison_.message.c_str()));

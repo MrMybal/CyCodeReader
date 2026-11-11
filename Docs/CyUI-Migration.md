@@ -1,9 +1,11 @@
 # Modular CyUI migration
 
+The current source integration adds CyUI PagedCodeEditor through the existing CodeEditor module and the shared editor/PagedTextEditor adapter. See [PagedText.md](PagedText.md) for native ownership and explicit streaming-syntax/recovery gaps. Ordinary font, palette, zoom and brace guides remain shared.
+
 ## Shared code presentation — 2026-11-11
 
 The release now pins published CyUI commit
-`6173630ad5eb1e585eee1a0e7d3617285563e774`. Core owns embedded JetBrains Mono;
+`0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. Core owns embedded JetBrains Mono;
 Code/Diff/CodeEditor own per-view Ctrl+wheel scaling, the shared Rider-inspired
 syntax palette and brace-only block guides. Reader detects the capability,
 reuses monoFont and skips the older build-local font/zoom/guide patches.
@@ -27,7 +29,7 @@ is already in the dependency closure, so no duplicate widget, ImGui instance or
 new backend is added. Earlier descriptions below record the migration before
 file comparisons existed. See Comparison.md for the new view and Git provider.
 
-The current source lock is CyUI commit `6173630ad5eb1e585eee1a0e7d3617285563e774`
+The current source lock is CyUI commit `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`
 from https://github.com/MrMybal/CyUI. It includes the 102-mode catalogue with Verse,
 plugin syntax engines, Logs, shared Diff scrolling and native code presentation.
 The published commit is available to clean locked builds.

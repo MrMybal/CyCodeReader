@@ -58,6 +58,16 @@ installed in PATH. Reader does not provide the IDE's commit/build/debug workflow
 | **Read-only comparison** | **Git file history** |
 | [![Side-by-side syntax-colored comparison](Docs/images/compare.png)](Docs/images/compare.png) | [![Sample file revisions and the selected commit diff](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
+## Preparing 0.1.7 (not published)
+
+Working sources now pin Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
+and CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. A shared native
+paged editor opens large UTF-8 files with asynchronous pages, Undo/Redo, search
+and complete streamed saves. Public v0.1.6 binaries do not include this integration.
+The source version is 0.1.7 beta; the download links above remain the published
+0.1.6 packages until release. See the [0.1.7 notes](Docs/Releases/v0.1.7.md) and
+[architecture, budgets and missing common contracts](Docs/PagedText.md).
+
 ## Features
 
 - **Editing:** Undo/Redo, multiple cursors, folding, bracket matching, indentation,
@@ -73,12 +83,12 @@ installed in PATH. Reader does not provide the IDE's commit/build/debug workflow
   split/unified diffs, change navigation and local Git history.
 - **File formats:** UTF-8/BOM, UTF-16 LE/BE BOM, explicit Windows-1252 and LF/CRLF/CR
   conversion. Saving is explicit; guarded atomic writes check external changes
-  and refuse lossy encoding conversions. Text files are limited to 4 MiB.
+  and refuse lossy encoding conversions. Ordinary documents are limited to 4 MiB; larger UTF-8 uses the paged profile.
 - **Extensions:** manifests and native ABI 1 plugins contribute commands, typed
   options and syntax, including native syntax engines and comparison providers.
   Restart is required; native plugins run as trusted code in the process.
 - **Automation and help:** optional CyToolsCore SDK/MCP accesses the same live
-  documents and revision guards. F1 opens the local illustrated CyDoc manual.
+  ordinary documents and revision guards; paged bridge support is pending. F1 opens the local illustrated CyDoc manual.
   The private Python/SDK companion is installed separately.
 
 Search is literal with ASCII case folding. Recursive folder search, regex
@@ -146,6 +156,8 @@ python scripts/fetch_dependencies.py
 python scripts/build.py
 ```
 
+Reader also resolves the native CyCode source API pinned in core-source.lock.json. Documents, encodings, live search, text plugins, processes and local transport are shared Core components. The standalone profile needs JSON only and keeps project/language services out of its build.
+
 The resolver fetches the exact CyUI commit from its official repository. An
 optional `--cyui PATH` must select a clean matching checkout; no upstream checkout
 is reset. GUI modules are **Core, Code, CodeEditor, Commands, Inspector, Diagnostics
@@ -180,6 +192,8 @@ see [COPYRIGHT](COPYRIGHT). Third-party components retain their own terms.
 
 | Library · source | License · terms | Use / scope |
 | --- | --- | --- |
+| [CyCode Core](https://github.com/MrMybal/CyCode) | [GPL-3.0-only](licenses/CyCode-Core.txt) · [full GPL](LICENSE) | Shared native documents, text session/transport, processes and paged storage. |
+| [Monocypher](https://monocypher.org/) | [BSD-2-Clause OR CC0-1.0](licenses/Monocypher.txt) | Native immutable payload validation. |
 | [CyUI](https://github.com/MrMybal/CyUI) | [MIT](licenses/CyUI.txt) | Modular native interface, code editor, searchable commands, diagnostics and comparisons. |
 | [Dear ImGui](https://github.com/ocornut/imgui) · [TextEditor](https://github.com/goossens/ImGuiColorTextEdit) | [MIT](licenses/DearImGui.txt) · [MIT](licenses/TextEditor.txt) | Native widgets and the single editor backend supplied through CyUI. |
 | [SDL3](https://github.com/libsdl-org/SDL) | [zlib](licenses/SDL3.txt) | Native windows, input and rendering integration. |
@@ -209,7 +223,8 @@ not automatically grant access to private dependencies.
 - [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
 - [Release notes](Docs/Releases/v0.1.6.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
 - [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
-- [CyCode](https://github.com/MrMybal/CyCode) — the independent IDE consuming this same `editor/` source library.
+- [CyCode Core](https://github.com/MrMybal/CyCode) — the shared native document/project engine.
+- [CyCodeIDE](https://github.com/MrMybal/CyCodeIDE) — the IDE consuming Core and this same graphical `editor/` library.
 
 <details>
 <summary><strong>AI Usage</strong></summary>

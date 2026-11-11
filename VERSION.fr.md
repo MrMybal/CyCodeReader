@@ -1,45 +1,49 @@
-# CyCodeReader 0.1.6
+# CyCodeReader 0.1.7
 
-[English](Docs/Releases/v0.1.6.md) · [README français](README.fr.md)
+[English](Docs/Releases/v0.1.7.md) · [README français](README.fr.md)
 
-11 novembre 2026 · **BÊTA** · Windows x64.
+11 novembre 2026 · **BÊTA — préparation locale, non publiée** · Windows x64.
 
-## Correction de l’assistant de mise à jour Windows
+## Core natif partagé et grands fichiers UTF-8
 
-- Corrige l’argument du dossier d’installation lorsqu’il se termine par une
-  barre oblique inverse. L’ancienne commande pouvait absorber l’empreinte SHA-256
-  et l’identifiant du processus parent, puis afficher **Invalid update arguments**.
-- Partage l’échappement Windows entre processus natifs, mise à jour et
-  redémarrage, pour préserver espaces, Unicode et séparateurs de fin de chemin.
-- Vérifie les chemins, l’empreinte et le processus parent avant lancement.
-- Conserve les nouveautés de police, zoom, couleurs, recherche et fermeture de la 0.1.5.
+- Core `f5e6261bf8acf22d0b3241622ed4294322724fb9` et CyUI
+  `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`, API source 1.
+- Documents, encodages, recherche, plugins texte, processus, transport et
+  utilitaires communs fournis par Core plutôt que dupliqués dans Reader.
+- Fichiers UTF-8 de plus de 4 Mio ouverts avec stockage natif et pages asynchrones.
+  Édition, Annuler/Rétablir, recherche littérale, navigation 64 bits et sauvegarde
+  intégrale s’effectuent en arrière-plan. Enregistrer sous préserve l’original et
+  refuse les destinations existantes.
+- Saisies refusées ou annulées conservées pour copie et acquittement, y compris
+  pendant une proposition native. Le premier CRLF est détecté même après une
+  première ligne dépassant 64 Kio. Le BOM et
+  les fins LF/CRLF/CR non modifiées sont préservés ; les insertions suivent la
+  politique native de fins de ligne.
+- Backend graphique injectable pour le propriétaire natif existant de l’IDE,
+  avec acquittement des reçus de commit et contrats d’historique natif.
+- Correction de mise à jour 0.1.6, JetBrains Mono, Ctrl+molette, palette partagée,
+  surlignage de recherche et masquage des fenêtres à la fermeture conservés.
 
-## Une installation manuelle depuis la 0.1.4 ou la 0.1.5
+## Limites du profil paginé
 
-L’ancien exécutable construit encore la commande défectueuse ; télécharger un
-autre paquet ne le remplace pas avant l’installation. Fermez Reader puis lancez
-manuellement l’installateur actuel à l’emplacement déjà installé une fois.
-Les préférences sont conservées ; aucune désinstallation préalable n’est nécessaire.
+Les petits fichiers gardent l’éditeur ordinaire, ses encodages, minimap, repli et
+curseurs multiples. Le profil paginé ne fournit pas minimap, repli, multicurseur,
+retour automatique, extraits, conversion d’encodage, comparaison intégrale,
+Tout remplacer ou recherche dans la sélection. La coloration contextuelle utilise
+un instantané complet borné à 32 Mio ; au-delà, le texte reste brut avec un message.
+L’import et l’indexation peuvent prendre du temps. L’exposition SDK/MCP et la
+récupération durable attendent un contrat natif commun de session ; les travaux
+paginés non enregistrés restent volatils. Voir [PagedText](Docs/PagedText.md).
 
-Pour une édition portable, fermez Reader et remplacez ses fichiers de programme
-par le ZIP portable corrigé complet dans le dossier existant, en conservant
-`data/` et les plugins personnalisés. Utilisez l’édition correspondante. Le refus
-des arguments intervient avant tout remplacement des fichiers de l’application.
+## Distribution et vérification
 
-## Téléchargements
+La compilation locale Release garde les tests natifs désactivés et les mises à
+jour publiques activées. ZIP portable, installateur par utilisateur et empreintes
+SHA-256 sont préparés localement, sans publication. Les téléchargements publics
+restent en 0.1.6. Les contrôles sources/données, compilation seule des scénarios,
+paquets et manuel bilingue sont consignés dans [Validation](Docs/Validation.md).
 
-- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-setup.exe).
-- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip).
-- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/SHA256SUMS.txt).
-- [Guide de récupération](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/updates#recovery).
-
-## Vérifications et limites
-
-Le téléchargement signalé de la 0.1.5 correspond à son SHA-256 publié. Douze
-contrats évalués par le compilateur couvrent l’échappement de production. Le
-scénario utilisant le véritable analyseur Windows et les sources concernées
-passent MSVC /Zs seulement. La compilation publique Windows x64 Release garde
-les tests natifs désactivés ; intégrité des paquets, sources et manuel bilingue
-sont contrôlés localement. L’application, l’assistant, l’installateur et les tests
-natifs n’ont pas été lancés. Les parcours réels installé/portable, redémarrage
-et Linux/macOS restent à vérifier.
+Application, assistant, CLI, installateur et tests natifs ne sont pas exécutés
+pendant la suspension liée à l’antivirus. Les parcours interactifs, installation,
+mise à jour, backend IDE, Linux et macOS restent à valider. Les Actions restent
+désactivées.

@@ -5,12 +5,12 @@ description: Comprenez les limites de taille, recherche, plugins et projets.
 section: Utiliser Reader
 order: 190
 parent: overview
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Portée {#limits}
 
-Reader est un éditeur de code et de texte, pas l’IDE CyCode complet. Il ne fournit ni compilation de projets, serveurs de langage, refactorisation sémantique, débogueur ou recherche récursive de dossiers. Les textes sont limités à 4 Mio. La recherche est littérale, avec casse ASCII seulement et sans expressions régulières. La récupération après incident et restauration complète de session ou d’annulation ne sont pas fournies. Les plugins natifs s’exécutent en confiance dans le processus sans déchargement à chaud ni bac à sable.
+Reader est un éditeur de code et de texte, pas l’IDE CyCode complet. Il ne fournit ni compilation de projets, serveurs de langage, refactorisation sémantique, débogueur ou recherche récursive de dossiers. Le profil ordinaire est limité à 4 Mio ; les grands UTF-8 utilisent le [profil paginé](doc:paged-text#limits), avec ses budgets et fonctions propres. La recherche est littérale, avec casse ASCII seulement et sans expressions régulières. La récupération après incident et restauration complète de session ou d’annulation ne sont pas fournies. Les plugins natifs s’exécutent en confiance dans le processus sans déchargement à chaud ni bac à sable.
 
 ## Langues {#translations}
 

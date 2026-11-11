@@ -20,14 +20,14 @@ void Reader::codeContext(size_t id,TextEditor::PopupData &data,bool line) {
             tab->editor.SetSelections({{{data.pos.line,0},end}});
         } else if (selection.start==selection.end || data.pos<selection.start || selection.end<data.pos) tab->editor.SetCursor(data.pos);
     }
-    const bool writable=!tab->editor.IsReadOnlyEnabled(),selected=tab->editor.GetMainCursorSelection().start!=tab->editor.GetMainCursorSelection().end;
+    const bool writable=!tab->readOnly(),selected=tab->editor.GetMainCursorSelection().start!=tab->editor.GetMainCursorSelection().end;
     auto item=[&](const char *label,const char *command,bool enabled=true,const char *shortcut=nullptr,Json params=nlohmann::json::object()) {
         if (ImGui::MenuItem(tr(label),shortcut,false,enabled)) { contextCommand_=command;contextParams_=std::move(params);ImGui::CloseCurrentPopup(); }
     };
-    item("Undo","undo",writable && tab->editor.CanUndo(),"Ctrl+Z");item("Redo","redo",writable && tab->editor.CanRedo(),"Ctrl+Y");ImGui::Separator();
+    item("Undo","undo",writable && tab->canUndo(),"Ctrl+Z");item("Redo","redo",writable && tab->canRedo(),"Ctrl+Y");ImGui::Separator();
     item("Cut","cut",writable,"Ctrl+X");item("Copy","copy",true,"Ctrl+C");item("Paste","paste",writable,"Ctrl+V");item("Select all","selectAll",true,"Ctrl+A");
     item("Find selection","find",selected,"Ctrl+F");ImGui::Separator();
-    item("Compare with saved version","compare.saved",!tab->document.untitled(),nullptr,{{"id",id}});
+    item("Compare with saved version","compare.saved",!tab->untitled(),nullptr,{{"id",id}});
     item("Compare with selected tab","compare.selected",find(compareSelected_) && compareSelected_!=id,nullptr,{{"id",id}});
     for (size_t p=0;p<fileProviders_.size();++p) if (ImGui::BeginMenu(tr(fileProviders_[p].menu.c_str()))) {
         const auto &provider=fileProviders_[p];
@@ -56,7 +56,7 @@ Json Reader::historyDiffParams(const std::string &command,int index) const {
 }
 void Reader::pollHistoryDiff() {
     auto &diff=history_.diff;const auto tab=find(history_.document);
-    const bool source=tab && pathUtf8(tab->document.path())==history_.path && history_.provider<fileProviders_.size();
+    const bool source=tab && pathUtf8(tab->path())==history_.path && history_.provider<fileProviders_.size();
     const bool wanted=history_.open && source && !diff.params.empty();
     const bool live=wanted && diff.params.value("afterRevision","").empty();
     const auto key=wanted ? Json{{"document",tab->id},{"path",history_.path},{"provider",history_.provider},{"generation",history_.generation},{"params",diff.params},{"revision",live ? tab->live->revision : 0},{"language",static_cast<int>(tab->codeEditor.language())}}.dump() : std::string{};
@@ -114,14 +114,14 @@ void Reader::historyAction(const std::string &command,const Json &params) {
     const bool append=command=="history.more",refresh=command=="history.refresh";
     if (!append && !refresh) {
         const auto tab=find(params.value("id",active_));const auto provider=params.value("provider",size_t(0));
-        if (!tab || tab->document.untitled() || provider>=fileProviders_.size() || fileProviders_[provider].history.empty()) throw std::runtime_error("File history provider is not available");
-        sync(tab);core_.refresh();history_.document=tab->id;history_.provider=provider;history_.path=pathUtf8(tab->document.path());history_.selection=command=="history.selection";
+        if (!tab || tab->paged || tab->untitled() || provider>=fileProviders_.size() || fileProviders_[provider].history.empty()) throw std::runtime_error("File history provider is not available");
+        sync(tab);core_.refresh();history_.document=tab->id;history_.provider=provider;history_.path=pathUtf8(tab->path());history_.selection=command=="history.selection";
         const auto selection=tab->editor.GetMainCursorSelection();history_.start=selection.start.line+1;history_.end=selection.end.line+1;
         if (selection.end.index==0 && selection.end.line>selection.start.line) --history_.end;
         if (selection.start==selection.end) history_.start=history_.end=params.value("line",tab->editor.GetMainCursorPosition().line)+1;
         history_.open=true;history_.focus=true;
     }
-    const auto tab=find(history_.document);if (!tab || pathUtf8(tab->document.path())!=history_.path) throw std::runtime_error("History document is no longer open");
+    const auto tab=find(history_.document);if (!tab || pathUtf8(tab->path())!=history_.path) throw std::runtime_error("History document is no longer open");
     sync(tab);core_.refresh();
     if (refresh && history_.selection) {
         const auto selection=tab->editor.GetMainCursorSelection();history_.start=selection.start.line+1;history_.end=selection.end.line+1;
@@ -139,7 +139,7 @@ void Reader::historyPanel() {
     if (history_.pending.valid() && history_.pending.wait_for(std::chrono::seconds(0))==std::future_status::ready) {
         try {
             const auto result=history_.pending.get();if (result.contains("error")) throw std::runtime_error(result.at("error").get<std::string>());
-            const auto tab=find(history_.document);if (!tab || pathUtf8(tab->document.path())!=history_.path || (history_.selection && tab->live->revision!=history_.revision)) throw std::runtime_error("History source changed. Refresh the history view.");
+            const auto tab=find(history_.document);if (!tab || pathUtf8(tab->path())!=history_.path || (history_.selection && tab->live->revision!=history_.revision)) throw std::runtime_error("History source changed. Refresh the history view.");
             const auto &history=result.at("history");if (history.at("path")!=history_.path || !history.at("commits").is_array() || history.at("commits").size()>100) throw std::runtime_error("Invalid file history response");
             for (const auto &commit : history.at("commits")) {
                 if (!validId(commit.at("id")) || !commit.at("parents").is_array() || commit.at("parents").size()>64) throw std::runtime_error("Invalid history revision");
@@ -159,9 +159,9 @@ void Reader::historyPanel() {
         registerFilterOwner(history_.filter);cyui::FilterOptions options;options.hint="Filter history...";cyui::filterBox("##history-filter",history_.filter,options);
         { cyui::ScopedDisabled pending(history_.pending.valid());if (cyui::button(tr("Refresh history"))) execute("history.refresh");if (history_.more) { ImGui::SameLine();if (cyui::button(tr("Load older revisions"))) execute("history.more"); } }
         if (!history_.message.empty()) ImGui::TextWrapped("%s",tr(history_.message.c_str()));
-        if (const auto tab=find(history_.document);!tab || pathUtf8(tab->document.path())!=history_.path || history_.selection && tab->live->revision!=history_.revision) cyui::callout(cyui::Tone::warning,tr("History source changed. Refresh the history view."));
+        if (const auto tab=find(history_.document);!tab || pathUtf8(tab->path())!=history_.path || history_.selection && tab->live->revision!=history_.revision) cyui::callout(cyui::Tone::warning,tr("History source changed. Refresh the history view."));
         std::vector<int> visible;
-        for (size_t i=0;i<history_.commits.size();++i) { const auto &c=history_.commits[i];if (history_.filter.matches(c.at("subject"),c.at("id").get<std::string>()+" "+c.at("author").get<std::string>()+" "+c.at("date").get<std::string>())) visible.push_back(static_cast<int>(i)); }
+        for (size_t i=0;i<history_.commits.size();++i) { const auto &c=history_.commits[i];if (history_.filter.matches(c.at("subject").get_ref<const std::string &>(),c.at("id").get<std::string>()+" "+c.at("author").get<std::string>()+" "+c.at("date").get<std::string>())) visible.push_back(static_cast<int>(i)); }
         const auto bodyHeight=ImGui::GetContentRegionAvail().y;
         if (ImGui::BeginTable("##history",4,ImGuiTableFlags_RowBg|ImGuiTableFlags_Resizable|ImGuiTableFlags_ScrollY,{0,std::max(cyui::dp(100.f),bodyHeight*history_.listFraction)})) {
             ImGui::TableSetupColumn(tr("Revision"),ImGuiTableColumnFlags_WidthFixed,cyui::dp(96));ImGui::TableSetupColumn(tr("Date"),ImGuiTableColumnFlags_WidthFixed,cyui::dp(160));ImGui::TableSetupColumn(tr("Author"),ImGuiTableColumnFlags_WidthFixed,cyui::dp(140));ImGui::TableSetupColumn(tr("Message"));ImGui::TableSetupScrollFreeze(0,1);ImGui::TableHeadersRow();

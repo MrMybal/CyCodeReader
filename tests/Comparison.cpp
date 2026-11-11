@@ -34,7 +34,7 @@ struct ReaderComparisonTests {
     }
     static void git(const std::string &executable,const std::filesystem::path &root,const std::vector<std::string> &arguments) {
         std::vector<std::string> argv={executable,"-C",pathUtf8(root),"-c","user.name=Offline fixture","-c","user.email=fixture@example.invalid","-c","core.autocrlf=false"};argv.insert(argv.end(),arguments.begin(),arguments.end());
-        const auto result=runProcess(argv,root,std::chrono::seconds(15),256*1024,nullptr,{{"GIT_CONFIG_NOSYSTEM","1"}}, {"GIT_DIR","GIT_WORK_TREE","GIT_INDEX_FILE","GIT_CONFIG_COUNT","GIT_CONFIG_PARAMETERS"});
+        const auto result=runProcessFiltered(argv,root,std::chrono::seconds(15),256*1024,nullptr,{{"GIT_CONFIG_NOSYSTEM","1"}}, {"GIT_DIR","GIT_WORK_TREE","GIT_INDEX_FILE","GIT_CONFIG_COUNT","GIT_CONFIG_PARAMETERS"});
         if (result.exitCode) throw std::runtime_error(result.output);
     }
     static int run(const std::filesystem::path &source,const std::filesystem::path &library,const std::string &executable) {

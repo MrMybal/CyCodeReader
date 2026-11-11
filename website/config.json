@@ -1,6 +1,6 @@
 {
   "name": "CyCodeReader",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "repository": "https://github.com/MrMybal/CyCodeReader",
   "releases": "https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.6",
   "portable": "https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip",
@@ -13,5 +13,6 @@
     "compare.png": "Docs/images/compare.png",
     "git-history.png": "Docs/images/git-history.png",
     "manual.jpg": "website/assets/manual.jpg"
-  }
+  },
+  "publishedVersion": "0.1.6"
 }

@@ -74,6 +74,11 @@ def build(output, regenerate=True):
     settings = json.loads((HERE / 'config.json').read_text('utf-8'))
     project_version = re.search(r'project\(CyCodeReader VERSION (\d+\.\d+\.\d+)', (ROOT / 'CMakeLists.txt').read_text('utf-8')).group(1)
     assert settings['name'] == 'CyCodeReader' and settings['version'] == project_version, 'Update showcase release metadata with the application version'
+    published = settings.get('publishedVersion', settings['version'])
+    assert re.fullmatch(r'\d+\.\d+\.\d+', published), 'Invalid published version'
+    assert settings['releases'].endswith('/tag/v' + published), 'Published release mismatch'
+    for edition in ('portable', 'setup'):
+        assert '/download/v' + published + '/CyCodeReader-' + published + '-' in settings[edition], 'Published download mismatch'
     source_assets = {name:(ROOT / path).resolve() for name,path in settings['assets'].items()}
     source_assets.update({'style.css': HERE / 'style.css', 'site.js': HERE / 'site.js'})
     for name,path in source_assets.items():

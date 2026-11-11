@@ -1,8 +1,3 @@
 #pragma once
-#include <string>
-namespace cycode::reader {
-struct DecodedText { std::string text,encoding; };
-DecodedText decodeText(const std::string &bytes,const std::string &encoding="auto");
-std::string encodeText(const std::string &text,const std::string &encoding);
-const char *encodingLabel(const std::string &encoding);
-}
+#include "cycode/text/Encoding.h"
+namespace cycode::reader { using cycode::text::DecodedText; using cycode::text::decodeText; using cycode::text::encodeText; using cycode::text::encodingLabel; }

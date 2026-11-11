@@ -28,7 +28,7 @@ ProcessResult git(const std::filesystem::path &executable,const std::filesystem:
     const std::vector<std::string> remove={"GIT_DIR","GIT_COMMON_DIR","GIT_WORK_TREE","GIT_INDEX_FILE","GIT_OBJECT_DIRECTORY","GIT_ALTERNATE_OBJECT_DIRECTORIES","GIT_NAMESPACE","GIT_SHALLOW_FILE","GIT_CONFIG","GIT_CONFIG_COUNT","GIT_CONFIG_PARAMETERS","GIT_CONFIG_SYSTEM","GIT_CONFIG_GLOBAL","GIT_GLOB_PATHSPECS","GIT_NOGLOB_PATHSPECS","GIT_ICASE_PATHSPECS","GIT_PREFIX","GIT_INTERNAL_SUPER_PREFIX"};
     std::vector<std::string> argv={pathUtf8(executable),"--no-pager","--no-optional-locks","--literal-pathspecs","-c","core.fsmonitor=false","-c","core.untrackedCache=false","-c","gc.auto=0","-c","maintenance.auto=false","-c","log.showSignature=false","-c","i18n.logOutputEncoding=UTF-8"};
     argv.insert(argv.end(),args.begin(),args.end());
-    const auto result=runProcess(argv,cwd,timeout,maximum,nullptr,{{"GIT_TERMINAL_PROMPT","0"},{"GIT_OPTIONAL_LOCKS","0"},{"GIT_NO_LAZY_FETCH","1"},{"GIT_ALLOW_PROTOCOL",""},{"LC_ALL","C"}},remove);
+    const auto result=runProcessFiltered(argv,cwd,timeout,maximum,nullptr,{{"GIT_TERMINAL_PROMPT","0"},{"GIT_OPTIONAL_LOCKS","0"},{"GIT_NO_LAZY_FETCH","1"},{"GIT_ALLOW_PROTOCOL",""},{"LC_ALL","C"}},remove);
     if (result.timedOut) throw std::runtime_error("Git comparison timed out");
     if (result.truncated) throw std::runtime_error("Git output exceeds the comparison limit");
     return result;

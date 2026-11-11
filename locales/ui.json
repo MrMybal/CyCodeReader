@@ -1082,5 +1082,189 @@
   "Editor documentation": {
     "en": "Editor documentation",
     "fr": "Documentation de l’éditeur"
+  },
+  "Paged text": {
+    "en": "Paged text",
+    "fr": "Texte paginé"
+  },
+  "bytes": {
+    "en": "bytes",
+    "fr": "octets"
+  },
+  "Paged UTF-8: native storage, asynchronous pages, full-document saves.": {
+    "en": "Paged UTF-8: native storage, asynchronous pages, full-document saves.",
+    "fr": "Texte paginé UTF-8 : stockage natif, pages asynchrones et sauvegardes intégrales."
+  },
+  "Paged text help": {
+    "en": "Paged text help",
+    "fr": "Aide du texte paginé"
+  },
+  "Pending input was cancelled. Recover it before closing or saving.": {
+    "en": "Pending input was cancelled. Recover it before closing or saving.",
+    "fr": "Des saisies en attente ont été annulées. Récupérez-les avant de fermer ou d’enregistrer."
+  },
+  "Copy pending input": {
+    "en": "Copy pending input",
+    "fr": "Copier les saisies en attente"
+  },
+  "Acknowledge pending input": {
+    "en": "Acknowledge pending input",
+    "fr": "Acquitter les saisies en attente"
+  },
+  "Paged text supports UTF-8 only; the source was not converted.": {
+    "en": "Paged text supports UTF-8 only; the source was not converted.",
+    "fr": "Le texte paginé prend uniquement en charge UTF-8 ; la source n’a pas été convertie."
+  },
+  "Finish pending input and native operations before saving.": {
+    "en": "Finish pending input and native operations before saving.",
+    "fr": "Terminez les saisies et opérations natives en attente avant d’enregistrer."
+  },
+  "Wait for the current paged operation.": {
+    "en": "Wait for the current paged operation.",
+    "fr": "Attendez la fin de l’opération paginée en cours."
+  },
+  "This command requires an ordinary text document.": {
+    "en": "This command requires an ordinary text document.",
+    "fr": "Cette commande exige un document texte ordinaire."
+  },
+  "Open result in paged source": {
+    "en": "Open result in paged source",
+    "fr": "Ouvrir le résultat dans la source paginée"
+  },
+  "Paged results open in the source view; no full-text preview copy.": {
+    "en": "Paged results open in the source view; no full-text preview copy.",
+    "fr": "Les résultats paginés ouvrent la vue source, sans copie intégrale pour l’aperçu."
+  },
+  "Searching paged text...": {
+    "en": "Searching paged text...",
+    "fr": "Recherche dans le texte paginé…"
+  },
+  "Replace all is unavailable in paged mode.": {
+    "en": "Replace all is unavailable in paged mode.",
+    "fr": "Tout remplacer est indisponible en mode paginé."
+  },
+  "The SDK/MCP session currently exposes ordinary documents only.": {
+    "en": "The SDK/MCP session currently exposes ordinary documents only.",
+    "fr": "La session SDK/MCP expose actuellement les documents ordinaires uniquement."
+  },
+  "Importing and indexing UTF-8 text...": {
+    "en": "Importing and indexing UTF-8 text...",
+    "fr": "Import et indexation du texte UTF-8…"
+  },
+  "Native operation / index in progress...": {
+    "en": "Native operation / index in progress...",
+    "fr": "Opération native / indexation en cours…"
+  },
+  "Saving the complete native document...": {
+    "en": "Saving the complete native document...",
+    "fr": "Enregistrement du document natif complet…"
+  },
+  "Syntax highlighting is unavailable above 32 MiB.": {
+    "en": "Syntax highlighting is unavailable above 32 MiB.",
+    "fr": "La coloration est indisponible au-delà de 32 Mio."
+  },
+  "Insertion exceeds the 1 MiB operation budget": {
+    "en": "Insertion exceeds the 1 MiB operation budget",
+    "fr": "L’insertion dépasse le budget de 1 Mio par opération"
+  },
+  "Paged document is read-only": {
+    "en": "Paged document is read-only",
+    "fr": "Le document paginé est en lecture seule"
+  },
+  "Stale paged document revision": {
+    "en": "Stale paged document revision",
+    "fr": "Révision périmée du document paginé"
+  },
+  "Invalid paged read budget": {
+    "en": "Invalid paged read budget",
+    "fr": "Budget de lecture paginée invalide"
+  },
+  "Cannot prepare UTF-8 line fragment": {
+    "en": "Cannot prepare UTF-8 line fragment",
+    "fr": "Impossible de préparer le fragment de ligne UTF-8"
+  },
+  "Paged read cancelled": {
+    "en": "Paged read cancelled",
+    "fr": "Lecture paginée annulée"
+  },
+  "Page preparation exceeds its byte/token budget": {
+    "en": "Page preparation exceeds its byte/token budget",
+    "fr": "La préparation de page dépasse son budget d’octets ou de jetons"
+  },
+  "Wrong paged document identity": {
+    "en": "Wrong paged document identity",
+    "fr": "Identité incorrecte du document paginé"
+  },
+  "Clipboard result discarded after a revision change.": {
+    "en": "Clipboard result discarded after a revision change.",
+    "fr": "Résultat du presse-papiers abandonné après un changement de révision."
+  },
+  "Clipboard publication failed; selection was not cut.": {
+    "en": "Clipboard publication failed; selection was not cut.",
+    "fr": "La copie vers le presse-papiers a échoué ; la sélection n’a pas été coupée."
+  },
+  "Committed edit; view acknowledgement was cancelled.": {
+    "en": "Committed edit; view acknowledgement was cancelled.",
+    "fr": "Modification validée ; l’acquittement de la vue a été annulé."
+  },
+  "Clipboard selection exceeds the 4 MiB export budget.": {
+    "en": "Clipboard selection exceeds the 4 MiB export budget.",
+    "fr": "La sélection dépasse le budget d’export de 4 Mio du presse-papiers."
+  },
+  "No native transaction available.": {
+    "en": "No native transaction available.",
+    "fr": "Aucune transaction native disponible."
+  },
+  "Paged revision counter exhausted": {
+    "en": "Paged revision counter exhausted",
+    "fr": "Compteur de révisions paginées épuisé"
+  },
+  "Loading native paged backend...": {
+    "en": "Loading native paged backend...",
+    "fr": "Chargement du backend natif paginé…"
+  },
+  "Standalone durable paged recovery is unavailable.": {
+    "en": "Standalone durable paged recovery is unavailable.",
+    "fr": "La récupération durable du texte paginé autonome est indisponible."
+  },
+  "Native text service": {
+    "en": "Native text service",
+    "fr": "Service de texte natif"
+  },
+  "Invalid native paged backend state": {
+    "en": "Invalid native paged backend state",
+    "fr": "État invalide du backend natif paginé"
+  },
+  "Invalid native UTF-8 byte continuation": {
+    "en": "Invalid native UTF-8 byte continuation",
+    "fr": "Continuation native en octets UTF-8 invalide"
+  },
+  "Invalid native prepared edit identity": {
+    "en": "Invalid native prepared edit identity",
+    "fr": "Identité de modification native préparée invalide"
+  },
+  "Native apply did not issue a committed revision": {
+    "en": "Native apply did not issue a committed revision",
+    "fr": "La validation native n’a pas fourni de nouvelle révision"
+  },
+  "Native Undo did not issue a committed revision": {
+    "en": "Native Undo did not issue a committed revision",
+    "fr": "L’annulation native n’a pas fourni de nouvelle révision"
+  },
+  "Native search exceeds its result budget": {
+    "en": "Native search exceeds its result budget",
+    "fr": "La recherche native dépasse son budget de résultats"
+  },
+  "Search must include the complete CRLF pair.": {
+    "en": "Search must include the complete CRLF pair.",
+    "fr": "La recherche doit inclure la paire CRLF complète."
+  },
+  "Invalid native paged search range": {
+    "en": "Invalid native paged search range",
+    "fr": "Plage native de recherche paginée invalide"
+  },
+  "Recover cancelled input before editing or saving.": {
+    "en": "Recover cancelled input before editing or saving.",
+    "fr": "Récupérez les saisies annulées avant de modifier ou d’enregistrer."
   }
 }

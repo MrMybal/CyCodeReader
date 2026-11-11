@@ -84,6 +84,8 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
 Reader::~Reader() {
     // Cancel immediately, including when an exception bypasses requestQuit().
     sdkStop_=true;updateCancel_=true;
+    // Join paged workers before unregistering syntax contributions or unloading plugins.
+    for (auto &tab:tabs_) tab->paged.reset();
     if (comparison_.pending.valid()) comparison_.pending.wait();
     if (history_.pending.valid()) history_.pending.wait();
     if (history_.diff.pending.valid()) history_.diff.pending.wait();
@@ -122,7 +124,7 @@ void Reader::applyAppearance() {
 std::shared_ptr<Reader::Tab> Reader::find(size_t id) const { for (const auto &tab : tabs_) if (tab->id==id) return tab; return {}; }
 std::shared_ptr<Reader::Tab> Reader::active() const { return find(active_); }
 std::string Reader::title(const std::shared_ptr<Tab> &tab) const {
-    const auto name=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path().filename());
+    const auto name=tab->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->path().filename());
     return "     "+name+"###reader-document-"+std::to_string(tab->id);
 }
 void Reader::remember(const std::filesystem::path &path) {
@@ -132,14 +134,15 @@ void Reader::remember(const std::filesystem::path &path) {
 void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
     const auto &mode=tab->language;
-    tab->syntaxPath=tab->document.untitled() ? "code.cpp" : pathUtf8(tab->document.path());
+    tab->syntaxPath=tab->untitled() ? "code.cpp" : pathUtf8(tab->path());
     const bool unreal=mode=="C++ / Unreal" || mode=="unreal" ||
-        (mode=="auto" && !tab->document.untitled() && unrealFile(tab->document.path()));
+        (mode=="auto" && !tab->untitled() && unrealFile(tab->path()));
     auto selected=mode=="auto" ? cyui::codeLanguageForPath(tab->syntaxPath) :
         cyui::codeLanguageFromName(mode.starts_with("plugin:") ? mode.substr(7) : mode);
     if (mode=="TypeScript / TSX") selected=cyui::CodeLanguage::tsx;
     if (unreal && (selected==cyui::CodeLanguage::cpp || selected==cyui::CodeLanguage::c || mode=="C++ / Unreal")) selected=cyui::CodeLanguage::unreal;
     const auto info=cyui::codeLanguageInfo(selected);
+    if (tab->paged) { tab->codeEditor.setLanguage(selected);tab->paged->setLanguage(selected);return; }
     if (mode!="auto") tab->syntaxPath=info.extensions.empty() ? "code.txt" : "code."+info.extensions.front();
     if (selected==cyui::CodeLanguage::unreal) tab->syntaxPath="code.cpp";
     // Preserve the context-aware Unreal/C# tokenizer and existing incremental parsers.
@@ -156,8 +159,8 @@ void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
 #else
     const auto &mode=tab->language;
     const TextEditor::Language *language=nullptr;
-    tab->syntaxPath=tab->document.untitled() ? "code.cpp" : pathUtf8(tab->document.path());
-    if (mode=="auto") language=editorLanguage(tab->syntaxPath,!tab->document.untitled() && unrealFile(tab->document.path()));
+    tab->syntaxPath=tab->untitled() ? "code.cpp" : pathUtf8(tab->path());
+    if (mode=="auto") language=editorLanguage(tab->syntaxPath,!tab->untitled() && unrealFile(tab->path()));
     else if (mode=="C++ / Unreal") language=editorLanguage("code.cpp",true);
     else if (mode!="plain") {
         const std::pair<const char *,const char *> mapping[]={{"C","code.c"},{"C++","code.cpp"},{"C#","code.cs"},{"GLSL","code.glsl"},{"HLSL","code.hlsl"},{"Python","code.py"},{"Lua","code.lua"},{"JSON","code.json"},{"Markdown","code.md"},{"Rust","code.rs"},{"Java","code.java"},{"JavaScript","code.js"},{"TypeScript","code.ts"},{"TypeScript / TSX","code.tsx"},{"HTML","code.html"},{"CSS","code.css"}};
@@ -165,7 +168,7 @@ void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
     }
     if (mode=="plain" || mode=="C++ / Unreal") tab->syntaxPath="code.txt";
     if (mode.starts_with("plugin:")) { const auto key=mode.substr(7);if (pluginLanguages_.contains(key)) { language=pluginLanguages_.at(key).get();tab->syntaxPath="code.txt"; } }
-    else if (mode=="auto") { const auto ext=tab->document.path().extension().string();if (pluginExtensions_.contains(ext)) { language=pluginLanguages_.at(pluginExtensions_.at(ext)).get();tab->syntaxPath="code.txt"; } }
+    else if (mode=="auto") { const auto ext=tab->path().extension().string();if (pluginExtensions_.contains(ext)) { language=pluginLanguages_.at(pluginExtensions_.at(ext)).get();tab->syntaxPath="code.txt"; } }
     tab->editor.SetLanguage(language);
     tab->syntax.update(tab->editor,tab->syntaxPath,tab->document.text());
 #endif
@@ -190,14 +193,22 @@ void Reader::open(const std::filesystem::path &path) {
     std::lock_guard lock(core_.mutex());
     try {
         const auto full=std::filesystem::weakly_canonical(std::filesystem::absolute(path));
-        for (const auto &tab : tabs_) if (sameFile(tab->document.path(),full)) { active_=tab->id; tab->focus=true; return; }
+        for (const auto &tab : tabs_) if (sameFile(tab->path(),full)) { active_=tab->id; tab->focus=true; return; }
         if (tabs_.size()>=64) throw std::runtime_error(tr("Close a document before opening more files."));
+        if (std::filesystem::file_size(full)>cycode::maxTextFileBytes) {
+            if (openEncoding_!="auto") throw std::runtime_error(tr("Paged text supports UTF-8 only; the source was not converted."));
+            auto tab=std::make_shared<Tab>(std::make_shared<LiveDocument>());
+            tab->id=nextPagedId_++;tab->live->id=tab->id;
+            tab->paged=std::make_unique<cycode::PagedTextEditor>(tab->id,full,readerDataDirectory(options_.installation)/"reader/paged");
+            setLanguage(tab);tabs_.push_back(tab);active_=tab->id;remember(full);return;
+        }
         auto tab=std::make_shared<Tab>(core_.add(Document::open(full,openEncoding_))); tab->id=tab->live->id;
         install(tab); tabs_.push_back(tab); active_=tab->id; remember(full);
     } catch (const std::exception &exception) { error(exception); }
 }
 void Reader::sync(const std::shared_ptr<Tab> &tab) {
     if (!tab) return;
+    if (tab->paged) { const auto oldPath=tab->path();tab->paged->poll();tab->live->revision=tab->paged->status().revision;if (oldPath!=tab->path()) { remember(tab->path());setLanguage(tab); }return; }
     if (pullLiveDocument(tab->editor,*tab->live,tab->appliedRevision,tab->version)) tab->syntax.update(tab->editor,tab->syntaxPath,tab->document.text());
     if (tab->version==tab->editor.GetUndoIndex()) return;
     try { tab->document.replace(tab->editor.GetText()); tab->syntax.update(tab->editor,tab->syntaxPath,tab->document.text()); }
@@ -208,7 +219,7 @@ void Reader::sync(const std::shared_ptr<Tab> &tab) {
 void Reader::showDialog(bool save,size_t tab,bool compare) {
     if (dialog_) return;
     dialog_=std::make_shared<Dialog>(); dialog_->save=save; dialog_->tab=tab;dialog_->compare=compare;
-    if (const auto doc=find(tab); doc && !doc->document.untitled()) dialog_->initial=pathUtf8(doc->document.path());
+    if (const auto doc=find(tab); doc && !doc->untitled()) dialog_->initial=pathUtf8(doc->path());
     if (options_.automated) return; // Scripted selection uses pollDialog; native dialogs stay interactive-only.
     auto *owner=new std::shared_ptr<Dialog>(dialog_);
     auto callback=[](void *data,const char *const *files,int) {
@@ -234,16 +245,24 @@ void Reader::pollDialog() {
 void Reader::save(const std::shared_ptr<Tab> &tab,bool as) {
     if (!tab) return;
     sync(tab);
-    if (as || tab->document.untitled()) { showDialog(true,tab->id); return; }
-    tab->document.save(); tab->diskChanged=false; remember(tab->document.path()); lastError_.clear();
+    if (as || tab->untitled()) { showDialog(true,tab->id); return; }
+    if (tab->paged) {
+        if (!tab->paged->save()) throw std::runtime_error(tr("Finish pending input and native operations before saving."));
+        return;
+    }
+    tab->document.save(); tab->diskChanged=false; remember(tab->path()); lastError_.clear();
     cyui::notify(tr("Saved"),cyui::Tone::success);
 }
 void Reader::saveAs(const std::shared_ptr<Tab> &tab,const std::filesystem::path &path) {
     if (!tab) return;
     sync(tab);
     const auto full=std::filesystem::weakly_canonical(std::filesystem::absolute(path));
-    for (const auto &other : tabs_) if (other!=tab && sameFile(other->document.path(),full)) throw std::runtime_error(tr("This file is already open in another tab."));
-    if (sameFile(tab->document.path(),full)) { save(tab); return; }
+    for (const auto &other : tabs_) if (other!=tab && sameFile(other->path(),full)) throw std::runtime_error(tr("This file is already open in another tab."));
+    if (sameFile(tab->path(),full)) { save(tab); return; }
+    if (tab->paged) {
+        if (!tab->paged->save(full)) throw std::runtime_error(tr("Finish pending input and native operations before saving."));
+        return;
+    }
     PendingSave pending{tab->id,full,{}};
     if (std::filesystem::exists(full)) { pending.baseline=readTextFileBytes(full); overwrite_=std::move(pending); }
     else commitSave(pending);
@@ -257,34 +276,48 @@ void Reader::commitSave(const PendingSave &pending) {
 }
 void Reader::saveNext() {
     if (saveQueue_.empty() || dialog_ || closeId_ || overwrite_.tab) return;
+    for (const auto &tab:tabs_) if (tab->paged && tab->paged->status().busy) return;
     const auto id=saveQueue_.front(); saveQueue_.erase(saveQueue_.begin());
     try { save(find(id)); } catch (...) { saveQueue_.clear(); throw; }
 }
 void Reader::erase(size_t id) {
-    core_.remove(id);
+    if (const auto tab=find(id);tab && !tab->paged) core_.remove(id);
     std::erase_if(tabs_,[&](const auto &tab) { return tab->id==id; });
     if (active_==id) { active_=tabs_.empty() ? 0 : tabs_.back()->id; if (auto tab=active()) tab->focus=true; }
 }
 void Reader::requestClose(size_t id,bool reload) {
     if (dialog_ || closeId_ || overwrite_.tab) return;
     auto tab=find(id); if (!tab) return; sync(tab);
-    if (tab->document.dirty()) { closeId_=id; reload_=reload; return; }
-    if (reload) { try { tab->document=Document::open(tab->document.path()); install(tab); } catch (const std::exception &exception) { error(exception); } }
+    if (tab->paged && tab->paged->status().busy) { error(std::runtime_error(tr("Wait for the current paged operation.")));return; }
+    if (tab->dirty()) { closeId_=id; reload_=reload; return; }
+    if (reload) { try {
+        if (tab->paged) { const auto path=tab->path();erase(tab->id);open(path); }
+        else { tab->document=Document::open(tab->path());install(tab); }
+    } catch (const std::exception &exception) { error(exception); } }
     else erase(id);
 }
 void Reader::requestQuit() {
     std::lock_guard lock(core_.mutex());
     if (dialog_ || overwrite_.tab || closeId_) return;
-    for (const auto &tab : tabs_) { sync(tab); if (tab->document.dirty()) { quitting_=true; closeId_=tab->id; return; } }
+    for (const auto &tab:tabs_) if (tab->paged && tab->paged->status().busy) {
+        error(std::runtime_error(tr("Wait for the current paged operation.")));return;
+    }
+    for (const auto &tab : tabs_) { sync(tab); if (tab->dirty()) { quitting_=true; closeId_=tab->id; return; } }
     quit_=true;
     sdkStop_=true;updateCancel_=true;
 }
 void Reader::resolveClose(const std::string &choice) {
     auto tab=find(closeId_); if (!tab) { closeId_=0; return; }
-    if (choice=="cancel") { updateOnExit_.reset();closeId_=0; quitting_=false; reload_=false; ImGui::ClosePopupToLevel(0,true); return; }
-    if (choice=="save") { try { save(tab); } catch (const std::exception &exception) { error(exception); return; } if (tab->document.dirty() || dialog_) return; }
+    if (choice!="cancel" && tab->paged && tab->paged->status().busy) {
+        error(std::runtime_error(tr("Wait for the current paged operation.")));return;
+    }
+    if (choice=="cancel") { closingPaged_=0;updateOnExit_.reset();closeId_=0; quitting_=false; reload_=false; ImGui::ClosePopupToLevel(0,true); return; }
+    if (choice=="save") { try { save(tab);if (tab->paged) { closingPaged_=tab->id;return; } } catch (const std::exception &exception) { error(exception); return; } if (tab->dirty() || dialog_) return; }
     const auto id=closeId_; const bool reload=reload_; closeId_=0; reload_=false; ImGui::ClosePopupToLevel(0,true);
-    if (reload) { try { tab->document=Document::open(tab->document.path()); install(tab); } catch (const std::exception &exception) { error(exception); } }
+    if (reload) { try {
+        if (tab->paged) { const auto path=tab->path();erase(tab->id);open(path); }
+        else { tab->document=Document::open(tab->path());install(tab); }
+    } catch (const std::exception &exception) { error(exception); } }
     else erase(id);
     if (quitting_) { quitting_=false; requestQuit(); }
 }
@@ -292,6 +325,7 @@ void Reader::execute(const std::string &command,const Json &params) {
     std::lock_guard lock(core_.mutex());
     try {
         auto tab=active();
+        if (tab && tab->paged && pagedCommand(command,params)) return;
         if (command == "help" || command.starts_with("help.")) {
             std::string page = params.value("page", command == "help" ? "overview" : command.substr(5));
             if (page == "context") {
@@ -335,7 +369,7 @@ void Reader::execute(const std::string &command,const Json &params) {
         else if (command=="saveAs") { if (params.contains("path")) saveAs(tab,utf8Path(params.at("path"))); else save(tab,true); }
         else if (command=="saveAll") { saveQueue_.clear(); for (const auto &item : tabs_) saveQueue_.push_back(item->id); saveNext(); }
         else if (command=="close" && tab) requestClose(tab->id);
-        else if (command=="reload" && tab && !tab->document.untitled()) requestClose(tab->id,true);
+        else if (command=="reload" && tab && !tab->untitled()) requestClose(tab->id,true);
         else if (command=="quit") requestQuit();
         else if (command=="palette") palette_=true;
         else if (command=="goto") goto_=true;
@@ -398,26 +432,33 @@ void Reader::tools() {
     tool(cyui::icon::save,"Save","Ctrl+S","save",bool(tab));tool(cyui::icon::copy,"Save all","Ctrl+Alt+S","saveAll",bool(tab));
     tool(cyui::icon::close,"Close file","Ctrl+W","close",bool(tab));
     cyui::toolbarSeparator();
-    tool(cyui::icon::undo,"Undo","Ctrl+Z","undo",tab && tab->editor.CanUndo());tool(cyui::icon::redo,"Redo","Ctrl+Y","redo",tab && tab->editor.CanRedo());
-    tool(cyui::icon::cut,"Cut","Ctrl+X","cut",tab && !tab->editor.IsReadOnlyEnabled());tool(cyui::icon::copy,"Copy","Ctrl+C","copy",bool(tab));
-    tool(cyui::icon::paste,"Paste","Ctrl+V","paste",tab && !tab->editor.IsReadOnlyEnabled());
+    tool(cyui::icon::undo,"Undo","Ctrl+Z","undo",tab && tab->canUndo());tool(cyui::icon::redo,"Redo","Ctrl+Y","redo",tab && tab->canRedo());
+    tool(cyui::icon::cut,"Cut","Ctrl+X","cut",tab && !tab->readOnly());tool(cyui::icon::copy,"Copy","Ctrl+C","copy",bool(tab));
+    tool(cyui::icon::paste,"Paste","Ctrl+V","paste",tab && !tab->readOnly());
     cyui::toolbarSeparator();
     tool(cyui::icon::search,"Find","Ctrl+F","find",bool(tab));tool(cyui::icon::edit,"Replace","Ctrl+H","replace",bool(tab));
     tool(cyui::icon::filter,"Search open documents","Ctrl+Shift+F","searchOpen");
     tool(cyui::icon::code,"Compare files","","compare.open",bool(tab));
     for (size_t p=0;p<fileProviders_.size();++p) if (!fileProviders_[p].history.empty())
         tool(cyui::icon::clock,"File history","","history.open",providerReady(p,fileProviders_[p].history.at("file")),false,{{"provider",p}});
-    tool(cyui::icon::library,"Minimap","","view.toggle",true,minimap_,{{"option","minimap"}});
-    tool(cyui::icon::code,"Show whitespace","","view.toggle",true,whitespace_,{{"option","whitespace"}});
+    tool(cyui::icon::library,"Minimap","","view.toggle",!tab || !tab->paged,minimap_ && (!tab || !tab->paged),{{"option","minimap"}});
+    tool(cyui::icon::code,"Show whitespace","","view.toggle",!tab || !tab->paged,whitespace_ && (!tab || !tab->paged),{{"option","whitespace"}});
     if (tab && ImGui::GetContentRegionAvail().x>cyui::dp(100.f)) {
-        const auto path=tab->document.untitled() ? std::string(tr("Untitled")) : pathUtf8(tab->document.path());
+        const auto path=tab->untitled() ? std::string(tr("Untitled")) : pathUtf8(tab->path());
         cyui::clippedText(ImGui::GetWindowDrawList(),ImGui::GetCursorScreenPos(),ImGui::GetContentRegionAvail().x,cyui::palette().textDim,path.c_str());
     }
     cyui::endTopBar();
     cyui::beginStatusBar("##reader-status");
     if (const auto tab=active()) {
+        if (tab->paged) {
+            const auto &status=tab->paged->status();const auto pos=tab->paged->view().selection().caret;
+            cyui::statusText(cyui::Tone::neutral,"%s | Ln %llu, Col %llu | %llu %s | UTF-8 | %llu %s%s",
+                tr("Paged text"),static_cast<unsigned long long>(pos.line+1),static_cast<unsigned long long>(pos.character+1),
+                static_cast<unsigned long long>(status.lines),tr("Lines"),static_cast<unsigned long long>(status.bytes),tr("bytes"),tab->dirty() ? " *" : "");
+        } else {
         const auto pos=tab->editor.GetMainCursorPosition();
-        cyui::statusText(cyui::Tone::neutral,"%s | Ln %zu, Col %zu | %zu %s | %s | %s%s",tab->editor.GetLanguageName().c_str(),pos.line+1,pos.index+1,tab->editor.GetLineCount(),tr("Lines"),tab->document.encoding(),tab->document.lineEnding(),tab->document.dirty() ? " *" : "");
+        cyui::statusText(cyui::Tone::neutral,"%s | Ln %zu, Col %zu | %zu %s | %s | %s%s",tab->editor.GetLanguageName().c_str(),pos.line+1,pos.index+1,tab->editor.GetLineCount(),tr("Lines"),tab->document.encoding(),tab->document.lineEnding(),tab->dirty() ? " *" : "");
+        }
     } else cyui::statusText(cyui::Tone::neutral,"%s",tr("Code editor"));
     cyui::endStatusBar();
 }
@@ -439,12 +480,12 @@ void Reader::documents() {
             cyui::filterBox("##file-filter",filesFilter_,field);
             size_t visibleFiles=0;
             for (const auto &tab : tabs_) {
-                const auto name=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path().filename());
-                const auto keywords=tab->document.untitled() ? std::string("Untitled ")+tr("Untitled") : pathUtf8(tab->document.path());
+                const auto name=tab->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->path().filename());
+                const auto keywords=tab->untitled() ? std::string("Untitled ")+tr("Untitled") : pathUtf8(tab->path());
                 if (!filesFilter_.matches(name,keywords)) continue;
                 ++visibleFiles;
                 ImGui::PushID(static_cast<int>(tab->id));
-                if (fileSelectable(name+(tab->document.dirty() ? " *" : ""),tab->document.untitled() ? "new.cpp" : pathUtf8(tab->document.path()),active_==tab->id,theme_)) { active_=tab->id; tab->focus=true; }
+                if (fileSelectable(name+(tab->dirty() ? " *" : ""),tab->untitled() ? "new.cpp" : pathUtf8(tab->path()),active_==tab->id,theme_)) { active_=tab->id; tab->focus=true; }
                 ImGui::PopID();
             }
             if (tabs_.empty()) cyui::textDim("%s",tr("Open or drop code files to begin."));
@@ -477,11 +518,13 @@ void Reader::documents() {
             ImGui::SetNextWindowSize(cyui::dp(650,450),ImGuiCond_Always); tab->detached=false;
         }
         if (tab->focus) { ImGui::SetNextWindowFocus(); tab->focus=false; }
-        const auto flags=ImGuiWindowFlags_NoCollapse|(tab->document.dirty() ? ImGuiWindowFlags_UnsavedDocument : 0);
+        const auto flags=ImGuiWindowFlags_NoCollapse|(tab->dirty() ? ImGuiWindowFlags_UnsavedDocument : 0);
         if (ImGui::Begin(title(tab).c_str(),&visible,flags)) {
-            documentIcon(tab->document.untitled() ? "new.cpp" : pathUtf8(tab->document.path()),theme_);
+            documentIcon(tab->untitled() ? "new.cpp" : pathUtf8(tab->path()),theme_);
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)) active_=tab->id;
             if (tab->diskChanged) { cyui::callout(cyui::Tone::warning,tr("File changed on disk. Reload it or save a copy.")); if (cyui::button(tr("Reload from disk"))) requestClose(tab->id,true); ImGui::SameLine(); if (cyui::button(tr("Save as..."))) save(tab,true); }
+            if (tab->paged) drawPaged(tab);
+            else {
             tab->editor.SetWordWrapEnabled(wrap_);
             tab->editor.SetShowMiniMapEnabled(minimap_); tab->editor.SetShowWhitespacesEnabled(whitespace_);
             tab->editor.SetFindButtonLabel(tr("Find")); tab->editor.SetFindAllButtonLabel(tr("Find all"));
@@ -496,19 +539,20 @@ void Reader::documents() {
             updateSearchMarkers(tab);
             if (tab->codeEditor.draw(("##reader-text-"+std::to_string(tab->id)).c_str())) tab->version=~size_t(0);
             sync(tab);
+            }
             if (!contextCommand_.empty()) { auto command=std::move(contextCommand_);contextCommand_.clear();execute(command,contextParams_); }
         }
         if (ImGui::BeginPopupContextWindow("##reader-tab-actions",ImGuiPopupFlags_MouseButtonRight|ImGuiPopupFlags_NoOpenOverItems)) {
             if (ImGui::MenuItem(tr("Select for comparison"))) execute("compare.select",{{"id",tab->id}});
             if (ImGui::MenuItem(tr("Compare with selected tab"),nullptr,false,find(compareSelected_) && compareSelected_!=tab->id)) execute("compare.selected",{{"id",tab->id}});
-            if (ImGui::MenuItem(tr("Compare with saved version"),nullptr,false,!tab->document.untitled())) execute("compare.saved",{{"id",tab->id}});
+            if (ImGui::MenuItem(tr("Compare with saved version"),nullptr,false,!tab->untitled())) execute("compare.saved",{{"id",tab->id}});
             for (size_t p=0;p<fileProviders_.size();++p) if (tab->id==active_) for (const auto &action : fileProviders_[p].actions) {
                 const auto command=action.at("command").get<std::string>();
                 if (ImGui::MenuItem(tr(action.at("title").get_ref<const std::string&>().c_str()),nullptr,false,providerReady(p,command))) execute("compare.provider",{{"provider",p},{"command",command}});
             }
             if (ImGui::MenuItem(tr("Move to new window"))) tab->detached=true;
             if (ImGui::MenuItem(tr("Return to editor"))) ImGui::DockBuilderDockWindow(title(tab).c_str(),editorDock_);
-            bool readOnly=tab->editor.IsReadOnlyEnabled(); if (ImGui::MenuItem(tr("Read-only"),nullptr,&readOnly)) tab->editor.SetReadOnlyEnabled(readOnly);
+            bool readOnly=tab->readOnly(); if (ImGui::MenuItem(tr("Read-only"),nullptr,&readOnly)) { if (tab->paged) tab->paged->setReadOnly(readOnly);else tab->editor.SetReadOnlyEnabled(readOnly); }
             if (ImGui::MenuItem(tr("Editor documentation"))) execute("help",{{"page","editing"},{"anchor","documents"}});
             if (ImGui::MenuItem(tr("Close file"))) closing.push_back(tab->id);
             ImGui::EndPopup();
@@ -545,7 +589,7 @@ void Reader::dialogs() {
     std::map<cyui::ItemId,std::string> actionsById;
     if (palette_) {
         for (const auto &tab : tabs_) {
-            const auto name=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path());
+            const auto name=tab->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->path());
             const auto id=uiId("document/"+std::to_string(tab->id));
             commands.push_back({id,name,"",tr("Documents")});documentCommands.emplace(id,tab->id);
         }
@@ -556,7 +600,7 @@ void Reader::dialogs() {
         for (const auto &action : actions) {
             const auto id=uiId(std::string("action/")+action[1]);
             const std::string command=action[1];
-            const bool enabled=command=="compare.saved" ? active() && !active()->document.untitled() : active() || command=="help" || command.starts_with("help.") || command=="new" || command=="open" || command=="updates" || command=="compare.open";
+            const bool enabled=command=="compare.saved" ? active() && !active()->untitled() : active() || command=="help" || command.starts_with("help.") || command=="new" || command=="open" || command=="updates" || command=="compare.open";
             commands.push_back({id,tr(action[0]),action[2],tr("Actions"),enabled});
             actionsById.emplace(id,action[1]);
         }
@@ -574,8 +618,9 @@ void Reader::dialogs() {
     }
     if (goto_) ImGui::OpenPopup(tr("Go to line"));
     if (ImGui::BeginPopupModal(tr("Go to line"),&goto_,ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::InputInt(tr("Line"),&line_);
-        if (cyui::primaryButton(tr("Go"))) { if (auto tab=active()) tab->editor.SetCursor({static_cast<size_t>(std::max(1,line_)-1),0}); goto_=false; ImGui::CloseCurrentPopup(); }
+        if (const auto tab=active();tab && tab->paged) ImGui::InputScalar(tr("Line"),ImGuiDataType_U64,&pagedLine_);
+        else ImGui::InputInt(tr("Line"),&line_);
+        if (cyui::primaryButton(tr("Go"))) { if (auto tab=active()) { if (tab->paged) tab->paged->goTo(pagedLine_ ? pagedLine_-1 : 0);else tab->editor.SetCursor({static_cast<size_t>(std::max(1,line_)-1),0}); } goto_=false; ImGui::CloseCurrentPopup(); }
         ImGui::SameLine(); if (cyui::button(tr("Cancel")) || ImGui::IsKeyPressed(ImGuiKey_Escape)) { goto_=false; ImGui::CloseCurrentPopup(); }
         ImGui::EndPopup();
     }
@@ -583,22 +628,25 @@ void Reader::dialogs() {
 void Reader::frame() {
     try {
         std::lock_guard lock(core_.mutex());
-        std::erase_if(tabs_,[&](const auto &tab) { return !core_.documents().contains(tab->id); });
+        std::erase_if(tabs_,[&](const auto &tab) { return !tab->paged && !core_.documents().contains(tab->id); });
         for (const auto &[id,live] : core_.documents()) if (!find(id)) { auto tab=std::make_shared<Tab>(live);tab->id=id;install(tab);tabs_.push_back(tab);active_=id; }
         if (!find(active_)) active_=tabs_.empty() ? 0 : tabs_.back()->id;
         for (const auto &tab : tabs_) sync(tab);
+        if (closingPaged_) if (const auto closing=find(closingPaged_);closing && !closing->paged->status().busy) {
+            closingPaged_=0;if (!closing->dirty()) resolveClose("discard");
+        }
         core_.refresh();pollFileProviders();
         pollDialog(); saveNext(); shortcuts(); menus(); tools(); documents(); dialogs();extensionPanels();searchWindows();historyPanel();updatePanel();comparisonPanel();
-        for (const auto &tab : tabs_) { sync(tab);tab->live->readOnly=tab->editor.IsReadOnlyEnabled(); }
+        for (const auto &tab : tabs_) { sync(tab);tab->live->readOnly=tab->readOnly(); }
         core_.refresh();
         if (ImGui::GetTime()>=pollAt_) {
             pollAt_=ImGui::GetTime()+1.;
-            if (auto tab=active(); tab && !tab->document.untitled()) {
+            if (auto tab=active(); tab && !tab->paged && !tab->untitled()) {
                 tab->diskChanged=tab->document.changedOnDisk();
-                if (tab->diskChanged && !tab->document.dirty()) { tab->document=Document::open(tab->document.path()); install(tab); }
+                if (tab->diskChanged && !tab->dirty()) { tab->document=Document::open(tab->path()); install(tab); }
             }
         }
-        if (const auto tab=active(); tab && window_) SDL_SetWindowTitle(window_,("CyCodeReader — "+(tab->document.untitled() ? std::string(tr("Untitled")) : pathUtf8(tab->document.path().filename()))+(tab->document.dirty() ? " *" : "")).c_str());
+        if (const auto tab=active(); tab && window_) SDL_SetWindowTitle(window_,("CyCodeReader — "+(tab->untitled() ? std::string(tr("Untitled")) : pathUtf8(tab->path().filename()))+(tab->dirty() ? " *" : "")).c_str());
         else if (window_) SDL_SetWindowTitle(window_,"CyCodeReader");
     } catch (const std::exception &exception) { error(exception); }
     cyui::renderNotifications();
@@ -606,11 +654,14 @@ void Reader::frame() {
 Json Reader::state() const {
     std::lock_guard lock(const_cast<Core&>(core_).mutex());
     Json docs=Json::array();
-    for (const auto &tab : tabs_) docs.push_back({{"id",tab->id},{"path",pathUtf8(tab->document.path())},
-        {"text",tab->document.text()},{"dirty",tab->document.dirty()},{"syntax",tab->editor.GetLanguageName()},
+    for (const auto &tab : tabs_) {
+        if (tab->paged) { const auto &p=tab->paged->status();docs.push_back({{"id",tab->id},{"path",pathUtf8(tab->path())},{"paged",true},{"revision",p.revision},{"bytes",p.bytes},{"lines",p.lines},{"dirty",tab->dirty()},{"busy",p.busy},{"message",p.message}});continue; }
+        docs.push_back({{"id",tab->id},{"path",pathUtf8(tab->path())},
+        {"text",tab->document.text()},{"dirty",tab->dirty()},{"syntax",tab->editor.GetLanguageName()},
         {"syntaxSpans",tab->syntax.spans()},{"syntaxTruncated",tab->syntax.truncated()},
         {"diskChanged",tab->diskChanged},{"undo",tab->editor.GetUndoIndex()},
         {"hasFind",tab->editor.HasFindString()},{"selection",tab->editor.GetCursorText(0)}});
+    }
     return {{"application","CyCodeReader"},{"active",active_},{"documents",docs},{"error",lastError_},
         {"pendingClose",closeId_},{"pendingOverwrite",overwrite_.tab},{"pendingDialog",bool(dialog_)},{"quit",quit_},{"theme",theme_},{"language",locale_},{"trace",trace_}};
 }
@@ -618,7 +669,7 @@ void Reader::testAction(const Json &action) {
     std::lock_guard lock(core_.mutex());
     if (!options_.automated) throw std::runtime_error("Reader test action requires automated mode");
     const auto command=action.at("command").get<std::string>();
-    if (command=="setText") { if (auto tab=active()) { tab->editor.SelectAll(); tab->editor.ReplaceTextPreservingTabs(action.at("text").get<std::string>()); sync(tab); } }
+    if (command=="setText") { if (auto tab=active()) { if (tab->paged) throw std::runtime_error("setText is not a paged operation"); tab->editor.SelectAll(); tab->editor.ReplaceTextPreservingTabs(action.at("text").get<std::string>()); sync(tab); } }
     else if (command=="activate") { active_=action.at("id"); if (auto tab=active()) tab->focus=true; }
     else if (command=="detach") { if (auto tab=active()) tab->detached=true; }
     else if (command=="resolveClose") resolveClose(action.at("choice"));

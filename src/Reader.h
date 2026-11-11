@@ -6,6 +6,7 @@
 #include "ModuleModels.h"
 #include "Updates.h"
 #include "cycode/Syntax.h"
+#include "cycode/PagedTextEditor.h"
 #include <cyui/modules/CodeEditor.h>
 #include <cyui/modules/Commands.h>
 #include <cyui/modules/Diagnostics.h>
@@ -45,6 +46,13 @@ class Reader {
     friend struct ReaderExperienceTests;
     struct Tab {
         explicit Tab(std::shared_ptr<LiveDocument> entry) : live(std::move(entry)),document(live->document),editor(codeEditor.native()) {}
+        std::unique_ptr<cycode::PagedTextEditor> paged;
+        const std::filesystem::path &path() const { return paged ? paged->status().path : document.path(); }
+        bool untitled() const { return !paged && document.untitled(); }
+        bool dirty() const { return paged ? paged->status().dirty || paged->unsettled() : document.dirty(); }
+        bool readOnly() const { return paged ? paged->status().readOnly || paged->status().busy : editor.IsReadOnlyEnabled(); }
+        bool canUndo() const { return paged ? paged->status().canUndo && !readOnly() : editor.CanUndo(); }
+        bool canRedo() const { return paged ? paged->status().canRedo && !readOnly() : editor.CanRedo(); }
         std::shared_ptr<LiveDocument> live;
         Document &document;
         size_t id=0;
@@ -96,6 +104,8 @@ class Reader {
     void shortcuts();
     void tools();
     void documents();
+    bool pagedCommand(const std::string &,const Json &);
+    void drawPaged(const std::shared_ptr<Tab> &);
     void dialogs();
     void extensionPanels();
     void openFind(bool replace=false,bool all=false);
@@ -240,6 +250,8 @@ class Reader {
     float textScale_=1.15f;
     double pollAt_=0;
     int line_=1;
+    uint64_t pagedLine_=1;
+    size_t closingPaged_=0, nextPagedId_=size_t(1)<< (sizeof(size_t)*8-2);
     ImGuiID dock_=0, editorDock_=0;
     std::string theme_="graphite", locale_="en", density_="compact", lastError_;
 };

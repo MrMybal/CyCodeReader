@@ -45,9 +45,37 @@ static void acceptance() {
     e.SetReadOnlyEnabled(false);begin("${1:name} $1");
     size_t requested=0;TextEditor::AutoCompleteConfig config;config.triggerOnTyping=false;config.triggerDelay=std::chrono::milliseconds(0);
     config.callback=[&](TextEditor::AutoCompleteState &state) { ++requested;state.suggestions={"new_completion"}; };e.SetAutoCompleteConfig(&config);
-    ImGui::GetIO().AddKeyEvent(ImGuiMod_Ctrl,true);ImGui::GetIO().AddKeyEvent(ImGuiKey_Space,true);frame(e);
-    ImGui::GetIO().AddKeyEvent(ImGuiKey_Space,false);ImGui::GetIO().AddKeyEvent(ImGuiMod_Ctrl,false);frame(e);frame(e);
-    require(!session.active() && requested>0 && e.GetNumberOfCursors()==1,"Explicit completion did not leave the snippet safely");
+    auto explicitCompletion=[&] {
+        const auto before=requested;
+        auto &io=ImGui::GetIO();
+        auto eventModifier=[&](ImGuiKey mod) {
+            // AddKeyEvent receives physical modifiers. Dear ImGui swaps Ctrl /
+            // Command for macOS before exposing the logical shortcut modifiers.
+            if (io.ConfigMacOSXBehaviors && (mod==ImGuiMod_Ctrl || mod==ImGuiMod_Super))
+                return static_cast<ImGuiKey>(mod==ImGuiMod_Ctrl ? ImGuiMod_Super : ImGuiMod_Ctrl);
+            return mod;
+        };
+        for (const auto mod : {ImGuiMod_Ctrl,ImGuiMod_Shift,ImGuiMod_Alt,ImGuiMod_Super})
+            if (config.triggerShortcut & mod) io.AddKeyEvent(eventModifier(mod),true);
+        const auto key=static_cast<ImGuiKey>(config.triggerShortcut & ~ImGuiMod_Mask_);
+        io.AddKeyEvent(key,true);frame(e);
+        io.AddKeyEvent(key,false);
+        for (const auto mod : {ImGuiMod_Ctrl,ImGuiMod_Shift,ImGuiMod_Alt,ImGuiMod_Super})
+            if (config.triggerShortcut & mod) io.AddKeyEvent(eventModifier(mod),false);
+        frame(e);frame(e);
+        require(!session.active() && requested>before && e.GetNumberOfCursors()==1,
+                ("Configured explicit completion did not leave the snippet safely: chord="+
+                    std::to_string(config.triggerShortcut)+" requested="+std::to_string(requested)+
+                    " before="+std::to_string(before)+" active="+std::to_string(session.active())+
+                    " cursors="+std::to_string(e.GetNumberOfCursors())).c_str());
+    };
+    explicitCompletion();
+    begin("${1:name} $1");
+    config.triggerShortcut=ImGuiMod_Ctrl | ImGuiMod_Shift | ImGuiKey_Space;
+    e.SetAutoCompleteConfig(&config);
+    // Dear ImGui resolves shortcut routing between frames. Register the newly
+    // configured chord before injecting it, as in the real preference/input loop.
+    frame(e);frame(e);explicitCompletion();
     e.SetAutoCompleteConfig(nullptr);frame(e);
 }
 int main() {

@@ -8,6 +8,8 @@ Dependencies retain their own licenses and copyright notices.
 | Component | License | Source |
 |---|---|---|
 | JetBrains Mono Regular 2.304 | SIL OFL 1.1 | https://github.com/JetBrains/JetBrainsMono/tree/v2.304 |
+| CyCode Core | GPL-3.0-only | https://github.com/MrMybal/CyCode (core-source.lock.json) |
+| Monocypher 4.0.3 | BSD-2-Clause OR CC0-1.0 | https://monocypher.org/ |
 | CyUI | MIT | https://github.com/MrMybal/CyUI (editor/cyui-source.lock.json) |
 | Dear ImGui | MIT | https://github.com/ocornut/imgui |
 | TextEditor | MIT | https://github.com/goossens/ImGuiColorTextEdit (bundled by pinned CyUI) |
@@ -19,7 +21,9 @@ Dependencies retain their own licenses and copyright notices.
 
 Notices are preserved in licenses/. Exact source revisions and SHA-256 archive
 hashes are in dependencies.lock.json; the immutable CyUI Git revision is in
-editor/cyui-source.lock.json. Downloads remain outside Git in runtime/.
+editor/cyui-source.lock.json; the native Core lock is core-source.lock.json.
+Core copyright is retained in licenses/CyCode-Core.txt, with the full GPL supplied
+in LICENSE. Monocypher retains its complete dual-licence notice in licenses/Monocypher.txt. Downloads remain outside Git in runtime/.
 editor/scripts/prepare_texteditor.py patches only a build-local widget copy;
 original upstream sources and notices remain intact. Windows system fonts are
 loaded when available and are not redistributed. Code views use the bundled,

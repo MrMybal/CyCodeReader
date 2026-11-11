@@ -1,4 +1,41 @@
+# Shared native Core profiles
+
+Reader selects CyCode::TextSession, Documents, TextBridge, Process, Snippets and PagedText through the
+canonical cmake/CyCodeComponents.cmake resolver. The exact Core revision and native
+source API 1 are recorded in core-source.lock.json. Documents, codecs, search,
+text plugins, bounded process ownership, JSON envelopes and loopback transport
+are Core implementations; src/ compatibility headers preserve Reader names.
+The seven old Reader service implementations and earlier utility copies are
+retired. There is one native file/process/session implementation in the graph.
+
+The same BufferState and decode/encode/save primitives are used by the project
+Engine and standalone text profile. Reader keeps standalone paths, UTF-16 and
+Windows-1252 support, read-only state and editor Undo/Redo. It does not initialize
+project/language services or import the full Engine. Syntax remains a CyUI/editor
+presentation service. Native source API 1 and graphical editor API 1 are source
+contracts; they do not promise a stable C++ binary ABI. Existing text plugin C
+ABI 1 remains unchanged and is distinct from project plugin ABI 1/2.
+
+The native dependency cache needs JSON and Monocypher; headless ordinary TextSession does not link the graphical editor. With an explicit development Core, use
+`python scripts/build.py --core-only --core-root <CyCode> --deps <dependency-cache>`.
+The normal resolver uses its immutable published source revision and preserves
+dirty caches. The native service advertises cycode-core/1 through its compatible
+cycodereader-native/1 descriptor. Revisions, disk guards, read-only checks, bounded
+responses and EOF shutdown are enforced by the shared native owner. CyToolsCore
+still owns jobs, identities, permissions and MCP; no parallel scheduler is added.
+
+Reader 671c588 with Core 84e4c78 passed all 17 service/view tests on Windows x64,
+Ubuntu x64 and macOS arm64, plus the separate seven-case headless build. Actual
+plugins, encodings, guarded edits, IPC/EOF, shared editor/syntax, comparison/history,
+filtering and platform/custom snippet completion chords are exercised on runners.
+The existing C++ text plugin ABI is unchanged. This does not establish GPU, IME
+or physical desktop acceptance. See Docs/Validation.md for exact provenance.
+Local application/test execution stays suspended while antivirus removals remain
+unresolved. Production compilation and data checks are separate evidence.
+
 # Architecture
+
+The new shared PagedTextEditor adapter and exact missing common contracts are described in [PagedText.md](PagedText.md). Paged tabs own native LargeText snapshots rather than registering empty ordinary Documents in TextSession.
 
 The original application artwork lives in icons/CyCodeReader.png/.ico, with a
 separate document variant. The SDL/OpenGL shell owns Branding: SDL's PNG loader
@@ -9,7 +46,7 @@ multi-resolution ICOs; Setup uses the application ICO and the PNG in its wizard.
 Only the four approved PNG/ICO files are deployed. The shared editor/native core
 and selected CyUI modules do not gain a rendering or image-module dependency.
 
-src/ owns Reader windows, documents, menus, dialogs and preferences. ReaderCore integrates the real CyToolsCore SDK/MCP through a private Python
+src/ owns Reader windows, document views, menus, dialogs and preferences. ReaderCore integrates the real CyToolsCore SDK/MCP through a private Python
 companion; CyCode project/LSP/VCS/build/debug services remain separate. Reader's
 optional Git plugin provides read-only file comparisons through the generic
 comparison-provider contract, without importing those IDE services.
@@ -63,7 +100,7 @@ cannot consume the SHA-256/parent arguments. Older installed launchers need one
 manual upgrade before this corrected code handles subsequent updates.
 
 
-ReaderCore owns shared LiveDocument entries, native revisions, plugin registrations
+The Core-owned TextSession (ReaderCore source alias) owns shared LiveDocument entries, native revisions, plugin registrations
 and document operations under one recursive mutex. GUI tabs reference those same
 Document objects. IPC handlers never access ImGui. The GUI holds the lock while
 editing, publishes text/revisions, and pulls native updates through LiveEditor as
@@ -73,7 +110,7 @@ adapter has a headless actual-widget test; full desktop acceptance stays separat
 Bridge binds only loopback and authenticates bounded native JSON requests. It is
 private IPC. app/tool.py uses the real CyToolsCore Runtime, schemas, scheduler,
 identities, HTTP service and official MCP adapter. Each GUI process starts one SDK
-companion with distinct reader/writer credentials and endpoint files. NativeProcess
+companion with distinct reader/writer credentials and endpoint files. The shared native Process component
 owns its hidden child-process tree and bounded logs; closing Reader stops it.
 After all dirty-document/save dialogs accept the exit, Reader immediately signals
 SDK/update cancellation. The SDL shell hides the main and detached windows before
@@ -83,7 +120,7 @@ Core, plugins, ImGui and the OpenGL context. The SDK has no unconditional
 two-second wait before its existing process-tree cancellation.
 There is no independent Python document model or recreated MCP scheduler.
 
-Encoding.cpp performs strict UTF-16 surrogate conversion and explicit Windows-1252
+The Core Documents module performs strict UTF-16 surrogate conversion and explicit Windows-1252
 mapping. Document preserves source bytes on no-op saves and tracks pending encoding
 and newline changes as dirty metadata. Shared cycode_files still owns bounded reads
 and atomic disk-baseline/exclusive-create writes.

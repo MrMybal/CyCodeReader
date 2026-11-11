@@ -5,7 +5,7 @@ description: Work with live buffers, Undo and external changes.
 section: Using Reader
 order: 30
 parent: overview
-revision: 3
+revision: 4
 ---
 
 ## Documents {#documents}
@@ -16,7 +16,7 @@ Save checks the original disk baseline and uses guarded atomic replacement. An e
 
 ## Encoding {#encoding}
 
-UTF-8/BOM and UTF-16 LE/BE BOM are detected. Windows-1252 is explicit. [Encoding controls](doc:encoding#convert) change pending format in memory; saving is separate. Files are limited to 4 MiB.
+UTF-8/BOM and UTF-16 LE/BE BOM are detected. Windows-1252 is explicit. [Encoding controls](doc:encoding#convert) change pending format in memory; saving is separate. The ordinary profile is limited to 4 MiB; large UTF-8 files use the [paged profile](doc:paged-text#paged).
 
 ## Layout {#layout}
 

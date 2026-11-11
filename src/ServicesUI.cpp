@@ -12,7 +12,7 @@
 #endif
 namespace cycode::reader {
 void Reader::nativeAction(const std::string &method,Json params) {
-    if (auto tab=active()) { sync(tab);params["id"]=tab->id;params["expectedRevision"]=tab->live->revision;auto result=core_.dispatch(method,params);if (method=="plugins.invoke") { pluginResult_=result.at("result").dump(2);pluginOutput_.setLanguage(cyui::CodeLanguage::json);configureCodeEditor(pluginOutput_,editorFont_);pluginOutput_.setText(pluginResult_);pluginOutput_.setReadOnly(true); }sync(tab); }
+    if (auto tab=active()) { if (tab->paged) throw std::runtime_error(tr("This command requires an ordinary text document."));sync(tab);params["id"]=tab->id;params["expectedRevision"]=tab->live->revision;auto result=core_.dispatch(method,params);if (method=="plugins.invoke") { pluginResult_=result.at("result").dump(2);pluginOutput_.setLanguage(cyui::CodeLanguage::json);configureCodeEditor(pluginOutput_,editorFont_);pluginOutput_.setText(pluginResult_);pluginOutput_.setReadOnly(true); }sync(tab); }
 }
 void Reader::preparePluginLanguages() {
     const auto state=core_.plugins().describe();
@@ -26,8 +26,12 @@ void Reader::preparePluginLanguages() {
             if (definition.contains("providerCommand")) {
                 const auto command=definition.at("providerCommand").get<std::string>();
                 shared.highlight=[this,pluginId,command](std::string_view source) {
-                    std::lock_guard lock(core_.mutex());
-                    return pluginSyntaxTokens(core_.plugins().invoke(pluginId,command,{{"text",std::string(source)}}));
+                    const Json input={{"text",std::string(source)}};
+                    std::function<Json()> call;
+                    { std::lock_guard lock(core_.mutex());call=core_.plugins().prepare(pluginId,command,input); }
+                    // Core pins the DLL and serializes plugin execution without
+                    // retaining the live-document/UI mutex during the callback.
+                    return pluginSyntaxTokens(call());
                 };
             }
             pluginSyntax_[key]=cyui::registerCodeLanguage(shared);
@@ -86,11 +90,11 @@ void Reader::extensionPanels() {
                 const auto pluginId=plugin.at("id").get<std::string>(),name=plugin.at("name").get<std::string>();
                 const auto context=name+" "+pluginId;
                 auto &view=pluginOptions_[pluginId];view.synchronize(plugin);
-                auto commandMatches=[&](const Json &command) { return command.value("kind","")!="syntax" && command.value("kind","")!="service" && pluginsFilter_.matches(command.at("title"),context+" "+command.at("id").get<std::string>()); };
+                auto commandMatches=[&](const Json &command) { return command.value("kind","")!="syntax" && command.value("kind","")!="service" && pluginsFilter_.matches(command.at("title").get_ref<const std::string &>(),context+" "+command.at("id").get<std::string>()); };
                 auto languageMatches=[&](const Json &language) {
                     auto keywords=context+" "+language.at("id").get<std::string>();
                     for (const auto &ext : language.at("extensions")) keywords+=" "+ext.get<std::string>();
-                    return pluginsFilter_.matches(language.at("name"),keywords);
+                    return pluginsFilter_.matches(language.at("name").get_ref<const std::string &>(),keywords);
                 };
                 bool any=pluginsFilter_.matches(name,pluginId);
                 for (const auto &command : plugin.at("commands")) any|=commandMatches(command);
@@ -126,6 +130,7 @@ void Reader::extensionPanels() {
     } else for (auto &[id,view] : pluginOptions_) cancelInspectorDrafts(view.state);
     if (mcpPanel_) {
         const bool visible=ImGui::Begin("CyToolsCore / MCP",&mcpPanel_);
+        if (visible && active() && active()->paged) cyui::callout(cyui::Tone::warning,tr("The SDK/MCP session currently exposes ordinary documents only."));
         if (visible) {
             if (cyui::iconButton(cyui::icon::help,tr("MCP documentation"))) execute("help",{{"page","mcp"}});
             const bool ready=sdk_.valid() && !sdkDescriptor_.empty() && std::filesystem::is_regular_file(sdkDescriptor_);
@@ -138,6 +143,10 @@ void Reader::extensionPanels() {
                 ImGui::SetClipboardText(config.dump(2).c_str());
             }ImGui::EndDisabled();
             cyui::textDim("%s",tr("The read identity cannot edit files or execute plugins. Saving remains explicit."));
+            if (bridge_) {
+                const auto status=bridge_->serviceStatus();
+                cyui::textDim("%s: %s",tr("Native text service"),status.at("service").at("state").get_ref<const std::string &>().c_str());
+            }
             if (cyui::button(tr("Copy logs"))) {
                 std::vector<cyui::LogEntry> rows;serviceLogs_.snapshot(rows,0);std::string text;
                 for (const auto &row : rows) text+=row.text+"\n";
@@ -182,7 +191,7 @@ void Reader::extensionPanels() {
             bool matchingLicense=optionsFilter_.matches("CyCodeReader GPL-3.0-only Copyright", "Licenses "+cyui::tr("Licenses"));
             for (const auto &file : licenses) matchingLicense|=optionsFilter_.matches(pathUtf8(file.filename()),"Licenses "+cyui::tr("Licenses"));
             if (cyui::beginFilteredSection("Licenses",optionsFilter_,matchingLicense,false)) {
-                ImGui::TextWrapped("%s",cyui::tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT."));
+                ImGui::TextWrapped("%s",cyui::tr("CyCodeReader: GPL-3.0-only. Copyright (c) 2026 Cyberalien. This program comes without any warranty. See LICENSE and COPYRIGHT.").c_str());
                 for (const auto &file : licenses) if (optionsFilter_.matches(pathUtf8(file.filename()),"Licenses "+cyui::tr("Licenses"))) {
                     if (ImGui::TreeNode(pathUtf8(file.filename()).c_str())) { const auto text=readTextFileBytes(file);ImGui::TextUnformatted(text.c_str());ImGui::TreePop(); }
                 }

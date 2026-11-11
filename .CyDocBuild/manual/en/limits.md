@@ -5,12 +5,12 @@ description: Understand size, search, plugin and project boundaries.
 section: Using Reader
 order: 190
 parent: overview
-revision: 2
+revision: 3
 ---
 
 ## Scope {#limits}
 
-Reader is a code/text editor, not the complete CyCode IDE. It has no project build system, language servers, semantic refactoring, debugger or recursive folder search. Text files are limited to 4 MiB. Search is literal, with ASCII-only case folding; regex is absent. Crash recovery and complete session/Undo restoration are not supplied. Native plugins are trusted in-process code with no hot unload or sandbox.
+Reader is a code/text editor, not the complete CyCode IDE. It has no project build system, language servers, semantic refactoring, debugger or recursive folder search. Ordinary files are limited to 4 MiB; large UTF-8 files use the [paged profile](doc:paged-text#limits), with its own budgets and capabilities. Search is literal, with ASCII-only case folding; regex is absent. Crash recovery and complete session/Undo restoration are not supplied. Native plugins are trusted in-process code with no hot unload or sandbox.
 
 ## Languages {#translations}
 

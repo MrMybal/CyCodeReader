@@ -15,7 +15,7 @@ int main(int argc,char **argv) {
         require(editor.GetTokenColor({0,7})==TextEditor::Color::declaration,"Plugin type did not color");
         require(editor.GetTokenColor({0,25})==TextEditor::Color::comment,"Plugin comment did not color");
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
-        require(cyui::codeLanguages().size()==101,"Shared syntax catalogue was not linked");
+        require(cyui::codeLanguages().size()==102,"Shared syntax catalogue was not linked");
         const auto definition=sharedPluginLanguage("fixture/config",{{"name","Configuration"},{"extensions",Json::array({".cycfg"})},{"keywords",Json::array({"option"})},{"lineComment","#"}});
         const auto mode=cyui::registerCodeLanguage(definition);cyui::CodeEditor shared;shared.setLanguage(mode);
         shared.setText("option value # comment");shared.refreshSyntax();

@@ -4,6 +4,7 @@
 #include "cycode/Paths.h"
 #include <imgui_stdlib.h>
 #include <algorithm>
+#include <climits>
 
 namespace cycode::reader {
 namespace {
@@ -23,7 +24,7 @@ size_t offsetAt(const std::string &text,TextEditor::DocPos pos) {
 }
 void Reader::openFind(bool replace,bool all) {
     if (const auto tab=active()) {
-        sync(tab);const auto selected=tab->editor.GetCursorText(0);
+        sync(tab);const auto selected=tab->paged ? std::string() : tab->editor.GetCursorText(0);
         if (!selected.empty() && selected.size()<=4096 && selected.find('\n')==std::string::npos) searchQuery_=selected;
         find_.document=tab->id;
     }
@@ -33,6 +34,11 @@ void Reader::openFind(bool replace,bool all) {
 void Reader::rebuildSearch() {
     for (const auto &tab : tabs_) sync(tab);core_.refresh();
     std::string key=Json{{"query",searchQuery_},{"case",find_.sensitive},{"words",find_.words},{"extended",find_.extended},{"selection",find_.selection},{"begin",find_.begin},{"end",find_.end},{"document",active_},{"all",searchPanel_}}.dump();
+    const auto pagedQuery=expandedSearchText(searchQuery_,find_.extended);
+    for (const auto &tab:tabs_) if (tab->paged && (searchPanel_ || tab->id==active_)) {
+        tab->paged->search(pagedQuery,find_.sensitive,find_.words);
+        key+="/paged/"+std::to_string(tab->paged->status().searchGeneration);
+    }
     for (const auto &tab : tabs_) key+="/"+std::to_string(tab->id)+":"+std::to_string(tab->live->revision);
     if (key==find_.key) return;find_.key=key;find_.message.clear();
     searchMatches_={{"matches",Json::array()},{"truncated",false}};searchRows_.clear();searchNavigation_.clear();++searchRowsRevision_;
@@ -41,6 +47,24 @@ void Reader::rebuildSearch() {
     if (query.size()>4096) { find_.message="Search query must contain 1 to 4096 bytes";return; }
     for (const auto &tab : tabs_) {
         if (!searchPanel_ && tab->id!=active_) continue;
+        if (tab->paged) {
+            const auto &status=tab->paged->status();
+            if (status.searching) find_.message="Searching paged text...";
+            if (status.searchedRevision==status.revision) for (const auto &m:status.matches) {
+                if (searchRows_.size()==2000) { searchMatches_["truncated"]=true;break; }
+                const auto id=uiId("paged-search/"+std::to_string(tab->id)+"/"+std::to_string(status.revision)+"/"+std::to_string(m.offset));
+                Json match={{"id",tab->id},{"paged",true},{"revision",status.revision},{"offset",m.offset},{"length",m.length},
+                    {"line",m.range.first().line+1},{"column",m.range.first().character+1},
+                    {"endLine",m.range.last().line},{"endCharacter",m.range.last().character}};
+                // Diagnostics only have int labels. Navigation retains the full 64-bit positions.
+                searchRows_.push_back({id,cyui::LogLevel::info,pathUtf8(tab->path()),m.preview,
+                    static_cast<int>(std::min<uint64_t>(m.range.first().line+1,INT_MAX)),
+                    static_cast<int>(std::min<uint64_t>(m.range.first().character+1,INT_MAX))});
+                searchNavigation_[id]=match;searchMatches_["matches"].push_back(std::move(match));
+            }
+            if (status.truncated) searchMatches_["truncated"]=true;
+            continue;
+        }
         size_t begin=0,end=std::string::npos;
         if (!searchPanel_ && find_.selection) {
             if (find_.document!=tab->id || find_.selectionRevision!=tab->live->revision) { find_.message="Selection changed. Select the search range again.";continue; }
@@ -50,7 +74,7 @@ void Reader::rebuildSearch() {
         for (const auto &m : found.matches) {
             Json match={{"id",tab->id},{"revision",tab->live->revision},{"offset",m.offset},{"length",m.length},{"line",m.line},{"column",m.column}};
             const auto id=uiId("search/"+std::to_string(tab->id)+"/"+std::to_string(tab->live->revision)+"/"+std::to_string(m.offset));
-            const auto source=tab->document.untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->document.path());
+            const auto source=tab->untitled() ? std::string(tr("Untitled"))+" "+std::to_string(tab->id) : pathUtf8(tab->path());
             const auto start=m.offset-m.column+1,stop=tab->document.text().find('\n',m.offset);
             const auto snippet=tab->document.text().substr(start,std::min(size_t(512),(stop==std::string::npos ? tab->document.text().size() : stop)-start));
             searchRows_.push_back({id,cyui::LogLevel::info,source,snippet,static_cast<int>(m.line),static_cast<int>(m.column)});searchNavigation_[id]=match;searchMatches_["matches"].push_back(match);
@@ -60,6 +84,11 @@ void Reader::rebuildSearch() {
 }
 void Reader::navigateSearch(const Json &match,bool focus) {
     const auto tab=find(match.at("id"));if (!tab || tab->live->revision!=match.at("revision")) { find_.key.clear();return; }
+    if (tab->paged) {
+        cyui::PagedCodePosition first{match.at("line").get<uint64_t>()-1,match.at("column").get<uint64_t>()-1};
+        cyui::PagedCodePosition last{match.at("endLine").get<uint64_t>(),match.at("endCharacter").get<uint64_t>()};
+        tab->paged->view().setSelection({first,last});active_=tab->id;tab->focus=focus;return;
+    }
     const auto &text=tab->document.text();const auto at=match.at("offset").get<size_t>(),length=match.at("length").get<size_t>();
     if (at>text.size() || length>text.size()-at) return;
     const auto start=position(text,at,match.at("line"));const auto end=position(text,at+length);
@@ -69,8 +98,9 @@ void Reader::findMatch(bool previous) {
     if (searchQuery_.empty()) { openFind();return; }
     // Local navigation always targets the current editor, even with global results open.
     const auto tab=active();if (!tab) return;sync(tab);core_.refresh();
-    const auto query=normalizeEditorText(expandedSearchText(searchQuery_,find_.extended));
+    const auto query=tab->paged ? expandedSearchText(searchQuery_,find_.extended) : normalizeEditorText(expandedSearchText(searchQuery_,find_.extended));
     if (query.size()>4096) { find_.message="Search query must contain 1 to 4096 bytes";return; }
+    if (tab->paged) { tab->paged->search(query,find_.sensitive,find_.words);tab->paged->find(previous,find_.wrap);return; }
     size_t begin=0,end=std::string::npos;
     if (find_.selection) { if (find_.document!=tab->id || find_.selectionRevision!=tab->live->revision) { find_.message="Selection changed. Select the search range again.";return; }begin=find_.begin;end=find_.end; }
     const auto found=findTextMatches(tab->document.text(),query,find_.sensitive,find_.words,2000,begin,end);
@@ -85,10 +115,20 @@ void Reader::findMatch(bool previous) {
     find_.message.clear();
 }
 void Reader::replaceMatches(bool all) {
-    const auto tab=active();if (!tab || tab->editor.IsReadOnlyEnabled()) return;sync(tab);core_.refresh();
-    const auto query=normalizeEditorText(expandedSearchText(searchQuery_,find_.extended));if (query.empty()) return;
+    const auto tab=active();if (!tab || tab->readOnly()) return;sync(tab);core_.refresh();
+    const auto query=tab->paged ? expandedSearchText(searchQuery_,find_.extended) : normalizeEditorText(expandedSearchText(searchQuery_,find_.extended));if (query.empty()) return;
     if (query.size()>4096) { find_.message="Search query must contain 1 to 4096 bytes";return; }
     const auto replacement=normalizeEditorText(expandedSearchText(find_.replacement,find_.extended));
+    if (tab->paged) {
+        if (all) { find_.message="Replace all is unavailable in paged mode.";return; }
+        tab->paged->search(query,find_.sensitive,find_.words);
+        const auto &status=tab->paged->status();const auto selection=tab->paged->view().selection();
+        const auto hit=std::find_if(status.matches.begin(),status.matches.end(),[&](const auto &m) {
+            return m.range.anchor==selection.first() && m.range.caret==selection.last();
+        });
+        if (status.searchedRevision!=status.revision || hit==status.matches.end()) { tab->paged->find(false,find_.wrap);return; }
+        tab->paged->replace(replacement);find_.key.clear();return;
+    }
     const auto &text=tab->document.text();size_t begin=0,end=text.size();
     if (find_.selection) { if (find_.document!=tab->id || find_.selectionRevision!=tab->live->revision) { find_.message="Selection changed. Select the search range again.";return; }begin=find_.begin;end=find_.end; }
     const auto found=findTextMatches(text,query,find_.sensitive,find_.words,2000,begin,end);
@@ -111,6 +151,7 @@ void Reader::replaceMatches(bool all) {
     find_.key.clear();
 }
 void Reader::updateSearchMarkers(const std::shared_ptr<Tab> &tab) {
+    if (tab->paged) return;
     const bool inSelection=find_.selection && !searchPanel_;
     const auto key=searchQuery_+"/"+std::to_string(searchPanel_)+"/"+std::to_string(tab->editor.GetTextRevision())+"/"+std::to_string(tab->live->revision)+"/"+std::to_string(find_.sensitive)+std::to_string(find_.words)+std::to_string(find_.extended)+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(find_.selection)+":"+std::to_string(find_.document)+":"+std::to_string(find_.selectionRevision)+":"+std::to_string(find_.begin)+":"+std::to_string(find_.end);
     if (tab->searchMarkerKey==key) return;tab->searchMarkerKey=key;
@@ -144,12 +185,14 @@ void Reader::searchWindows() {
             ImGui::Checkbox(tr("Match case"),&find_.sensitive);ImGui::SameLine();ImGui::Checkbox(tr("Whole word"),&find_.words);ImGui::SameLine();ImGui::Checkbox(tr("Wrap around"),&find_.wrap);
             ImGui::Checkbox(tr("Extended escapes"),&find_.extended);cyui::tooltip(tr("Interpret \\n, \\r, \\t and \\\\."));ImGui::SameLine();
             bool selection=find_.selection;
+            ImGui::BeginDisabled(active() && active()->paged);
             if (ImGui::Checkbox(tr("In selection"),&selection)) {
-                if (auto tab=active()) { sync(tab);core_.refresh();const auto s=tab->editor.GetMainCursorSelection();find_.begin=offsetAt(tab->document.text(),s.start);find_.end=offsetAt(tab->document.text(),s.end);find_.selection=selection && find_.end>find_.begin;find_.document=tab->id;find_.selectionRevision=tab->live->revision; }
+                if (auto tab=active();tab && !tab->paged) { sync(tab);core_.refresh();const auto s=tab->editor.GetMainCursorSelection();find_.begin=offsetAt(tab->document.text(),s.start);find_.end=offsetAt(tab->document.text(),s.end);find_.selection=selection && find_.end>find_.begin;find_.document=tab->id;find_.selectionRevision=tab->live->revision; }
             }
+            ImGui::EndDisabled();
             cyui::ScopedDisabled disabled(searchQuery_.empty() || !active());
             if (cyui::primaryButton(tr("Find next")) || enter) findMatch();ImGui::SameLine();if (cyui::button(tr("Find previous"))) findMatch(true);
-            if (find_.replace) { cyui::ScopedDisabled ro(!active() || active()->editor.IsReadOnlyEnabled());ImGui::SameLine();if (cyui::button(tr("Replace"))) replaceMatches(false);ImGui::SameLine();if (cyui::button(tr("Replace all"))) replaceMatches(true); }
+            if (find_.replace) { cyui::ScopedDisabled ro(!active() || active()->readOnly());ImGui::SameLine();if (cyui::button(tr("Replace"))) replaceMatches(false);ImGui::SameLine();if (cyui::button(tr("Replace all"))) replaceMatches(true); }
             if (cyui::button(tr("Find in all open documents"))) { searchPanel_=true;searchFocus_=true;find_.open=false; }
             ImGui::SameLine();if (cyui::button(tr("Clear search marks"))) { searchQuery_.clear();find_.key.clear(); }
             if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsKeyPressed(ImGuiKey_Escape)) find_.open=false;
@@ -168,6 +211,7 @@ void Reader::searchWindows() {
             ImGui::Checkbox(tr("Match case"),&find_.sensitive);ImGui::SameLine();ImGui::Checkbox(tr("Whole word"),&find_.words);
             rebuildSearch();
             ImGui::Text("%zu %s",searchRows_.size(),tr("matches in open documents"));
+            if (!find_.message.empty()) cyui::textDim("%s",tr(find_.message.c_str()));
             if (searchMatches_.value("truncated",false)) cyui::callout(cyui::Tone::warning,tr("Search results limited to 2000 matches."));
             registerFilterOwner(searchResultsFilter_);cyui::FilterOptions field;field.hint="Filter search results...";cyui::filterBox("##result-filter",searchResultsFilter_,field);
             const auto &rows=searchFilteredRows_.rows(searchRows_,searchRowsRevision_,searchResultsFilter_);
@@ -188,7 +232,10 @@ void Reader::searchWindows() {
             if (!searchNavigation_.contains(selectedSearch_) && !rows.empty()) selectedSearch_=rows.front().id;
             if (searchNavigation_.contains(selectedSearch_)) {
                 const auto &match=searchNavigation_.at(selectedSearch_);const auto tab=find(match.at("id"));
-                if (tab && match.at("revision")==tab->live->revision) {
+                if (tab && tab->paged && match.at("revision")==tab->live->revision) {
+                    if (cyui::button(tr("Open result in paged source"))) navigateSearch(match);
+                    cyui::textDim("%s",tr("Paged results open in the source view; no full-text preview copy."));
+                } else if (tab && match.at("revision")==tab->live->revision) {
                     const auto key=match.dump()+find_.key+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(static_cast<int>(tab->codeEditor.language()));
                     if (key!=searchPreviewKey_) {
                         searchPreviewKey_=key;
@@ -209,7 +256,7 @@ void Reader::searchWindows() {
                             ranges.push_back({position(text,m.offset,m.line),position(text,m.offset+m.length)});
                         searchPreview_.native().SetReaderSearchMatches(std::move(ranges),cyui::palette().warning);
                     }
-                    if (cyui::button(tr("Open result"))) navigateSearch(match);ImGui::SameLine();cyui::textDim("%s",tab->document.untitled() ? tr("Untitled") : pathUtf8(tab->document.path()).c_str());
+                    if (cyui::button(tr("Open result"))) navigateSearch(match);ImGui::SameLine();cyui::textDim("%s",tab->untitled() ? tr("Untitled") : pathUtf8(tab->path()).c_str());
                     searchPreview_.draw("##search-preview");
                 }
             } else cyui::textDim("%s",searchQuery_.empty() ? tr("Type to search all open documents, including unsaved buffers.") : tr("No matches"));

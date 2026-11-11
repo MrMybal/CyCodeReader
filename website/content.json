@@ -40,8 +40,8 @@
     "fr": "Chapitres de la page"
   },
   "hero.status": {
-    "en": "BETA · 0.1.6 · Windows x64",
-    "fr": "BÊTA · 0.1.6 · Windows x64"
+    "en": "BETA · 0.1.7 in preparation · Windows x64",
+    "fr": "BÊTA · 0.1.7 en préparation · Windows x64"
   },
   "hero.heading": {
     "en": "Your files. Your workspace.",
@@ -144,8 +144,8 @@
     "fr": "Enregistrer explicitement"
   },
   "editor.three.body": {
-    "en": "Undo/Redo stays in the live document. Guarded atomic saves check disk changes; encoding conversions refuse lossy replacements. Text files are limited to 4 MiB.",
-    "fr": "Annulation et rétablissement restent dans le document actif. Les écritures atomiques contrôlent les changements sur disque ; les conversions refusent les pertes de caractères. Les fichiers texte sont limités à 4 Mio."
+    "en": "Version 0.1.7 adds asynchronous native paging for UTF-8 files above 4 MiB, with Undo/Redo, search and full guarded saves. Small files keep the ordinary editor. Paged mode has explicit feature and recovery limits; the public download remains 0.1.6.",
+    "fr": "La 0.1.7 ajoute des pages natives asynchrones pour les UTF-8 de plus de 4 Mio, avec Annuler/Rétablir, recherche et sauvegardes intégrales contrôlées. Les petits fichiers gardent l’éditeur ordinaire. Le mode paginé a des limites de fonctions et de récupération explicites ; le téléchargement public reste la 0.1.6."
   },
   "editor.guide": {
     "en": "Editing and saving guide",

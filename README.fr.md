@@ -13,7 +13,7 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Licence de l’application</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.1.6</strong></a><br><strong>BÊTA</strong></p>
+      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.6.fr.md"><strong>0.1.6</strong></a><br><strong>BÊTA</strong></p>
       <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.6/CyCodeReader-0.1.6-windows-x64-portable.zip">ZIP portable</a></p>
     </td>
   </tr>
@@ -32,7 +32,7 @@ indépendamment de l’IDE CyCode.
 > et conserve les améliorations de police, zoom, couleurs et recherche de la 0.1.5.
 > Si la 0.1.4 ou la 0.1.5 affiche **Invalid update arguments**, fermez Reader puis
 > lancez manuellement l’installateur actuel une fois. La validation interactive et
-> de l’installation reste en cours. Consultez les [notes et la récupération](VERSION.fr.md).
+> de l’installation reste en cours. Consultez les [notes et la récupération](Docs/Releases/v0.1.6.fr.md).
 
 [![CyCodeReader avec coloration C++, onglets, barre d’outils et minimap](Docs/images/editor.png)](Docs/images/editor.png)
 
@@ -61,6 +61,16 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 | **Comparaison en lecture seule** | **Historique de fichier Git** |
 | [![Comparaison côte à côte avec coloration syntaxique](Docs/images/compare.png)](Docs/images/compare.png) | [![Révisions d’un fichier d’exemple et différences du commit sélectionné](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
+## Préparation de la 0.1.7 (non publiée)
+
+Les sources épinglent Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
+et CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. L’éditeur paginé
+natif partagé ouvre les grands UTF-8 avec pages asynchrones, Annuler/Rétablir,
+recherche et sauvegardes intégrales en streaming. Les binaires publics 0.1.6
+précèdent cette intégration. La version des sources est 0.1.7 bêta ; les liens
+de téléchargement restent ceux de la 0.1.6 publiée. Voir les [notes 0.1.7](VERSION.fr.md)
+et [architecture, budgets et contrats manquants](Docs/PagedText.md).
+
 ## Fonctionnalités
 
 - **Édition** : annulation/rétablissement, curseurs multiples, repli du code,
@@ -80,13 +90,13 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 - **Formats** : UTF-8/BOM, UTF-16 LE/BE BOM, Windows-1252 explicite et conversion
   LF/CRLF/CR. L’enregistrement reste explicite ; les écritures atomiques contrôlent
   les changements externes et refusent les conversions destructives. Les fichiers
-  texte sont limités à 4 Mio.
+  ordinaires sont limités à 4 Mio ; les grands UTF-8 utilisent le profil paginé.
 - **Extensions** : manifestes et plugins natifs ABI 1 ajoutent commandes, options
   typées et syntaxes, dont des moteurs natifs et fournisseurs de comparaisons.
   Un redémarrage est nécessaire ; les plugins natifs sont du code de confiance
   exécuté dans le processus.
 - **Automatisation et aide** : le SDK/MCP CyToolsCore optionnel accède aux mêmes
-  documents actifs et contrôles de révision. F1 ouvre le manuel CyDoc illustré
+  documents ordinaires et contrôles de révision ; le pont paginé reste à fournir. F1 ouvre le manuel CyDoc illustré
   local. Le compagnon privé Python/SDK s’installe séparément.
 
 La recherche est littérale, avec une comparaison de casse limitée à l’ASCII.
@@ -169,6 +179,11 @@ les tests natifs et ne lancent pas l’application. `--core-only` compile les se
 de documents/extraits sans SDL/ImGui/CyUI ; il ne produit pas l’interface. L’édition
 elle-même ne nécessite aucun runtime Python.
 
+Reader utilise aussi l’API source native CyCode épinglée dans core-source.lock.json.
+Documents, encodages, recherche active, plugins texte, processus et transport local
+sont des composants du Core. Le profil autonome demande seulement JSON et ne
+compile pas les services de projet ou de langage.
+
 Le [guide de développement](Docs/Development.md) détaille les options de compilation,
 l’intégration de l’éditeur partagé, les paquets et la configuration optionnelle du
 wheel CyToolsCore verrouillé. La [génération documentaire](.CyDocBuild/README.md)
@@ -194,6 +209,8 @@ conservent leurs propres conditions.
 
 | Bibliothèque · sources | Licence · texte | Utilisation / périmètre |
 | --- | --- | --- |
+| [CyCode Core](https://github.com/MrMybal/CyCode) | [GPL-3.0-only](licenses/CyCode-Core.txt) · [GPL complète](LICENSE) | Documents natifs, session/transport texte, processus et stockage paginé partagés. |
+| [Monocypher](https://monocypher.org/) | [BSD-2-Clause OR CC0-1.0](licenses/Monocypher.txt) | Validation des contenus natifs immuables. |
 | [CyUI](https://github.com/MrMybal/CyUI) | [MIT](licenses/CyUI.txt) | Interface native modulaire, éditeur de code, commandes filtrables, diagnostics et comparaisons. |
 | [Dear ImGui](https://github.com/ocornut/imgui) · [TextEditor](https://github.com/goossens/ImGuiColorTextEdit) | [MIT](licenses/DearImGui.txt) · [MIT](licenses/TextEditor.txt) | Widgets natifs et moteur d’édition unique fourni par CyUI. |
 | [SDL3](https://github.com/libsdl-org/SDL) | [zlib](licenses/SDL3.txt) | Fenêtres natives, saisie et intégration du rendu. |
@@ -224,7 +241,8 @@ l’accès à une dépendance privée.
 - [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview) · [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview).
 - [Notes de version](VERSION.fr.md) · [Téléchargements](https://github.com/MrMybal/CyCodeReader/releases).
 - [Dépôt des sources](https://github.com/MrMybal/CyCodeReader) · [Suivi des problèmes](https://github.com/MrMybal/CyCodeReader/issues).
-- [CyCode](https://github.com/MrMybal/CyCode) — l’IDE indépendant qui consomme la même bibliothèque source `editor/`.
+- [CyCode Core](https://github.com/MrMybal/CyCode) — le moteur natif commun pour les documents et projets.
+- [CyCodeIDE](https://github.com/MrMybal/CyCodeIDE) — l’IDE qui utilise Core et la même bibliothèque graphique `editor/`.
 
 <details>
 <summary><strong>AI Usage</strong></summary>

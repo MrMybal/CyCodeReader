@@ -130,3 +130,11 @@ The original application, showcase and artwork retain
 [GPL-3.0-only](../LICENSE); see [COPYRIGHT](../COPYRIGHT). The complete manual retains
 its CyDoc MIT and other dependency notices. It uses image/gallery, with no Three.js
 runtime. See [third-party notices](../THIRD_PARTY_NOTICES.md).
+
+## Prepared and published versions
+
+config.json version follows the source/CMake version. publishedVersion identifies
+the already available release used by releases/setup/portable links. During 0.1.7
+preparation, these links remain on published 0.1.6; the hero explicitly announces
+the preparation status. The builder validates the release/download version pair.
+Building a local showcase does not authorize deployment or enable any workflow.
