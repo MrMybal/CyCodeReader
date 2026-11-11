@@ -59,7 +59,12 @@ SyntaxColours syntaxColours(const std::string &) {
         cyui::tokenColor(R::string),cyui::tokenColor(R::comment),cyui::tokenColor(R::preprocessor),
         cyui::tokenColor(R::function),cyui::tokenColor(R::preprocessor),cyui::tokenColor(R::type)};
 }
-void configureCodeEditor(cyui::CodeEditor &editor) {
+void configureCodeEditor(cyui::CodeEditor &editor, ImFont *font) {
+#ifdef CYUI_CODE_TEXT_PRESENTATION
+    (void)font; // Core owns the bundled code font in current CyUI.
+#else
+    editor.native().SetReaderFont(font);
+#endif
     editor.native().SetPaletteTransform([](TextEditor::Palette &colors) {
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
         const auto shared=colors;
@@ -72,11 +77,12 @@ void configureCodeEditor(cyui::CodeEditor &editor) {
 }
 TextEditor::Palette editorColours(const std::string &key) {
     const auto &p=cyui::palette(); const auto syntax=syntaxColours(key);
-    const std::array<ImU32,18> inputs={p.bg0,p.bg1,p.text,p.textFaint,p.accent,p.selection,p.lineStrong,p.error,p.accentText,
+    const auto foreground=cyui::tokenColor(cyui::TokenRole::text);
+    const std::array<ImU32,19> inputs={foreground,p.bg0,p.bg1,p.text,p.textFaint,p.accent,p.selection,p.lineStrong,p.error,p.accentText,
         syntax.keyword,syntax.type,syntax.number,syntax.string,syntax.comment,syntax.preprocessor,syntax.function,syntax.macro,syntax.attribute};
-    static std::array<ImU32,18> last{}; static TextEditor::Palette cached; static bool initialized=false;
+    static std::array<ImU32,19> last{}; static TextEditor::Palette cached; static bool initialized=false;
     if (initialized && inputs==last) return cached;
-    TextEditor::Palette result; result.fill(p.text);
+    TextEditor::Palette result; result.fill(foreground);
     auto set=[&](TextEditor::Color role,ImU32 colour) { result[size_t(role)]=colour; };
     set(TextEditor::Color::background,p.bg0);
     set(TextEditor::Color::keyword,syntax.keyword);
@@ -90,11 +96,11 @@ TextEditor::Palette editorColours(const std::string &key) {
     set(TextEditor::Color::attribute,syntax.attribute);
     set(TextEditor::Color::knownIdentifier,syntax.macro);
     set(TextEditor::Color::inactive,p.textFaint);
-    set(TextEditor::Color::parameter,p.text);
-    set(TextEditor::Color::field,p.text);
+    set(TextEditor::Color::parameter,foreground);
+    set(TextEditor::Color::field,foreground);
     set(TextEditor::Color::enumerator,syntax.type);
     set(TextEditor::Color::selection,p.selection);
-    set(TextEditor::Color::cursor,p.text);
+    set(TextEditor::Color::cursor,foreground);
     set(TextEditor::Color::lineNumber,p.textFaint);
     set(TextEditor::Color::currentLineNumber,p.accent);
     set(TextEditor::Color::currentLineHighlight,p.bg1);

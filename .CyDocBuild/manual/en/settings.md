@@ -5,7 +5,7 @@ description: Set themes, text size and saved view preferences.
 section: Using Reader
 order: 90
 parent: editing
-revision: 2
+revision: 3
 ---
 
 ## Appearance {#appearance}
@@ -15,3 +15,5 @@ View selects English/French, a theme, text size, wrapping, whitespace and minima
 ## Storage {#storage}
 
 Portable/development settings are beside the application under `data/reader`. Installed builds use `%LOCALAPPDATA%/CyCodeReader/reader`. Close instances before moving installation files or manually inspecting preferences. Uninstall preserves per-user settings.
+
+Ctrl + mouse wheel adjusts only the hovered code editor, preview or comparison (50–300%). The View text-size setting controls the interface more broadly. Per-view zoom is temporary; saved interface preferences remain separate.

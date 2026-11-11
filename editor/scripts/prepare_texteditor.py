@@ -74,6 +74,33 @@ def prepare(source, destination):
         ('\t\trenderScrollbarMiniMap();','\t\trenderScrollbarMiniMap();\n\t\tif (readerSearchVersion==transactions.getVersion()) {\n\t\t\tconst auto origin=ImGui::GetWindowPos();\n\t\t\tconst auto window=ImGui::GetCurrentWindow();\n\t\t\tconst auto rail=ImGui::GetWindowScrollbarRect(window,ImGuiAxis_Y);\n\t\t\tfor (const auto &match : readerSearch) {\n\t\t\t\tif (match.start.line>=document.size()) continue;\n\t\t\t\tconst auto row=document[match.start.line].row;\n\t\t\t\tif (config.showMiniMap && row>=firstMiniMapRow && row<lastMiniMapRow) {\n\t\t\t\t\tconst auto y=origin.y+(row-firstMiniMapRow)*miniMapRowHeight;\n\t\t\t\t\tdrawList->AddRectFilled(ImVec2(origin.x+miniMapOffset,y),ImVec2(origin.x+miniMapOffset+miniMapWidth,y+std::max(1.f,miniMapRowHeight*.65f)),readerSearchColor);\n\t\t\t\t}\n\t\t\t\tif (window->ScrollbarY) {\n\t\t\t\t\tconst float y=rail.Min.y+rail.GetHeight()*float(row)/float(std::max(size_t(1),typeSetter.getRowCount()));\n\t\t\t\t\tdrawList->PushClipRect(rail.Min,rail.Max,false);drawList->AddRectFilled(ImVec2(rail.Min.x,y),ImVec2(rail.Max.x,y+std::max(2.f,fontScaleDpi)),readerSearchColor);drawList->PopClipRect();\n\t\t\t\t}\n\t\t\t}\n\t\t}')
     ]
 
+    # Older published CyUI pins keep the compatibility path; new CyUI owns it.
+    if "void SetFontScale(float value);" not in (source/"TextEditor.h").read_text("utf-8"):
+        # Host font/zoom and scope guides are compatibility patches to the same
+        # build-local backend. Never mutate the locked CyUI checkout.
+        edits['TextEditor.h'] += [
+            ('\tvoid renderSelections();', '\tvoid renderSelections();\n\tImFont *readerFont=nullptr;\n\tfloat readerTextScale=1.f;'),
+            ('\tvoid SetLanguage(const Language* language);', '\tvoid SetLanguage(const Language* language);\n\tvoid SetReaderFont(ImFont *value) { readerFont=value; }\n\tfloat GetReaderTextScale() const { return readerTextScale; }')
+        ]
+        edits['TextEditor.cpp'] += [
+            ('\t\t// get font information', '''\t\t// Ctrl+wheel belongs only to the hovered text surface, including previews.
+            auto &readerIo=ImGui::GetIO();
+            const auto previousScale=readerTextScale;
+            if (ImGui::IsWindowHovered() && readerIo.KeyCtrl && !readerIo.KeyAlt && !readerIo.KeyShift && readerIo.MouseWheel!=0.f) {
+                readerTextScale=std::clamp(readerTextScale+readerIo.MouseWheel*.1f,.5f,3.f);
+                ImGui::SetKeyOwner(ImGuiKey_MouseWheelY,ImGui::GetCurrentWindow()->ID);
+            }
+            const auto previousHeight=glyphSize.y;
+            ImGui::PushFont(readerFont,ImGui::GetStyle().FontSizeBase*readerTextScale);
+            // get font information'''),
+            ('\t\t// determine current position and visible size', '''\t\tif (previousScale!=readerTextScale && previousHeight>0.f)
+                ImGui::SetScrollY(ImGui::GetScrollY()*glyphSize.y/previousHeight);
+            // determine current position and visible size'''),
+            ('\t}\n\n\tImGui::EndChild();', '\t\tImGui::PopFont();\n\t}\n\n\tImGui::EndChild();'),
+            ('if (bracket->visible && bracket->end.line - bracket->start.line > 1) {',
+             "if (bracket->visible && bracket->end.line - bracket->start.line > 1 && document[bracket->start.line][bracket->start.index].codepoint == '{') {"),
+        ]
+
     destination.mkdir(parents=True, exist_ok=True)
     for name, replacements in edits.items():
         content = (source/name).read_text('utf-8')
@@ -139,7 +166,8 @@ void TextEditor::SetSemanticTokens(const std::vector<SemanticToken>& tokens) {
     for (const auto &token : tokens) for (size_t i=token.start;i<token.end;++i) {
         auto &glyph=document[token.line][i];
         const auto lexical=syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : glyph.color;
-        if (token.color != Color::inactive && (lexical == Color::comment || lexical == Color::string)) continue;
+        // Comments/strings retain their shared lexical color, including in inactive code.
+        if (lexical == Color::comment || lexical == Color::string) continue;
         if (token.color == Color::declaration && lexical == Color::keyword) continue;
         glyph.semanticColor=token.color;
     }

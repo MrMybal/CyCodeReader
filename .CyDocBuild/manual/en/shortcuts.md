@@ -5,7 +5,7 @@ description: Find the editor, search, palette and help shortcuts.
 section: Using Reader
 order: 60
 parent: overview
-revision: 2
+revision: 3
 ---
 
 ## Keys {#shortcuts}
@@ -18,6 +18,7 @@ revision: 2
 | Ctrl+F / Ctrl+H | Find / replace window |
 | F3 / Shift+F3 | Next / previous match |
 | Ctrl+Shift+F | Search open documents |
+| Ctrl + mouse wheel | Scale text in the hovered code view (50–300%) |
 | Ctrl+G | Go to line |
 | Ctrl+P / Ctrl+Shift+P | Open-file / action palette |
 | F1 / Shift+F1 | Manual / contextual help |

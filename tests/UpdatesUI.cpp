@@ -37,12 +37,17 @@ struct ReaderUpdateTests {
                 reader.updateOnExit_=reader.preparedUpdate_;
                 ImGui::NewFrame();reader.requestQuit();reader.dialogs();
                 require(!reader.shouldQuit() && reader.closeId_!=0 && reader.pendingUpdate().has_value(),"Update bypassed dirty-document close guard");
+                require(!reader.sdkStop_ && !reader.updateCancel_,"Pending dirty-document confirmation stopped services");
                 reader.resolveClose("cancel");ImGui::Render();
                 require(!reader.pendingUpdate() && !reader.shouldQuit(),"Cancel did not cancel update handoff");
                 require(reader.state().at("documents")==before,"Cancel changed unsaved document");
+                require(!reader.sdkStop_ && !reader.updateCancel_,"Cancelled exit stopped services");
                 reader.updateOnExit_=reader.preparedUpdate_;
                 ImGui::NewFrame();reader.requestQuit();reader.dialogs();reader.resolveClose("discard");ImGui::Render();
                 require(reader.shouldQuit() && reader.pendingUpdate().has_value(),"Explicit guarded close lost update handoff");
+                require(reader.sdkStop_ && reader.updateCancel_,"Confirmed exit did not immediately cancel SDK/update workers");
+                reader.requestQuit();
+                require(reader.shouldQuit() && reader.sdkStop_ && reader.updateCancel_,"Repeated exit reset shutdown cancellation");
             }
             ImGui::DestroyContext();std::filesystem::remove_all(root);
             std::cout<<"Offline updates UI: EN/FR, dark/light, DPI, unchanged documents and cancelled/confirmed handoff passed without windows or network.\n";return 0;

@@ -1,5 +1,15 @@
 # Search and the default editor layout
 
+Code tabs, global-search previews and plugin text views use the bundled JetBrains
+Mono Regular 2.304 font. Ctrl+mouse wheel over a text view changes its font size
+from 50% to 300%, independently of menus and other views. Ordinary wheel scrolling
+is unchanged. Code ligatures are not shaped by the current renderer.
+
+Global-search previews highlight every matching term, including after query,
+case/whole-word or theme changes. Global marks ignore a previous local selection
+scope. Multiline parenthesis arguments keep matching-pair backgrounds without a
+vertical scope guide through the identifiers; brace block guides remain.
+
 Reader starts with the graphite theme, compact toolbar, document tabs, line
 numbers, status bar and minimap. The file sidebar, wrapping and whitespace marks
 are initially hidden. The toolbar displays the application logo without a name

@@ -7,6 +7,7 @@ Dependencies retain their own licenses and copyright notices.
 
 | Component | License | Source |
 |---|---|---|
+| JetBrains Mono Regular 2.304 | SIL OFL 1.1 | https://github.com/JetBrains/JetBrainsMono/tree/v2.304 |
 | CyUI | MIT | https://github.com/MrMybal/CyUI (editor/cyui-source.lock.json) |
 | Dear ImGui | MIT | https://github.com/ocornut/imgui |
 | TextEditor | MIT | https://github.com/goossens/ImGuiColorTextEdit (bundled by pinned CyUI) |
@@ -21,7 +22,9 @@ hashes are in dependencies.lock.json; the immutable CyUI Git revision is in
 editor/cyui-source.lock.json. Downloads remain outside Git in runtime/.
 editor/scripts/prepare_texteditor.py patches only a build-local widget copy;
 original upstream sources and notices remain intact. Windows system fonts are
-loaded when available and are not redistributed; other platforms use fallbacks.
+loaded when available and are not redistributed. Code views use the bundled,
+unmodified JetBrains Mono Regular; the SIL OFL and copyright notice are retained
+in licenses/JetBrainsMono-OFL.txt. Other interface text uses platform fallbacks.
 Binary distribution still requires a complete transitive notice/package audit.
 
 

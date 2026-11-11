@@ -46,7 +46,7 @@ def allowed(name):
                      'THIRD_PARTY_NOTICES.md'} or
             (len(parts) == 1 and name.endswith('.dll')) or
             (len(parts) > 1 and parts[0] in {'locales', 'licenses', 'plugins', 'app', 'help', 'Documentation'}) or
-            name in {'icons/CyCodeReader.png', 'icons/CyCodeReader.ico',
+            name in {'fonts/JetBrainsMono-Regular.ttf', 'icons/CyCodeReader.png', 'icons/CyCodeReader.ico',
                      'icons/CyCodeReader-document.png', 'icons/CyCodeReader-document.ico'})
 
 
@@ -139,6 +139,7 @@ def main():
         subprocess.run([find_cmake(build), '--install', str(build), '--config',
                         args.configuration, '--prefix', str(stage)], check=True)
         for name in ('CyCodeReader.exe', 'CyCodeReaderUpdater.exe', 'locales/ui.json',
+                     'fonts/JetBrainsMono-Regular.ttf', 'licenses/JetBrainsMono-OFL.txt',
                      'LICENSE', 'COPYRIGHT', 'msvcp140.dll', 'vcruntime140.dll',
                      'icons/CyCodeReader.png', 'icons/CyCodeReader.ico',
                      'icons/CyCodeReader-document.png', 'icons/CyCodeReader-document.ico',

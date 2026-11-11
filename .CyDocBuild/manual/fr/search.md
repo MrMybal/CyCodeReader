@@ -5,7 +5,7 @@ description: Choisissez le document courant ou tous les documents ouverts.
 section: Utiliser Reader
 order: 50
 parent: overview
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Chercher dans un document {#find}
@@ -19,3 +19,5 @@ Les correspondances sont des surbrillances et repères de minicarte/défilement,
 Ctrl+Shift+F cherche dans tous les textes ouverts, y compris sans fichier, non enregistrés et en lecture seule. Il ne parcourt pas récursivement un dossier de projet. Choisissez un résultat pour son aperçu, puis double-cliquez ou ouvrez-le pour activer sa source. Les filtres restreignent chemins et texte. Modifier la source invalide les anciennes positions ; actualisez la recherche.
 
 Les requêtes acceptent jusqu’à 4096 octets et les résultats sont tronqués au-delà de 2000 correspondances. Ctrl+P ouvre la palette des fichiers ; Ctrl+Shift+P celle des actions. Les [filtres de menus](doc:filtering#filters) ont un focus et une requête indépendants.
+
+L’aperçu de la source sélectionnée surligne toutes les occurrences de la requête selon les options de casse et de mot entier. Ces surbrillances suivent les changements de requête et apparaissent aussi dans l’éditeur source ; une ancienne sélection limitée à un document ne restreint pas les repères de recherche globale.

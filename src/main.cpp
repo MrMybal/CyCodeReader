@@ -11,6 +11,16 @@
 #include <shellapi.h>
 #endif
 namespace {
+// The native shell hides every Reader window before Reader joins its services.
+// Construct after Reader so this also runs first during exception unwinding.
+struct HideReaderWindowsOnExit {
+    ~HideReaderWindowsOnExit() {
+        int count=0;
+        auto windows=SDL_GetWindows(&count);
+        for (int i=0; windows && i<count; ++i) SDL_HideWindow(windows[i]);
+        SDL_free(windows);
+    }
+};
 std::vector<std::string> arguments(int argc,char **argv) {
     std::vector<std::string> result;
 #ifdef _WIN32
@@ -97,6 +107,7 @@ int main(int argc,char **argv) {
         if (hidden) { ImGui::GetPlatformIO().Platform_ShowWindow=[](ImGuiViewport *) {}; ImGui::GetPlatformIO().Platform_SetWindowFocus=[](ImGuiViewport *) {}; }
         {
             reader::Reader app(std::move(options),window);
+            HideReaderWindowsOnExit hideWindows;
             for (int frame=0; !app.shouldQuit(); ++frame) {
                 SDL_Event event;
                 while (SDL_PollEvent(&event)) {
@@ -105,6 +116,7 @@ int main(int argc,char **argv) {
                     if (event.type==SDL_EVENT_QUIT || (event.type==SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID==SDL_GetWindowID(window))) app.requestQuit();
                     if (event.type==SDL_EVENT_DROP_FILE && event.drop.data) app.open(utf8Path(event.drop.data));
                 }
+                if (app.shouldQuit()) break;
                 ImGui_ImplOpenGL3_NewFrame(); ImGui_ImplSDL3_NewFrame();
                 for (const auto &action : script) if (action.at("frame")==frame) {
                     if (action.at("command")=="keys") for (const auto &value : action.at("keys")) {
@@ -119,7 +131,9 @@ int main(int argc,char **argv) {
                 }
                 ImGui::NewFrame();
                 for (const auto &action : script) if (action.at("frame")==frame && action.at("command")!="keys" && action.at("command")!="text") app.testAction(action);
-                app.frame(); ImGui::Render(); SDL_GL_MakeCurrent(window,context);
+                app.frame(); ImGui::Render();
+                if (app.shouldQuit()) break;
+                SDL_GL_MakeCurrent(window,context);
                 int width=0,height=0; SDL_GetWindowSizeInPixels(window,&width,&height); glViewport(0,0,width,height);
                 const auto ground=cyui::vec(cyui::palette().bg0); glClearColor(ground.x,ground.y,ground.z,1); glClear(GL_COLOR_BUFFER_BIT);
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

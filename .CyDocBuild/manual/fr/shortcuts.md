@@ -5,7 +5,7 @@ description: Retrouvez les raccourcis d’édition, recherche, palettes et aide.
 section: Utiliser Reader
 order: 60
 parent: overview
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Touches {#shortcuts}
@@ -18,6 +18,7 @@ sourceRevision: 2
 | Ctrl+F / Ctrl+H | Fenêtre de recherche / remplacement |
 | F3 / Shift+F3 | Correspondance suivante / précédente |
 | Ctrl+Shift+F | Recherche dans les documents ouverts |
+| Ctrl + molette | Régler le texte de la vue de code survolée (50–300 %) |
 | Ctrl+G | Atteindre une ligne |
 | Ctrl+P / Ctrl+Shift+P | Palette des fichiers / des actions |
 | F1 / Shift+F1 | Manuel / aide contextuelle |

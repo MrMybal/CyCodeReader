@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(CyCodeReader VERSION 0.1.4 LANGUAGES C CXX)
+project(CyCodeReader VERSION 0.1.5 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -133,6 +133,8 @@ if(CYCODE_READER_BUILD_GUI)
   endif()
   add_executable(CyCodeReader src/main.cpp)
   set_property(TARGET CyCodeReader APPEND PROPERTY LINK_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/fonts/JetBrainsMono-Regular.ttf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/licenses/JetBrainsMono-OFL.txt"
     "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader.png"
     "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader.ico"
     "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader-document.png"
@@ -176,6 +178,8 @@ if(CYCODE_READER_BUILD_GUI)
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/app/tool.py" "${CMAKE_CURRENT_SOURCE_DIR}/app/contracts.py" "${CMAKE_CURRENT_SOURCE_DIR}/app/CyTool.json" "$<TARGET_FILE_DIR:CyCodeReader>/app"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_BINARY_DIR}/plugins" "$<TARGET_FILE_DIR:CyCodeReader>/plugins"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/licenses" "$<TARGET_FILE_DIR:CyCodeReader>/licenses"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:CyCodeReader>/fonts"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/fonts/JetBrainsMono-Regular.ttf" "$<TARGET_FILE_DIR:CyCodeReader>/fonts"
     COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:CyCodeReader>/icons"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader.png" "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader.ico" "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader-document.png" "${CMAKE_CURRENT_SOURCE_DIR}/icons/CyCodeReader-document.ico" "$<TARGET_FILE_DIR:CyCodeReader>/icons"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" "${CMAKE_CURRENT_SOURCE_DIR}/COPYRIGHT" "${CMAKE_CURRENT_SOURCE_DIR}/THIRD_PARTY_NOTICES.md" "$<TARGET_FILE_DIR:CyCodeReader>")
@@ -189,6 +193,7 @@ if(CYCODE_READER_BUILD_GUI)
   install(FILES locales/ui.json DESTINATION locales)
   install(DIRECTORY app/ DESTINATION app FILES_MATCHING PATTERN "*.py" PATTERN "*.json")
   install(DIRECTORY "${CMAKE_BINARY_DIR}/plugins/" DESTINATION plugins FILES_MATCHING PATTERN "*.json" PATTERN "*.dll" PATTERN "*.so" PATTERN "*.dylib")
+  install(FILES fonts/JetBrainsMono-Regular.ttf DESTINATION fonts)
   install(DIRECTORY licenses/ DESTINATION licenses)
   install(FILES icons/CyCodeReader.png icons/CyCodeReader.ico icons/CyCodeReader-document.png icons/CyCodeReader-document.ico DESTINATION icons)
 endif()

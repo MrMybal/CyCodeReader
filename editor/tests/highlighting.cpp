@@ -110,6 +110,9 @@ static void acceptance() {
     applySemanticHighlights(editor,tokens,true);
     require(editor.GetDisplayColor({0,8})==Color::identifier && editor.GetDisplayColor({1,6})==Color::declaration,"Semantic variables and aliases override lexical guesses");
     require(editor.GetTokenColor({0,8})==Color::declaration && editor.GetDisplayColor({2,3})==Color::comment,"Display overlays preserve lexical/completion and comment state");
+    editor.SetSemanticTokens({{2,3,7,Color::inactive}});
+    require(editor.GetDisplayColor({2,3})==Color::comment,"Inactive semantic spans must preserve green comments");
+    applySemanticHighlights(editor,tokens,true);
     bool invalid=false; try { editor.SetSemanticTokens({{0,0,999,Color::function}}); } catch (...) { invalid=true; }
     require(invalid && editor.GetDisplayColor({1,6})==Color::declaration,"Malformed overlay rejected atomically");
     editor.SelectAll(); editor.ReplaceTextInCurrentCursor(overlay+"int Next;\n");

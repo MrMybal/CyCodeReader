@@ -11,6 +11,6 @@ struct SyntaxColours {
 SyntaxColours syntaxColours(const std::string &key);
 TextEditor::Palette editorColours(const std::string &key);
 // Add the application's extra token roles to the common CodeEditor renderer.
-void configureCodeEditor(cyui::CodeEditor &editor);
+void configureCodeEditor(cyui::CodeEditor &editor, ImFont *font=nullptr);
 ImU32 readableText(ImU32 foreground, std::initializer_list<ImU32> backgrounds);
 } // namespace cycode

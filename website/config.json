@@ -1,10 +1,10 @@
 {
   "name": "CyCodeReader",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "repository": "https://github.com/MrMybal/CyCodeReader",
-  "releases": "https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.4",
-  "portable": "https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.4/CyCodeReader-0.1.4-windows-x64-portable.zip",
-  "setup": "https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.4/CyCodeReader-0.1.4-windows-x64-setup.exe",
+  "releases": "https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.5",
+  "portable": "https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.5/CyCodeReader-0.1.5-windows-x64-portable.zip",
+  "setup": "https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.5/CyCodeReader-0.1.5-windows-x64-setup.exe",
   "assets": {
     "logo.png": "icons/CyCodeReader.png",
     "editor.png": "Docs/images/editor.png",

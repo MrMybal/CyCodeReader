@@ -5,7 +5,7 @@ description: Choose a built-in or plugin syntax mode.
 section: Using Reader
 order: 70
 parent: overview
-revision: 3
+revision: 4
 ---
 
 ## Built-in modes {#syntax}
@@ -36,3 +36,7 @@ score_counter := class:
 This syntax mode does not start a Verse language server or compile UEFN projects.
 Verse compilation and live Fortnite integration are not included.
 See the [Book of Verse](https://verselang.github.io/book/00_overview/) for the language.
+
+## Code colours {#colours}
+
+The shared CyUI palette uses orange strings and green comments across syntax modes, with blue keywords, mauve types and turquoise functions where the mode classifies them. Comment annotations such as TODO retain the comment colour. Theme contrast can adjust the shade. Plain text keeps the normal code foreground; strings are quoted text classified by the selected syntax.

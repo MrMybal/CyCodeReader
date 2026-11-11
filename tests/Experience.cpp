@@ -15,6 +15,7 @@ struct ReaderExperienceTests {
     static void search(Reader &r) {
         require(r.minimap_ && !r.sidebar_ && !r.wrap_ && !r.whitespace_,"Requested default editor configuration is missing");
         r.execute("new");r.testAction({{"command","setText"},{"text","alpha Alpha alphabet\nété alpha 🛠\nlast\n"}});auto first=r.active();
+        require(r.editorFont_!=nullptr,"Bundled editor font was not loaded");
         require(!first->editor.IsFindReplaceEnabled(),"Native inline find was not disabled");
         require(first->editor.HasTextContextMenuCallback() && first->editor.HasLineNumberContextMenuCallback(),"Code/line context callbacks are missing");
         r.execute("find");r.searchQuery_="alpha";r.find_.words=true;r.rebuildSearch();
@@ -31,6 +32,17 @@ struct ReaderExperienceTests {
         r.searchQuery_=std::string(5000,'x');draw(r);draw(r);require(r.find_.open && !r.find_.message.empty(),"Oversized pasted query made the find window unusable");r.searchQuery_="alpha";r.find_.key.clear();
         r.execute("new");r.testAction({{"command","setText"},{"text","unsaved alpha\n"}});auto second=r.active();
         r.execute("searchOpen");r.searchQuery_="alpha";r.find_.sensitive=false;r.rebuildSearch();require(r.searchRows_.size()==4,"Global find omitted an open unsaved buffer");
+        r.selectedSearch_=r.searchRows_.front().id;draw(r);draw(r);
+        require(r.searchPreview_.native().GetReaderSearchMatchCount()==3,"Global preview omitted matches");
+        const auto sourceRevision=first->live->revision,sourceUndo=first->editor.GetUndoIndex();
+        r.find_.sensitive=true;draw(r);draw(r);
+        require(r.searchPreview_.native().GetReaderSearchMatchCount()==2,"Preview ignored changed case option at the same offset");
+        r.searchQuery_="alphabet";draw(r);draw(r);
+        require(r.searchPreview_.native().GetReaderSearchMatchCount()==1,"Preview retained another query's marks");
+        r.find_.selection=true;r.find_.document=second->id;r.find_.selectionRevision=0;r.find_.begin=0;r.find_.end=1;
+        r.updateSearchMarkers(first);require(first->editor.GetReaderSearchMatchCount()==1,"Global marks inherited stale local selection scope");
+        require(first->live->revision==sourceRevision && first->editor.GetUndoIndex()==sourceUndo,"Search display changed source or Undo");
+        r.find_.selection=false;r.searchQuery_="alpha";r.find_.sensitive=false;r.rebuildSearch();
         Json stale;for (const auto &[key,match] : r.searchNavigation_) if (match.at("id")==first->id) { stale=match;break; }
         r.testAction({{"command","activate"},{"id",first->id}});r.testAction({{"command","setText"},{"text","changed source\n"}});const auto selectionBefore=first->editor.GetMainCursorSelection();r.navigateSearch(stale);require(r.active_==first->id && first->editor.GetMainCursorSelection().start==selectionBefore.start,"Stale search result navigated to an unrelated document");r.rebuildSearch();require(r.searchRows_.size()==1,"Edited search source left stale results");
         r.erase(second->id);r.rebuildSearch();require(r.searchRows_.empty(),"Closed buffer retained search results");
@@ -40,6 +52,34 @@ struct ReaderExperienceTests {
         r.execute("view.locale",{{"locale","fr"}});draw(r);draw(r);test::capture("find-replace");
         r.execute("searchOpen");r.searchQuery_="one";draw(r);draw(r);test::capture("search-documents");r.searchPanel_=false;r.find_.open=true;
         for (const auto *locale : {"en","fr"}) for (const auto *theme : {"graphite","light-grey"}) for (float dpi : {1.f,2.f}) { r.execute("view.locale",{{"locale",locale}});r.execute("view.theme",{{"theme",theme}});cyui::applyDpi(dpi);draw(r);draw(r); }
+    }
+    static float textScale(cyui::CodeEditor &view) {
+#ifdef CYUI_CODE_TEXT_PRESENTATION
+        return view.textScale();
+#else
+        return view.native().GetReaderTextScale();
+#endif
+    }
+    static void zoom() {
+        cyui::CodeEditor view,other;
+        std::string text;for (int i=0;i<200;++i) text+="int value = 1;\n";
+        view.setText(text);view.setReadOnly(true);other.setText("other\n");
+        auto &io=ImGui::GetIO();
+        auto render=[&] {
+            ImGui::NewFrame();ImGui::SetNextWindowPos({100,100});ImGui::SetNextWindowSize({800,600});
+            ImGui::Begin("Text zoom fixture");view.draw("text",{0,400});other.draw("other",{0,80});ImGui::End();ImGui::Render();
+        };
+        io.AddMousePosEvent(300,250);render();render();
+        const auto revision=view.native().GetTextRevision(),undo=view.native().GetUndoIndex();
+        const auto lineHeight=view.native().GetLineHeight();const auto interfaceSize=ImGui::GetStyle().FontSizeBase;
+        io.AddKeyEvent(ImGuiMod_Ctrl,true);io.AddMouseWheelEvent(0,1);render();
+        require(textScale(view)>1.f && view.native().GetLineHeight()>lineHeight,"Ctrl+wheel did not enlarge read-only code");
+        require(textScale(other)==1.f && ImGui::GetStyle().FontSizeBase==interfaceSize,"Text zoom changed another view or the interface");
+        io.AddMouseWheelEvent(0,100);render();require(textScale(view)==3.f,"Text zoom upper bound failed");
+        io.AddMouseWheelEvent(0,-100);render();require(textScale(view)==.5f,"Text zoom lower bound failed");
+        io.AddKeyEvent(ImGuiMod_Ctrl,false);io.AddMouseWheelEvent(0,1);render();
+        require(textScale(view)==.5f,"Plain wheel changed text size");
+        require(view.native().GetTextRevision()==revision && view.native().GetUndoIndex()==undo && view.text()==text,"Text zoom edited source or Undo");
     }
     static void aligned() {
         cyui::DiffDocument doc;std::string a,b;for (int i=0;i<400;++i) { a+="int value_"+std::to_string(i)+"=1;\n";b+="int value_"+std::to_string(i)+"=2;\n"; }doc.setTexts(a,b,cyui::CodeLanguage::cpp);cyui::DiffState state;
@@ -64,10 +104,11 @@ struct ReaderExperienceTests {
     }
     static int run(const std::filesystem::path &source) {
         const auto root=std::filesystem::temp_directory_path()/("reader-experience-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));std::filesystem::create_directories(root/"locales");std::filesystem::copy_file(source/"locales/ui.json",root/"locales/ui.json");
+        std::filesystem::create_directories(root/"fonts");std::filesystem::copy_file(source/"fonts/JetBrainsMono-Regular.ttf",root/"fonts/JetBrainsMono-Regular.ttf");
         ImGui::CreateContext();
         try {
             auto &io=ImGui::GetIO();io.IniFilename=nullptr;io.DisplaySize={1400,1000};io.DeltaTime=1.f/60;io.ConfigFlags|=ImGuiConfigFlags_DockingEnable;
-            { Reader r({root,{},"graphite","en",true},nullptr);test::preloadCaptureGlyphs();unsigned char *pixels;int width,height;io.Fonts->GetTexDataAsRGBA32(&pixels,&width,&height);io.Fonts->SetTexID(ImTextureID(1));search(r);r.find_.open=false;r.searchPanel_=false;cyui::applyDpi(1.f);r.execute("view.theme",{{"theme","graphite"}});aligned();context(r); }
+            { Reader r({root,{},"graphite","en",true},nullptr);test::preloadCaptureGlyphs();unsigned char *pixels;int width,height;io.Fonts->GetTexDataAsRGBA32(&pixels,&width,&height);io.Fonts->SetTexID(ImTextureID(1));search(r);r.find_.open=false;r.searchPanel_=false;cyui::applyDpi(1.f);r.execute("view.theme",{{"theme","graphite"}});zoom();aligned();context(r); }
             require(findTextMatches("aaa aaaa a", "a",true,true).matches.size()==1,"Word boundaries failed");require(findTextMatches("a\na\na", "a",true,false,2).truncated,"Search limit was not reported");
             const auto begin=std::chrono::steady_clock::now();findTextMatches(std::string(4*1024*1024,'a'),std::string(4000,'a')+"b",false,false);require(std::chrono::steady_clock::now()-begin<std::chrono::seconds(2),"Adversarial search exceeded its linear-time budget");
             ImGui::DestroyContext();std::filesystem::remove_all(root);std::cout<<"Default layout, dedicated find/replace, open-buffer search, UTF-8/selection/Undo guards, minimap spans and single-canvas diff passed without OS windows.\n";return 0;

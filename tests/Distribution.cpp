@@ -32,6 +32,7 @@ int main(int argc,char **argv) {
         require(argc==2,"Fixture directory required");const auto fixtures=utf8Path(argv[1]);
         require(newerRelease("v1.10.0","1.9.9") && !newerRelease("v0.1.0","0.1.0") && !newerRelease("v0.0.9","0.1.0"),"Numeric version comparison failed");
         for (const auto *version : {"", "1.0", "1.0.0.0", "01.2.3", "1.2.3-beta", "1.2.3+build", "1.2.-3", "65536.0.0"}) refuses([&] { releaseVersion(version); });
+        require(packagePathAllowed("fonts/JetBrainsMono-Regular.ttf") && !packagePathAllowed("fonts/unknown.ttf"),"Bundled font package scope failed");
         for (const auto *path : {"../bad", "/root.dll", "data/preferences.json", "app/../../bad", "app/file:stream", "plugins/CON.json", "plugins/a./b.json", "plugins\\bad.json", "plugins/a//b.json", "installed.flag", "runtime/python.exe", "plugins/NUL/x"}) require(!packagePathAllowed(path),"Unsafe package path allowed");
         const auto portable=parseRelease(release(),Distribution::portable);require(portable.asset.apiUrl.ends_with("/42"),"Portable asset selection failed");
         require(parseRelease(release(),Distribution::installed).asset.apiUrl.ends_with("/43"),"Installer asset selection failed");

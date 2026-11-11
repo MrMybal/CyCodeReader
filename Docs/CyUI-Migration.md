@@ -1,5 +1,16 @@
 # Modular CyUI migration
 
+## Shared code presentation — 2026-11-11
+
+The release now pins published CyUI commit
+`6173630ad5eb1e585eee1a0e7d3617285563e774`. Core owns embedded JetBrains Mono;
+Code/Diff/CodeEditor own per-view Ctrl+wheel scaling, the shared Rider-inspired
+syntax palette and brace-only block guides. Reader detects the capability,
+reuses monoFont and skips the older build-local font/zoom/guide patches.
+Reader-specific search/semantic/snippet adapters remain. The ordinary locked
+build selects this path; a development override is not required.
+
+
 Current interface revision (2026-11-03): SearchUI owns modeless find/replace and
 open-buffer results; its optional display-only spans are prepared in the existing
 build-local TextEditor adapter. ComparisonUI and HistoryUI call the native
@@ -16,10 +27,10 @@ is already in the dependency closure, so no duplicate widget, ImGui instance or
 new backend is added. Earlier descriptions below record the migration before
 file comparisons existed. See Comparison.md for the new view and Git provider.
 
-The current source lock is CyUI commit `a228501d9418550ce68d2d67b70cebbb8fa3ee2a` from
-https://github.com/MrMybal/CyUI. It includes the shared 101-mode catalogue, plugin
-syntax engines, Logs mode and the native Diff scrolling correction. The commit is published on CyUI main; the validated local dependency cache
-contains that exact clean revision.
+The current source lock is CyUI commit `6173630ad5eb1e585eee1a0e7d3617285563e774`
+from https://github.com/MrMybal/CyUI. It includes the 102-mode catalogue with Verse,
+plugin syntax engines, Logs, shared Diff scrolling and native code presentation.
+The published commit is available to clean locked builds.
 The original migration notes below describe the earlier 10e3646 baseline.
 Source remains in the ignored dependency cache; no developer checkout is reset.
 

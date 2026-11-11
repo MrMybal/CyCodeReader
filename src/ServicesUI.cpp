@@ -12,7 +12,7 @@
 #endif
 namespace cycode::reader {
 void Reader::nativeAction(const std::string &method,Json params) {
-    if (auto tab=active()) { sync(tab);params["id"]=tab->id;params["expectedRevision"]=tab->live->revision;auto result=core_.dispatch(method,params);if (method=="plugins.invoke") { pluginResult_=result.at("result").dump(2);pluginOutput_.setLanguage(cyui::CodeLanguage::json);configureCodeEditor(pluginOutput_);pluginOutput_.setText(pluginResult_);pluginOutput_.setReadOnly(true); }sync(tab); }
+    if (auto tab=active()) { sync(tab);params["id"]=tab->id;params["expectedRevision"]=tab->live->revision;auto result=core_.dispatch(method,params);if (method=="plugins.invoke") { pluginResult_=result.at("result").dump(2);pluginOutput_.setLanguage(cyui::CodeLanguage::json);configureCodeEditor(pluginOutput_,editorFont_);pluginOutput_.setText(pluginResult_);pluginOutput_.setReadOnly(true); }sync(tab); }
 }
 void Reader::preparePluginLanguages() {
     const auto state=core_.plugins().describe();

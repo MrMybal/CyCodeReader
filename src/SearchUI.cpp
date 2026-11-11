@@ -111,11 +111,12 @@ void Reader::replaceMatches(bool all) {
     find_.key.clear();
 }
 void Reader::updateSearchMarkers(const std::shared_ptr<Tab> &tab) {
-    const auto key=searchQuery_+"/"+std::to_string(tab->live->revision)+"/"+std::to_string(find_.sensitive)+std::to_string(find_.words)+std::to_string(find_.extended)+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(find_.selection)+":"+std::to_string(find_.document)+":"+std::to_string(find_.selectionRevision)+":"+std::to_string(find_.begin)+":"+std::to_string(find_.end);
+    const bool inSelection=find_.selection && !searchPanel_;
+    const auto key=searchQuery_+"/"+std::to_string(searchPanel_)+"/"+std::to_string(tab->editor.GetTextRevision())+"/"+std::to_string(tab->live->revision)+"/"+std::to_string(find_.sensitive)+std::to_string(find_.words)+std::to_string(find_.extended)+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(find_.selection)+":"+std::to_string(find_.document)+":"+std::to_string(find_.selectionRevision)+":"+std::to_string(find_.begin)+":"+std::to_string(find_.end);
     if (tab->searchMarkerKey==key) return;tab->searchMarkerKey=key;
     const auto &text=tab->document.text();const auto query=normalizeEditorText(expandedSearchText(searchQuery_,find_.extended));
-    if (query.size()>4096 || find_.selection && (find_.document!=tab->id || find_.selectionRevision!=tab->live->revision)) { tab->editor.SetReaderSearchMatches({},cyui::palette().warning);return; }
-    const auto found=findTextMatches(text,query,find_.sensitive,find_.words,2000,find_.selection ? find_.begin : 0,find_.selection ? find_.end : std::string::npos);
+    if (query.size()>4096 || (inSelection && (find_.document!=tab->id || find_.selectionRevision!=tab->live->revision))) { tab->editor.SetReaderSearchMatches({},cyui::palette().warning);return; }
+    const auto found=findTextMatches(text,query,find_.sensitive,find_.words,2000,inSelection ? find_.begin : 0,inSelection ? find_.end : std::string::npos);
     std::vector<TextEditor::DocSelection> ranges;
     for (const auto &m : found.matches) {
         const auto start=position(text,m.offset,m.line);auto finish=start;
@@ -188,8 +189,26 @@ void Reader::searchWindows() {
             if (searchNavigation_.contains(selectedSearch_)) {
                 const auto &match=searchNavigation_.at(selectedSearch_);const auto tab=find(match.at("id"));
                 if (tab && match.at("revision")==tab->live->revision) {
-                    const auto key=match.dump();
-                    if (key!=searchPreviewKey_) { searchPreviewKey_=key;configureCodeEditor(searchPreview_);searchPreview_.setLanguage(tab->codeEditor.language());searchPreview_.setText(tab->document.text());searchPreview_.setReadOnly(true);const auto p=position(tab->document.text(),match.at("offset"),match.at("line"));searchPreview_.native().SetCursor(p);searchPreview_.native().ScrollToLine(p.line>5 ? p.line-5 : 0);searchPreview_.native().SetFindReplaceEnabled(false); }
+                    const auto key=match.dump()+find_.key+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(static_cast<int>(tab->codeEditor.language()));
+                    if (key!=searchPreviewKey_) {
+                        searchPreviewKey_=key;
+                        configureCodeEditor(searchPreview_,editorFont_);
+                        searchPreview_.setLanguage(tab->codeEditor.language());
+                        searchPreview_.setText(tab->document.text());
+                        searchPreview_.setReadOnly(true);
+                        const auto p=position(tab->document.text(),match.at("offset"),match.at("line"));
+                        searchPreview_.native().SetCursor(p);
+                        searchPreview_.native().ScrollToLine(p.line>5 ? p.line-5 : 0);
+                        searchPreview_.native().SetFindReplaceEnabled(false);
+                        // Same UTF-8/glyph conversion as live tabs; query/options/theme
+                        // invalidate the marks even when the selected offset stays put.
+                        const auto &text=tab->document.text();
+                        const auto query=normalizeEditorText(expandedSearchText(searchQuery_,find_.extended));
+                        std::vector<TextEditor::DocSelection> ranges;
+                        if (query.size()<=4096) for (const auto &m : findTextMatches(text,query,find_.sensitive,find_.words,2000).matches)
+                            ranges.push_back({position(text,m.offset,m.line),position(text,m.offset+m.length)});
+                        searchPreview_.native().SetReaderSearchMatches(std::move(ranges),cyui::palette().warning);
+                    }
                     if (cyui::button(tr("Open result"))) navigateSearch(match);ImGui::SameLine();cyui::textDim("%s",tab->document.untitled() ? tr("Untitled") : pathUtf8(tab->document.path()).c_str());
                     searchPreview_.draw("##search-preview");
                 }

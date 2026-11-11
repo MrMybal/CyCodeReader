@@ -5,7 +5,7 @@ description: Choose current-document or all-open-document scope.
 section: Using Reader
 order: 50
 parent: overview
-revision: 2
+revision: 3
 ---
 
 ## Find in a document {#find}
@@ -19,3 +19,5 @@ Matches are highlights and minimap/scrollbar marks, not edits. Closing Find keep
 Ctrl+Shift+F searches every open live buffer, including untitled, unsaved and read-only documents. It does not recursively search a project folder. Select a result to preview it, then double-click or Open result to activate the source occurrence. Filters narrow paths/text. Source changes invalidate old positions; refresh the query.
 
 Queries accept up to 4096 bytes and results truncate beyond 2000 matches. A file-name palette is Ctrl+P; actions use Ctrl+Shift+P. [Menu filters](doc:filtering#filters) have separate focus and query state.
+
+The selected source preview highlights every occurrence of the query, using the current case and whole-word options. These highlights follow query changes and also appear in the source editor; a previous document-only selection scope does not restrict global search marks.

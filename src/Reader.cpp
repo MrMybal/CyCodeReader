@@ -7,6 +7,7 @@
 #include "cycode/Paths.h"
 #include <algorithm>
 #include <fstream>
+#include <cstring>
 #include <cyui/Core.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
@@ -58,21 +59,39 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
     config.density=density_=="comfortable" ? cyui::Density::comfortable : cyui::Density::compact;
     config.dpiScale=window_ ? SDL_GetWindowDisplayScale(window_) : 1.f; cyui::apply(config);
     applyEditorTheme(theme_); cyui::loadFonts(); ImGui::GetStyle().FontScaleMain=textScale_;
+#ifdef CYUI_CODE_TEXT_PRESENTATION
+    editorFont_=cyui::monoFont();
+#else
+    // Bundle the OFL font so code has the same face on every installation.
+    const auto fontPath=options_.installation/"fonts/JetBrainsMono-Regular.ttf";
+    std::ifstream fontStream(fontPath,std::ios::binary|std::ios::ate);
+    const auto fontBytes=fontStream ? fontStream.tellg() : std::streampos(0);
+    if (fontBytes>0 && fontBytes<=1024*1024) {
+        auto *data=IM_ALLOC(static_cast<size_t>(fontBytes));
+        fontStream.seekg(0);
+        if (fontStream.read(static_cast<char *>(data),static_cast<std::streamsize>(fontBytes))) {
+            ImFontConfig fontConfig;
+            std::strcpy(fontConfig.Name,"JetBrains Mono Regular");
+            editorFont_=ImGui::GetIO().Fonts->AddFontFromMemoryTTF(data,static_cast<int>(fontBytes),cyui::metrics().fontSize,&fontConfig);
+        } else IM_FREE(data);
+    }
+#endif
     preparePluginLanguages();
     prepareFileProviders();
     for (const auto &path : options_.files) open(path);
     if (!options_.automated) startSdk();
 }
 Reader::~Reader() {
+    // Cancel immediately, including when an exception bypasses requestQuit().
+    sdkStop_=true;updateCancel_=true;
     if (comparison_.pending.valid()) comparison_.pending.wait();
     if (history_.pending.valid()) history_.pending.wait();
     if (history_.diff.pending.valid()) history_.diff.pending.wait();
     for (auto &provider : fileProviders_) if (provider.pending.valid()) provider.pending.wait();
-    updateCancel_=true;
     if (releaseCheck_.valid()) releaseCheck_.wait();
     if (updateDownload_.valid()) updateDownload_.wait();
     bridge_.reset();
-    if (sdk_.valid()) { if (sdk_.wait_for(std::chrono::seconds(2))!=std::future_status::ready) sdkStop_=true; sdk_.wait(); }
+    if (sdk_.valid()) sdk_.wait();
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
     for (const auto &[id,language] : pluginSyntax_) cyui::unregisterCodeLanguage(id);
 #endif
@@ -152,7 +171,7 @@ void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
 #endif
 }
 void Reader::install(const std::shared_ptr<Tab> &tab) {
-    configureCodeEditor(tab->codeEditor);
+    configureCodeEditor(tab->codeEditor,editorFont_);
     tab->editor.SetFindReplaceEnabled(false);
     const auto id=tab->id;
     tab->editor.SetTextContextMenuCallback([this,id](TextEditor::PopupData &data) { codeContext(id,data,false); });
@@ -258,6 +277,7 @@ void Reader::requestQuit() {
     if (dialog_ || overwrite_.tab || closeId_) return;
     for (const auto &tab : tabs_) { sync(tab); if (tab->document.dirty()) { quitting_=true; closeId_=tab->id; return; } }
     quit_=true;
+    sdkStop_=true;updateCancel_=true;
 }
 void Reader::resolveClose(const std::string &choice) {
     auto tab=find(closeId_); if (!tab) { closeId_=0; return; }

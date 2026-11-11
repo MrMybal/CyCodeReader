@@ -1,5 +1,59 @@
 # Validation
 
+## Release 0.1.5 preparation — 2026-11-11
+
+The Windows x64 public Release build now uses the clean published CyUI
+6173630ad5eb1e585eee1a0e7d3617285563e774 source lock, development overrides OFF,
+public update checks ON and BUILD_TESTING=OFF. It incorporates the earlier
+search/presentation/shutdown work below. Core supplies the font; native Code,
+CodeEditor and Diff supply zoom and syntax palette roles. Reader retains its
+build-local search/snippet/semantic compatibility hooks.
+
+The per-user installer and complete stored portable ZIP are prepared locally,
+with the paired English/French manual, original notices and verified SHA-256
+checksums. Source/data, packaging policy and documentation/showcase checks are
+separate from native acceptance. No application, installer, updater or native
+test is launched. Closure timing, actual wheel/font/DPI rendering, network
+updates, clean-machine installation and Linux/macOS remain unverified.
+GitHub Actions stay suspended during source/tag/release publication.
+
+## Prompt window closure — 2026-11-11
+
+The native shell now hides main and detached windows before Reader waits for
+its owned workers, also during exception unwinding, and avoids another render
+after exit is accepted. SDK/update cancellation starts only after the existing
+dirty-document guards accept closure; cancellation also starts immediately on
+destruction. The SDK's previous unconditional two-second delay is removed.
+Worker joins, preference persistence and update handoff remain owned by the
+existing shutdown path; no worker is detached or abandoned.
+
+Windows x64 Release production compilation and source/data checks pass with
+BUILD_TESTING=OFF. The existing offline update-UI fixture now specifies that
+dirty/cancelled closure keeps services running and accepted/repeated closure
+signals both cancellations. Its body is checked by MSVC /Zs only, without
+linking or running a native test. Actual closure timing, in-flight network/plugin
+work, detached-window visibility, exception/SDK process-tree behavior and
+Linux/macOS acceptance remain unverified during the antivirus suspension.
+No application, native test or GitHub Actions workflow was launched.
+
+## Search preview, editor font and text zoom — 2026-11-11
+
+Windows x64 Release Reader builds against the unchanged locked CyUI revision,
+with BUILD_TESTING=OFF. Source syntax/data checks pass. The bundled unmodified
+JetBrains Mono 2.304 file matches its recorded SHA-256, and its OFL notice is
+deployed alongside the binary. The package/update allowlist accepts only the
+specific bundled font path. CyUI and its downloaded backend stay unchanged;
+font/zoom and brace-only scope guides use the existing build-local adapter.
+
+Global previews now carry query/options/theme-bound display spans. Global tab
+marks ignore stale local selection scope. Existing opt-in Experience sources
+add preview invalidation, source/Undo preservation and Ctrl+wheel/read-only/
+view-isolation/bounds contracts; Distribution sources cover the exact font path.
+These fixture bodies are syntax checked only, without building or running native
+test executables. Visual search/zoom/guides, actual wheel/trackpad events, font
+rendering, runtime package updates, detached windows and Linux/macOS remain
+unverified under the existing antivirus suspension. No GUI or Actions was run.
+
 ## Shared Verse syntax — 2026-11-06
 
 Windows x64 Release Reader compiles against the exact committed CyUI Verse

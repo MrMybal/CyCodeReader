@@ -60,7 +60,7 @@ bool packagePathAllowed(std::string_view path) {
     if (path=="CyCodeReader.exe" || path=="CyCodeReaderUpdater.exe" || path=="portable.flag" || path=="package-files.json" || path=="LICENSE" || path=="COPYRIGHT" || path=="THIRD_PARTY_NOTICES.md") return true;
     if (path.find('/')==std::string_view::npos) return path.ends_with(".dll");
     return path.starts_with("Documentation/") || path.starts_with("help/") || path.starts_with("locales/") || path.starts_with("licenses/") || path.starts_with("plugins/") || path.starts_with("app/") ||
-        path=="icons/CyCodeReader.png" || path=="icons/CyCodeReader.ico" || path=="icons/CyCodeReader-document.png" || path=="icons/CyCodeReader-document.ico";
+        path=="fonts/JetBrainsMono-Regular.ttf" || path=="icons/CyCodeReader.png" || path=="icons/CyCodeReader.ico" || path=="icons/CyCodeReader-document.png" || path=="icons/CyCodeReader-document.ico";
 }
 std::string sha256File(const std::filesystem::path &path) {
 #ifdef _WIN32

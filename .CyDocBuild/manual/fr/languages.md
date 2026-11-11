@@ -5,7 +5,7 @@ description: Choisissez une syntaxe intégrée ou fournie par plugin.
 section: Utiliser Reader
 order: 70
 parent: overview
-sourceRevision: 3
+sourceRevision: 4
 ---
 
 ## Modes intégrés {#syntax}
@@ -37,3 +37,7 @@ Ce mode de coloration ne démarre pas de serveur de langage Verse et ne compile
 pas les projets UEFN. La compilation Verse et la liaison avec Fortnite en cours
 d’exécution ne sont pas intégrées. Consultez le
 [Book of Verse](https://verselang.github.io/book/00_overview/) pour le langage.
+
+## Couleurs du code {#colours}
+
+La palette CyUI commune utilise des chaînes orange et des commentaires verts dans les modes de syntaxe, avec mots-clés bleus, types mauves et fonctions turquoise lorsque le mode les identifie. Les annotations de commentaire comme TODO conservent le vert. Le contraste du thème peut ajuster la nuance. Le texte brut garde la couleur normale du code ; les chaînes sont le texte entre guillemets identifié par la syntaxe choisie.

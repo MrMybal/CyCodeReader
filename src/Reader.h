@@ -236,6 +236,7 @@ class Reader {
     bool reload_=false, quitting_=false, quit_=false, palette_=false, goto_=false;
     bool sidebar_=false, wrap_=false, minimap_=true, whitespace_=false;
     bool resetLayout_=true;
+    ImFont *editorFont_=nullptr; // Owned by this context's atlas.
     float textScale_=1.15f;
     double pollAt_=0;
     int line_=1;

@@ -70,6 +70,12 @@ private IPC. app/tool.py uses the real CyToolsCore Runtime, schemas, scheduler,
 identities, HTTP service and official MCP adapter. Each GUI process starts one SDK
 companion with distinct reader/writer credentials and endpoint files. NativeProcess
 owns its hidden child-process tree and bounded logs; closing Reader stops it.
+After all dirty-document/save dialogs accept the exit, Reader immediately signals
+SDK/update cancellation. The SDL shell hides the main and detached windows before
+Reader joins its workers, including on exceptions, and skips further rendering
+after accepted closure. Shutdown still joins owned futures before destroying
+Core, plugins, ImGui and the OpenGL context. The SDK has no unconditional
+two-second wait before its existing process-tree cancellation.
 There is no independent Python document model or recreated MCP scheduler.
 
 Encoding.cpp performs strict UTF-16 surrogate conversion and explicit Windows-1252

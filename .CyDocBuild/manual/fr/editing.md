@@ -5,7 +5,7 @@ description: Travaillez avec les documents en mémoire, l’annulation et les ch
 section: Utiliser Reader
 order: 30
 parent: overview
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Documents {#documents}
@@ -21,3 +21,13 @@ UTF-8/BOM et UTF-16 LE/BE BOM sont détectés. Windows-1252 reste explicite. Les
 ## Disposition {#layout}
 
 Affichage règle les retours visuels, espaces, minicarte, taille du texte et réinitialisation de disposition. Détachez un onglet ou choisissez une nouvelle fenêtre pour obtenir une vraie fenêtre native sur un autre écran. Les [préférences](doc:settings#appearance) règlent thèmes et langue. Reader ne restaure pas une session complète ni un historique de récupération après incident.
+
+## Texte du code {#code-text}
+
+Les vues de code utilisent JetBrains Mono Regular, fournie avec l’application. Maintenez Ctrl et tournez la molette sur un éditeur, un aperçu de recherche ou une comparaison pour régler le texte de cette vue entre 50 et 300 %. Les deux côtés d’une comparaison partagent le même zoom. Les autres panneaux conservent leur taille de texte. Ce réglage visuel ne modifie ni le document ni son historique d’annulation ; le zoom par vue n’est pas restauré entre les sessions. Le rendu des ligatures n’est pas fourni.
+
+Les guides de blocs multilignes suivent les accolades ; les listes de paramètres conservent l’appariement des délimiteurs sans trait vertical traversant leurs noms. La minicarte reste disponible dans Affichage.
+
+## Fermer Reader {#close}
+
+Reader demande d’enregistrer ou d’abandonner les documents modifiés avant de quitter. Annuler garde l’application ouverte. Une fois la fermeture acceptée, les fenêtres natives sont masquées avant la fin du nettoyage en arrière-plan.

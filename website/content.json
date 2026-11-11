@@ -40,8 +40,8 @@
     "fr": "Chapitres de la page"
   },
   "hero.status": {
-    "en": "BETA · 0.1.4 · Windows x64",
-    "fr": "BÊTA · 0.1.4 · Windows x64"
+    "en": "BETA · 0.1.5 · Windows x64",
+    "fr": "BÊTA · 0.1.5 · Windows x64"
   },
   "hero.heading": {
     "en": "Your files. Your workspace.",
@@ -76,8 +76,8 @@
     "fr": "Agrandir la capture de l’éditeur de code"
   },
   "captures.note": {
-    "en": "Application views show v0.1.1 and sample files in English; the current download is v0.1.4.",
-    "fr": "Les vues de l’application montrent la v0.1.1 et des fichiers d’exemple en anglais ; le téléchargement actuel est la v0.1.4."
+    "en": "Application views show v0.1.1 and sample files in English. Version 0.1.5 adds a new code font and palette that these older images do not show.",
+    "fr": "Les vues de l’application montrent la v0.1.1 et des fichiers d’exemple en anglais. La version 0.1.5 apporte une nouvelle police et une palette que ces anciennes images ne montrent pas."
   },
   "chapter.editor": {
     "en": "Edit",
@@ -128,16 +128,16 @@
     "fr": "Garder ses repères"
   },
   "editor.one.body": {
-    "en": "Multiple cursors, folding, bracket matching and snippets, with a minimap and text-size controls.",
-    "fr": "Curseurs multiples, repli du code, appariement des délimiteurs et extraits, avec minimap et taille du texte réglable."
+    "en": "JetBrains Mono, multiple cursors, folding, snippets and minimap. Hold Ctrl and turn the mouse wheel to scale the hovered code view from 50 to 300%.",
+    "fr": "JetBrains Mono, curseurs multiples, repli du code, extraits et minicarte. Maintenez Ctrl et tournez la molette pour régler le texte de la vue survolée de 50 à 300 %."
   },
   "editor.two.title": {
     "en": "Choose your layout",
     "fr": "Choisir sa disposition"
   },
   "editor.two.body": {
-    "en": "Dockable tabs, separate instances, wrapping and visible whitespace. Choose among six themes and an English or French interface.",
-    "fr": "Onglets ancrables, instances distinctes, retour à la ligne et espaces visibles. Choisissez parmi six thèmes et une interface en anglais ou en français."
+    "en": "Dockable tabs, separate instances, wrapping and visible whitespace. Choose among six themes and an English or French interface. Accepted closure hides the windows before service cleanup and removes the fixed two-second SDK delay.",
+    "fr": "Onglets ancrables, instances distinctes, retour à la ligne et espaces visibles. Choisissez parmi six thèmes et une interface en anglais ou en français. La fermeture acceptée masque les fenêtres avant le nettoyage des services et supprime l’attente fixe de deux secondes du SDK."
   },
   "editor.three.title": {
     "en": "Save deliberately",
@@ -160,8 +160,8 @@
     "fr": "Trouver un mot. Garder le contexte."
   },
   "search.body": {
-    "en": "Use a separate find/replace window for the active document, or search every open buffer at once. Untitled and unsaved documents are included. Results keep an excerpt and a source preview.",
-    "fr": "Utilisez une fenêtre de recherche/remplacement pour le document actif, ou cherchez dans tous les buffers ouverts. Les documents sans nom et non enregistrés sont inclus. Les résultats gardent un extrait et un aperçu de la source."
+    "en": "Use a separate find/replace window for the active document, or search every open buffer at once. Untitled and unsaved documents are included. Results keep an excerpt and a source preview. Source previews highlight every occurrence using the current search options.",
+    "fr": "Utilisez une fenêtre de recherche/remplacement pour le document actif, ou cherchez dans tous les buffers ouverts. Les documents sans nom et non enregistrés sont inclus. Les résultats gardent un extrait et un aperçu de la source. Les aperçus de source surlignent chaque occurrence selon les options de recherche actives."
   },
   "search.one": {
     "en": "Case, whole word, selection and wrap options",
@@ -292,8 +292,8 @@
     "fr": "Plusieurs langages. Le même éditeur."
   },
   "syntax.body": {
-    "en": "The shared CyUI registry supplies 102 syntax modes. Choose automatically by extension or filter the Syntax menu by name. Language toolchains are not required for highlighting.",
-    "fr": "Le registre CyUI partagé fournit 102 modes de syntaxe. Utilisez la détection par extension ou filtrez le menu Syntaxe par nom. La coloration ne nécessite pas les outils de compilation des langages."
+    "en": "The shared CyUI registry supplies 102 syntax modes. Choose automatically by extension or filter the Syntax menu by name. Language toolchains are not required for highlighting. A Rider-inspired palette keeps strings orange and comments green across languages, with blue keywords and mauve types.",
+    "fr": "Le registre CyUI partagé fournit 102 modes de syntaxe. Utilisez la détection par extension ou filtrez le menu Syntaxe par nom. La coloration ne nécessite pas les outils de compilation des langages. Une palette inspirée de Rider garde les chaînes orange et les commentaires verts dans les langages, avec mots-clés bleus et types mauves."
   },
   "syntax.native": {
     "en": "Native and managed code",
@@ -460,8 +460,8 @@
     "fr": "Un éditeur natif pour vos fichiers."
   },
   "download.body": {
-    "en": "Install version 0.1.4 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
-    "fr": "Installez la version 0.1.4 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
+    "en": "Install version 0.1.5 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
+    "fr": "Installez la version 0.1.5 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
   },
   "download.portable": {
     "en": "Portable ZIP",
