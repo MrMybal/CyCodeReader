@@ -85,6 +85,7 @@ if(CYCODE_EDITOR_BUILD_GUI)
   set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/cyui-source.lock.json"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_texteditor.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/text_assistance.py"
     "${CYUI_DIR}/third_party/texteditor/TextEditor.h" "${CYUI_DIR}/third_party/texteditor/TextEditor.cpp")
   execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prepare_texteditor.py"
     --source "${CYUI_DIR}/third_party/texteditor" --destination "${CYCODE_EDITOR_DIR}" COMMAND_ERROR_IS_FATAL ANY)
@@ -120,6 +121,10 @@ if(CYCODE_EDITOR_BUILD_GUI)
     target_link_libraries(cycode_editor_snippet_tests PRIVATE cycode_editor)
     add_test(NAME editor_snippets COMMAND cycode_editor_snippet_tests)
     set_tests_properties(editor_snippets PROPERTIES TIMEOUT 30)
+    add_executable(cycode_editor_assistance_tests tests/editor_assistance_tests.cpp)
+    target_link_libraries(cycode_editor_assistance_tests PRIVATE cycode_editor)
+    add_test(NAME editor_assistance COMMAND cycode_editor_assistance_tests)
+    set_tests_properties(editor_assistance PROPERTIES TIMEOUT 30)
     add_executable(cycode_editor_completion_tests tests/editor_completion_tests.cpp)
     target_link_libraries(cycode_editor_completion_tests PRIVATE cycode_editor)
     add_test(NAME editor_completion COMMAND cycode_editor_completion_tests)

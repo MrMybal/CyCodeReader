@@ -1,5 +1,58 @@
 # Validation
 
+## Core/IDE source alignment — 2026-11-13
+
+Reader working sources pin published Core 0541cd0c438bcca507da232e9e1caa2156596910, with native/common
+source API 1 and existing CyUI 0ba1ba663b4b2bf46d066a32829bc91ea2743cba. At review
+time IDE main is 1ca2f26d56d7b5dc0dbf4db92e3a08be06ca8e89 and independently
+pins Core 8b8b7cefef47272871afe7774999f8b838ba1ab1. Reader does not rewrite the
+IDE checkout or lock. Relative to Reader's f5e6261 baseline, consumed module
+changes are Process pipe draining and Tools discovery; project indexing/MCP
+features remain in their owning Core profile. Reader still builds no Engine.
+
+Fresh graphical and headless Windows x64 Release production builds pass in
+runtime/build-core-0541cd0-vs and runtime/build-core-0541cd0-headless-vs, tests
+OFF and public updates ON. Graph inspection confirms one native Document,
+LargeText and Process implementation, one TextEditor and one ImGui; no native
+test target. The ten pre-existing modified/new files, including assistance
+corrections, were snapshotted and retained byte-for-byte before this validation
+entry was prepended. The first simultaneous configurations contended for the
+dependency Git index; the graphical configuration was then rerun against the
+resolved clean explicit Core. No lock file was deleted or checkout reset.
+
+Source checks parse 33 Python/17 JSON files; five mocked resolver and three
+distribution-policy checks pass. Assistance, completion, snippet and paged
+fixtures pass MSVC /Zs only, with no native fixture linked or run. The complete
+EN/FR manual passes integrity and DOM checks: 78 pages, 490 routes. UTF-8 and
+Git whitespace checks pass. No application, CLI, helper, installer or native
+test is launched. GUI, install/update and platform runtime acceptance remain
+suspended according to AGENTS.md. GitHub Actions is untouched; no push, tag or
+release is performed. Public 0.1.7 packages and their original Core pin remain
+unchanged. This is an unreleased local source alignment.
+
+## Ordinary editor assistance correction — 2026-11-12
+
+Unreleased working sources add default document-word completion, selection
+occurrence display and Allman-style C/C++/Unreal/C# block indentation on Enter.
+The default provider is replaced by a host's explicit completion callback; it
+does not claim project semantic/member/import completion. Full-document format
+passes are not added. The public 0.1.7 packages remain unchanged.
+
+The Windows x64 Release production build passes with BUILD_TESTING=OFF. One
+native TextEditor and one ImGui remain in the graph. No CyUI source/lock or
+workflow is modified. The new assistance fixture and the existing completion
+and snippet fixtures pass MSVC /Zs; none is linked or executed. Prepared cases
+cover repeated-word ranking, reset invalidation, comment/string exclusion,
+keyword vocabulary, spaces/tabs, exact caret/Undo/Redo, initializer/comment
+guards, Unicode whole-identifier occurrences and independence from Find marks.
+
+Source checks parse 33 Python and 17 JSON files. Bilingual manual verification
+passes for 78 pages and 490 routes; DOM checks pass without a browser/server.
+Git whitespace and UTF-8 checks pass. No native application, helper, CLI,
+installer or native test is executed under the existing antivirus suspension.
+Actual keyboard-popup, visual highlight/theme/DPI and block-format behaviour
+remain runtime acceptance work; this evidence is compiler/data only.
+
 ## 0.1.7 public package publication — 2026-11-11
 
 The owner authorized push and binary publication after the local preparation

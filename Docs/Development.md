@@ -22,6 +22,17 @@ builds resolve the immutable lock and refuse modified dependency caches. Native
 tests require --run-tests and remain suspended locally during the antivirus
 investigation; historical workflows supplied earlier Windows/Linux/macOS evidence. All Actions remain disabled by the owner.
 
+## Core/IDE alignment — 2026-11-13
+
+Reader working sources select published Core `0541cd0c438bcca507da232e9e1caa2156596910`,
+native/common source API 1, and retain the existing CyUI source lock. At review
+time the published IDE is 1ca2f26d56d7b5dc0dbf4db92e3a08be06ca8e89 and its
+independent Core lock is 8b8b7cefef47272871afe7774999f8b838ba1ab1. Reader does
+not change that checkout or lock. The modular text profile remains lightweight;
+the consumed native delta is Process/Tools, without adding a project Engine,
+index, language server or second MCP host. The existing Reader update product and
+public 0.1.7 packages stay independent. The local editor-assistance fixes remain.
+
 ## Paged source integration
 
 See [PagedText.md](PagedText.md) for the shared API, source pair, worker ownership,

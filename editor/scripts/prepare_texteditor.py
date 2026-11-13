@@ -104,6 +104,7 @@ def prepare(source, destination):
         ]
 
     destination.mkdir(parents=True, exist_ok=True)
+    prepared = {}
     for name, replacements in edits.items():
         content = (source/name).read_text('utf-8')
         for replacement in replacements:
@@ -207,6 +208,11 @@ void TextEditor::SetSyntaxTokens(const std::vector<SemanticToken>& tokens) {
         if shared and name == 'TextEditor.cpp':
             content=content.replace('syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : glyph.color;',
                                     'syntaxVersion == transactions.getVersion() && glyph.syntaxColor != Color::count ? glyph.syntaxColor : GetSharedSyntaxColor({token.line,i});')
+        prepared[name] = content
+
+    from text_assistance import augment
+    prepared['TextEditor.h'], prepared['TextEditor.cpp'] = augment(prepared['TextEditor.h'], prepared['TextEditor.cpp'])
+    for name, content in prepared.items():
         path = destination/name
         data = content.encode('utf-8')
         if not path.exists() or path.read_bytes() != data:

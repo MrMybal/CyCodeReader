@@ -2,6 +2,27 @@
 
 The current source integration adds CyUI PagedCodeEditor through the existing CodeEditor module and the shared editor/PagedTextEditor adapter. See [PagedText.md](PagedText.md) for native ownership and explicit streaming-syntax/recovery gaps. Ordinary font, palette, zoom and brace guides remain shared.
 
+## Shared ordinary-editor assistance — 2026-11-12
+
+editor/scripts/text_assistance.py extends the single checked build-local backend
+through prepare_texteditor.py; upstream CyUI stays at its existing immutable pin.
+The default native callback indexes current-document identifiers and language
+vocabulary, ranking exact-prefix/frequency/name and returning at most 128 choices.
+It caches by native text revision, invalidates on reset/language change, scans at
+most 4 Mi glyphs and retains at most 32768 distinct document words. Strings and
+comments are excluded. An IDE's explicit semantic/snippet callback replaces the
+default; GetDocumentWordSuggestions is available for an intentional host fallback.
+
+Selection occurrences use separate display spans and existing fold/wrap geometry,
+whole-identifier case-sensitive glyph matching, a 4 Mi glyph scan and 2000 marks.
+The selection palette role is used; Find spans, Undo and native revisions stay
+independent. Allman block layout on Enter is limited to C/C++/Unreal/C# function,
+control and class/namespace headers; initializer, string/comment braces stay put.
+Indentation preserves existing tabs and computes the caret in actual glyph units.
+The new character, layout and indent remain one native Undo transaction.
+This is structural typing assistance, not a project formatter or semantic server.
+Paged editing is unaffected. Public 0.1.7 does not include this source correction.
+
 ## Shared code presentation — 2026-11-11
 
 The release now pins published CyUI commit

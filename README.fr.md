@@ -63,9 +63,17 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 | **Comparaison en lecture seule** | **Historique de fichier Git** |
 | [![Comparaison côte à côte avec coloration syntaxique](Docs/images/compare.png)](Docs/images/compare.png) | [![Révisions d’un fichier d’exemple et différences du commit sélectionné](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
+## Sources actuelles (non publiées)
+
+Les sources utilisent maintenant Core `0541cd0c438bcca507da232e9e1caa2156596910`, API native et
+commune 1, avec CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`.
+Les correctifs locaux de propositions de mots, indentation des blocs et occurrences
+sélectionnées sont conservés. Les téléchargements publics 0.1.7 restent inchangés ;
+leur paire initiale est décrite ci-dessous. Voir les [vérifications](Docs/Validation.md).
+
 ## Core natif partagé en 0.1.7
 
-Les sources épinglent Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
+La version 0.1.7 épingle Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
 et CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. L’éditeur paginé
 natif partagé ouvre les grands UTF-8 avec pages asynchrones, Annuler/Rétablir,
 recherche et sauvegardes intégrales en streaming. Voir les [notes 0.1.7](VERSION.fr.md)

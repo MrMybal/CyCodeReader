@@ -59,6 +59,14 @@ installed in PATH. Reader does not provide the IDE's commit/build/debug workflow
 | **Read-only comparison** | **Git file history** |
 | [![Side-by-side syntax-colored comparison](Docs/images/compare.png)](Docs/images/compare.png) | [![Sample file revisions and the selected commit diff](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
+## Current sources (unreleased)
+
+Working sources now pin Core `0541cd0c438bcca507da232e9e1caa2156596910` with native/common
+source API 1 and retain CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`.
+The local document-word suggestions, block indentation and selected-identifier
+occurrence corrections are preserved. Public 0.1.7 downloads remain unchanged;
+their original dependency pair is recorded below. See [validation](Docs/Validation.md).
+
 ## Shared native Core in 0.1.7
 
 Version 0.1.7 pins Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`

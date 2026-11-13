@@ -63,6 +63,8 @@ LABELS.update({'Search must include the complete CRLF pair.': 'La recherche doit
 
 LABELS.update({'Recover cancelled input before editing or saving.':'Récupérez les saisies annulées avant de modifier ou d’enregistrer.'})
 
+LABELS.update({'No suggestions':'Aucune suggestion'})
+
 if __name__ == "__main__":
     path=Path(__file__).resolve().parents[1]/"locales/ui.json"
     path.write_text(json.dumps({key:{"en":key,"fr":value} for key,value in LABELS.items()},indent=2,ensure_ascii=False)+"\n",encoding="utf-8")

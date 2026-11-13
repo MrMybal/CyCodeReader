@@ -5,7 +5,7 @@ description: Work with live buffers, Undo and external changes.
 section: Using Reader
 order: 30
 parent: overview
-revision: 4
+revision: 5
 ---
 
 ## Documents {#documents}
@@ -27,6 +27,26 @@ Use View for wrapping, whitespace, minimap, text size and layout reset. Detach a
 Code views use the bundled JetBrains Mono Regular font. Hold Ctrl and turn the mouse wheel over an editor, search preview or comparison to change that view's text size from 50 to 300%. Both sides of a split comparison share the same scale. Other panels keep their own text size. This display change does not alter the document or its Undo history, and per-view zoom is not restored between sessions. Ligature shaping is not provided.
 
 Multiline block guides follow braces; argument lists keep bracket matching without a vertical line through parameter names. The minimap remains available in View.
+
+## Local code assistance {#assistance}
+
+The next source build suggests identifiers already used in the ordinary document
+and the active language's keywords/types while typing. Ctrl+Space opens the same
+list; Enter or Tab accepts it and Escape dismisses it. Repeated identifiers rank
+first. This is local text completion, without project types, member resolution or
+automatic imports. Comments and strings are excluded from the code-word index.
+
+Select a complete identifier on one line to highlight its other exact occurrences.
+These display marks clear with the selection and coexist with Find highlights,
+without changing the document or Undo history.
+
+In C, C++/Unreal and C#, Enter after a function/control block opener moves its
+brace to the next line, adds the body indent and keeps the closing brace aligned.
+Spaces or tabs follow the editor policy; one Undo restores the original text.
+Initializer braces, comments and strings are not reformatted as function headers.
+This formats blocks during typing; it is not a complete Rider/clang-format pass.
+Paged files keep their documented restricted profile. Public 0.1.7 predates this
+source correction. A host's own completion callback remains authoritative.
 
 ## Close Reader {#close}
 

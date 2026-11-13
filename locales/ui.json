@@ -1266,5 +1266,9 @@
   "Recover cancelled input before editing or saving.": {
     "en": "Recover cancelled input before editing or saving.",
     "fr": "Récupérez les saisies annulées avant de modifier ou d’enregistrer."
+  },
+  "No suggestions": {
+    "en": "No suggestions",
+    "fr": "Aucune suggestion"
   }
 }
