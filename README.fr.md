@@ -61,21 +61,20 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 | **Comparaison en lecture seule** | **Historique de fichier Git** |
 | [![Comparaison côte à côte avec coloration syntaxique](Docs/images/compare.png)](Docs/images/compare.png) | [![Révisions d’un fichier d’exemple et différences du commit sélectionné](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Sources actuelles (non publiées)
+## Services natifs en 0.1.8
 
-Les sources utilisent maintenant Core `0541cd0c438bcca507da232e9e1caa2156596910`, API native et
-commune 1, avec CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`.
-Les correctifs locaux de propositions de mots, indentation des blocs et occurrences
-sélectionnées sont conservés. Les téléchargements publics 0.1.8 restent inchangés ;
-leur paire initiale est décrite ci-dessous. Voir les [vérifications](Docs/Validation.md).
+La 0.1.8 épingle Core `7d0a468a490733c920694b3c41dc980f50c7cfea`, CyUI
+`6ef01cfcdb197f3a89d64618ce5ef8818c704728` et CyMCPSDK 0.7.1
+`b0eea5e9b35ae6cea660843e9c03bf25554f7944`. Reader conserve un seul propriétaire natif des
+documents, API source 1. Propositions de mots du document, indentation des blocs et
+occurrences sélectionnées restent disponibles. Chat, CLI et MCP partagent les outils
+sur les documents actifs avec leurs contrôles ; voir la [configuration et les opérations](Docs/MCP.md)
+et les [notes de version](VERSION.fr.md).
 
-## Core natif partagé en 0.1.8
-
-La version 0.1.8 épingle Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
-et CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. L’éditeur paginé
-natif partagé ouvre les grands UTF-8 avec pages asynchrones, Annuler/Rétablir,
-recherche et sauvegardes intégrales en streaming. Voir les [notes 0.1.8](VERSION.fr.md)
-et [architecture, budgets et contrats manquants](Docs/PagedText.md).
+L’éditeur paginé partagé traite les grands UTF-8 avec pages asynchrones,
+Annuler/Rétablir, recherche et sauvegardes intégrales en streaming. Ce profil
+graphique garde des limites distinctes de l’automatisation des documents ordinaires ;
+voir le [guide des grands fichiers](Docs/PagedText.md).
 
 ## Fonctionnalités
 

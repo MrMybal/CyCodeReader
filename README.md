@@ -58,21 +58,18 @@ installed in PATH. Reader does not provide the IDE's commit/build/debug workflow
 | **Read-only comparison** | **Git file history** |
 | [![Side-by-side syntax-colored comparison](Docs/images/compare.png)](Docs/images/compare.png) | [![Sample file revisions and the selected commit diff](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Current sources (unreleased)
+## Native services in 0.1.8
 
-Working sources now pin Core `0541cd0c438bcca507da232e9e1caa2156596910` with native/common
-source API 1 and retain CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`.
-The local document-word suggestions, block indentation and selected-identifier
-occurrence corrections are preserved. Public 0.1.8 downloads remain unchanged;
-their original dependency pair is recorded below. See [validation](Docs/Validation.md).
+Version 0.1.8 pins Core `7d0a468a490733c920694b3c41dc980f50c7cfea`, CyUI
+`6ef01cfcdb197f3a89d64618ce5ef8818c704728` and CyMCPSDK 0.7.1
+`b0eea5e9b35ae6cea660843e9c03bf25554f7944`. Reader uses one native document owner with
+source API 1. Local document-word suggestions, block indentation and selected-word
+occurrences remain available. Chat, CLI and MCP share guarded live-document tools;
+see [setup and operation coverage](Docs/MCP.md) and the [release notes](Docs/Releases/v0.1.8.md).
 
-## Shared native Core in 0.1.8
-
-Version 0.1.8 pins Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
-and CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. A shared native
-paged editor opens large UTF-8 files with asynchronous pages, Undo/Redo, search
-and complete streamed saves. See the [0.1.8 notes](Docs/Releases/v0.1.8.md) and
-[architecture, budgets and missing common contracts](Docs/PagedText.md).
+The shared paged editor handles large UTF-8 files with asynchronous pages,
+Undo/Redo, search and complete streamed saves. Its GUI profile and limits are
+separate from ordinary-document automation; see [the large-file guide](Docs/PagedText.md).
 
 ## Features
 
@@ -95,7 +92,7 @@ and complete streamed saves. See the [0.1.8 notes](Docs/Releases/v0.1.8.md) and
   Restart is required; native plugins run as trusted code in the process.
 - **Automation and help:** native CyMCPSDK chat/CLI/MCP accesses the same live
   ordinary documents and revision guards; paged bridge support is pending. F1 opens the local illustrated CyDoc manual.
-  The native console companion ships beside Reader; configure a provider for chat.
+  The native console companion ships in `app/`; configure a provider for chat.
 
 Search is literal with ASCII case folding. Recursive folder search, regex
 replacement, macros, arbitrary external run commands, crash recovery, complete
