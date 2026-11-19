@@ -5,12 +5,12 @@ description: Utilisez le parcours de l’édition portable ou installée.
 section: Utiliser Reader
 order: 180
 parent: overview
-sourceRevision: 4
+sourceRevision: 5
 ---
 
 ## Éditions {#updates}
 
-Extrayez tout le ZIP portable dans un dossier accessible en écriture et gardez `portable.flag` ; préférences et cache restent dans `data`. L’installateur par utilisateur utilise normalement `%LOCALAPPDATA%/Programs/CyCodeReader` et conserve les préférences séparément. Il ne change pas les associations de fichiers et n’installe pas le SDK Python facultatif. Ne mélangez pas dossiers portable et installé.
+Extrayez tout le ZIP portable dans un dossier accessible en écriture et gardez `portable.flag` ; préférences et cache restent dans `data`. L’installateur par utilisateur utilise normalement `%LOCALAPPDATA%/Programs/CyCodeReader` et conserve les préférences séparément. Le chat natif et le compagnon console sont inclus ; aucun SDK Python n’est à installer. Ne mélangez pas dossiers portable et installé.
 
 Les nouvelles installations publiques vérifient GitHub Releases en arrière-plan au démarrage par défaut. Une version compatible plus récente ouvre le panneau Mises à jour. Utilisez **Télécharger la mise à jour**, puis **Fermer et installer la mise à jour** après avoir examiné la version. Les préférences existantes sont conservées ; **Mises à jour → Vérifier les mises à jour au démarrage** active ou désactive les prochaines vérifications. Le panneau permet aussi une vérification manuelle. Aucun téléchargement de mise à jour séparé n’est à choisir sur GitHub. Les compilations de développement ou de préparation peuvent désactiver ces vérifications. Reader ne collecte pas d’identifiants GitHub privés pour son actualisation. Examinez la version disponible et le téléchargement vérifié par empreinte avant d’accepter.
 

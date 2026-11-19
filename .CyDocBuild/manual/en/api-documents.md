@@ -22,3 +22,4 @@ These contracts describe the native service exposed by the official SDK/MCP inte
 - [`documents_save`](doc:operation-documents-save-documents-save) — Save an already-named document at expectedRevision using its native disk baseline and guarded atomic replacement.
 - [`documents_format`](doc:operation-documents-format-documents-format) — Change the pending encoding/newline convention at expectedRevision.
 - [`documents_close`](doc:operation-documents-close-documents-close) — Close an open document at expectedRevision.
+- [`documents_save_as`](doc:operation-documents-save-as-documents-save-as) — Save a guarded document under a NEW path; original preserved.

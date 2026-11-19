@@ -1,56 +1,68 @@
-# CyCodeReader 0.1.7
+# CyCodeReader 0.1.8
 
-[English](Docs/Releases/v0.1.7.md) · [README français](README.fr.md)
+[English](Docs/Releases/v0.1.8.md) · [README français](README.fr.md)
 
-11 novembre 2026 · **BÊTA** · Windows x64.
+20 novembre 2026 · **BÊTA** · Windows x64.
 
-## Core natif partagé et grands fichiers UTF-8
+## Assistant et automatisation natifs
 
-- Core `f5e6261bf8acf22d0b3241622ed4294322724fb9` et CyUI
-  `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`, API source 1.
-- Documents, encodages, recherche, plugins texte, processus, transport et
-  utilitaires communs fournis par Core plutôt que dupliqués dans Reader.
-- Fichiers UTF-8 de plus de 4 Mio ouverts avec stockage natif et pages asynchrones.
-  Édition, Annuler/Rétablir, recherche littérale, navigation 64 bits et sauvegarde
-  intégrale s’effectuent en arrière-plan. Enregistrer sous préserve l’original et
-  refuse les destinations existantes.
-- Saisies refusées ou annulées conservées pour copie et acquittement, y compris
-  pendant une proposition native. Le premier CRLF est détecté même après une
-  première ligne dépassant 64 Kio. Le BOM et
-  les fins LF/CRLF/CR non modifiées sont préservés ; les insertions suivent la
-  politique native de fins de ligne.
-- Backend graphique injectable pour le propriétaire natif existant de l’IDE,
-  avec acquittement des reçus de commit et contrats d’historique natif.
-- Correction de mise à jour 0.1.6, JetBrains Mono, Ctrl+molette, palette partagée,
-  surlignage de recherche et masquage des fenêtres à la fermeture conservés.
+- Remplacement du service SDK Python optionnel par CyMCPSDK 0.7.1 compilé depuis ses sources.
+- Chat CyMCP::ChatUI intégré à côté du code : réponses progressives, annulation,
+  pièces jointes explicites, détection des fournisseurs/modèles et historique privé.
+- Un registre partagé entre chat, console et MCP : 30 opérations dans l’interface,
+  22 dans une session texte autonome sans fenêtre.
+- Actions sur les vrais tampons, sélections, curseur et Annuler/Rétablir, sur le
+  thread graphique. L’édition est explicite, avec contrôles de révision, lecture
+  seule, fermeture des modifications et conflit disque. L’enregistrement reste
+  explicite ; Enregistrer sous refuse une destination existante.
+- Compagnon `app/cycodereader_cli.exe` : list, describe, invoke JSON, JSONL, service
+  autonome et MCP. `--connect` pilote une instance ouverte. Conservation de
+  `--serve`, `--desktop-service` et du lanceur Python de compatibilité.
+- Reçus de tâches durables privés, annulation coopérative, quotas avant exécution,
+  résultats temporaires fragmentés et suppression explicite des reçus.
+  Une expiration ou une réponse interrompue ne rejoue jamais automatiquement l’action.
+- Découverte compacte, ressources/grep, invalidation et notifications, mesures
+  techniques facultatives et fenêtre de contexte API réglable.
+- Connexion facultative à des outils MCP distants configurés et autorisés explicitement.
+- Core `7d0a468`, CyUI `6ef01cf` et SDK publié `b0eea5e`, API source 1.
+  Éditeur paginé, JetBrains Mono, zoom, palette et récupération de mise à jour conservés.
 
-## Limites du profil paginé
+## Démarrer
 
-Les petits fichiers gardent l’éditeur ordinaire, ses encodages, minimap, repli et
-curseurs multiples. Le profil paginé ne fournit pas minimap, repli, multicurseur,
-retour automatique, extraits, conversion d’encodage, comparaison intégrale,
-Tout remplacer ou recherche dans la sélection. La coloration contextuelle utilise
-un instantané complet borné à 32 Mio ; au-delà, le texte reste brut avec un message.
-L’import et l’indexation peuvent prendre du temps. L’exposition SDK/MCP et la
-récupération durable attendent un contrat natif commun de session ; les travaux
-paginés non enregistrés restent volatils. Voir [PagedText](Docs/PagedText.md).
+Ouvrez **CyMCPSDK / MCP**, configurez un fournisseur et un modèle capables d’appeler
+des outils, puis connectez-vous. L’assistant commence en lecture ; autorisez les
+modifications volontairement pour une nouvelle connexion. Les clés API proviennent
+d’une variable d’environnement nommée. Placez les réglages persistants dans
+`settings.json` ; les champs modifiés dans le panneau concernent la session.
+Les services de modèles locaux sont pris en charge sans téléchargement de moteur
+ni de poids par Reader.
+
+Le panneau copie aussi les configurations MCP lecture/édition. Consultez le
+[guide CLI/MCP](Docs/MCP.md) pour les commandes, descripteurs locaux authentifiés,
+connexions et import des anciennes tâches.
 
 ## Téléchargements
 
-- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-setup.exe).
-- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-portable.zip).
-- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/SHA256SUMS.txt).
-- [Récupération depuis le lanceur 0.1.4/0.1.5](Docs/Releases/v0.1.6.fr.md).
+- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-setup.exe).
+- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-portable.zip).
+- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/SHA256SUMS.txt).
 
-## Distribution et vérification
+Extrayez le ZIP complet et conservez ses ressources et `data/`. La console et ses
+DLL se trouvent dans `app/`, un emplacement accepté par les anciens validateurs de
+paquets. L’importeur facultatif des anciennes tâches y figure également.
+Pour **Invalid update arguments** en 0.1.4/0.1.5, suivez la
+[récupération manuelle existante](Docs/Releases/v0.1.6.fr.md).
 
-La compilation locale Release garde les tests natifs désactivés et les mises à
-jour publiques activées. ZIP portable, installateur par utilisateur et empreintes
-SHA-256 accompagnent la release publique. Cette version numérique utilise le
-canal de mise à jour public ; sa maturité reste bêta. Les contrôles sources/données, compilation seule des scénarios,
-paquets et manuel bilingue sont consignés dans [Validation](Docs/Validation.md).
+## Limites et vérification
 
-Application, assistant, CLI, installateur et tests natifs ne sont pas exécutés
-pendant la suspension liée à l’antivirus. Les parcours interactifs, installation,
-mise à jour, backend IDE, Linux et macOS restent à valider. Les Actions restent
-désactivées.
+Les documents ordinaires restent limités à 4 Mio. Les UTF-8 plus grands utilisent
+le profil paginé de l’interface, sans exposition à cette session d’automatisation.
+HTTP fonctionne en requête/réponse locale authentifiée, sans SSE dans cet hôte ;
+le stdio direct prend en charge les abonnements du SDK. Les outils distants doivent
+être autorisés explicitement ; cet adaptateur ne s’abonne pas à leurs notifications.
+Les plugins natifs restent du code de confiance dans le processus, non interruptible de force.
+
+Compilations Windows Release, régressions natives, scénarios synthétiques chat/CLI/MCP
+et paquet portable extrait vérifiés localement. Fournisseurs commerciaux,
+installation/mise à jour interactive, saisie physique, Linux et macOS restent à
+valider pour cette migration. Voir le [bilan de validation](Docs/Validation.md).

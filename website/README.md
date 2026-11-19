@@ -135,5 +135,5 @@ runtime. See [third-party notices](../THIRD_PARTY_NOTICES.md).
 
 config.json version follows the source/CMake version. publishedVersion identifies
 the available release used by releases/setup/portable links. Both versions are
-0.1.7 for this release. The builder validates the release/download version pair.
+0.1.8 for this release. The builder validates the release/download version pair.
 Building a local showcase does not authorize deployment or enable any workflow.

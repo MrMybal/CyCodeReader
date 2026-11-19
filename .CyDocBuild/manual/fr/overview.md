@@ -4,7 +4,7 @@ title: CyCodeReader
 description: Choisissez une tâche dans l’éditeur de code et de texte.
 section: Utiliser Reader
 order: 0
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Commencer {#getting-started}
@@ -13,7 +13,7 @@ CyCodeReader modifie des fichiers de code et de texte sans ouvrir de projet d’
 
 ## Plateformes {#platforms}
 
-Les paquets Windows x64 comprennent une édition portable et un installateur par utilisateur. Un pilote OpenGL 3.3 est nécessaire. L’éditeur n’exige pas Python ; le [compagnon MCP facultatif](doc:mcp#connection) a ses propres prérequis. Les compilations source Linux/macOS sont prévues ; aucun paquet natif n’est fourni ici.
+Les paquets Windows x64 comprennent une édition portable et un installateur par utilisateur. Un pilote OpenGL 3.3 est nécessaire. L’éditeur, le chat natif et le [compagnon MCP](doc:mcp#connection) n’exigent pas Python. Configurez un fournisseur compatible pour l’assistant. Les compilations source Linux/macOS sont prévues ; aucun paquet natif n’est fourni ici.
 
 ## Licence {#licensing}
 

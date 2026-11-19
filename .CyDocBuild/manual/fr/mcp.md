@@ -5,15 +5,21 @@ description: Copiez la configuration de lecture ou d’édition de cette instanc
 section: Utiliser Reader
 order: 160
 parent: plugins
-sourceRevision: 2
+sourceRevision: 3
 ---
 
 ## Connexion {#connection}
 
-Le compagnon facultatif de Reader utilise le vrai SDK CyToolsCore. Son installation Python/SDK privée compatible reste séparée du paquet public de l’éditeur. Le panneau MCP affiche l’état et propose démarrage, nouvelle tentative et copie de configuration. Copiez l’accès lecture pour consulter ; choisissez explicitement l’édition pour modifier ou appeler un plugin. Chaque processus a son contexte privé ; conservez les fichiers d’identité et de connexion confidentiels.
+Reader intègre désormais CyMCPSDK 0.7.1 en C++ ; aucun service Python ni wheel à installer. Ouvrez **CyMCPSDK / MCP** pour copier la configuration lecture ou édition de l’instance ouverte. Le chat utilise CyMCP::ChatUI avec streaming, annulation, pièces jointes, détection des fournisseurs, modèles et historique privé restaurable. Configurez un fournisseur compatible avec les appels d’outils. L’édition reste désactivée par défaut ; ouvrez une nouvelle connexion pour appliquer ses permissions. Les clés API proviennent d’une variable d’environnement nommée.
 
 ## Opérations {#operations}
 
-L’adaptateur officiel expose `op_<operationId>`. Ses arguments placent l’entrée de l’opération dans `parameters`, par exemple `{"parameters":{}}` pour `op_documents_list`. Suivez `cy_get_job` jusqu’à Completed/Failed/Cancelled au lieu d’assimiler l’envoi à une réussite.
+Le compagnon `cycodereader_cli` accepte `list`, `describe NOM`, `invoke NOM --json JSON`, `jsonl`, `serve` et `mcp`. `--connect FICHIER --access read|edit` cible l’instance réelle. `--file FICHIER --data-dir DOSSIER` ouvre une session sans interface. L’ancienne option native `--serve` et le lanceur Python `--bridge-config` restent compatibles.
 
-Lisez l’identifiant émis et la révision courante avant de remplacer, formater, enregistrer ou fermer un document. Enregistrer est explicite ; fermer un texte modifié exige `discard:true`. Ouvrir un fichier fourni exige l’accès au système de fichiers ; modifier et invoquer un plugin exigent leurs autorisations respectives. Les [contrats publics](doc:api-links#contract) décrivent chaque schéma d’entrée et de sortie. Le SDK ne peut ni isoler ni interrompre de force un callback natif.
+La découverte compacte expose `cy_tools_search`, `cy_tools_describe`, `cy_tools_call` et les lecteurs de ressources. Appelez `cy_tools_call` avec `{"name":"documents_list","arguments":{}}` ; `--full-tools` expose directement les opérations sans enveloppe `parameters`. Les 30 contrats sont décrits dans la référence ; 8 nécessitent l’interface (22 en mode autonome). L’identité lecture ne peut ni modifier ni ouvrir des chemins arbitraires. Les plugins nécessitent aussi `allowPlugins:true`. L’enregistrement reste explicite, avec contrôles de révision, lecture seule et conflit disque. Les documents paginés restent accessibles uniquement dans l’interface.
+
+## Résultats et réglages {#results}
+
+`jobs_list/get/cancel/forget` donnent accès aux reçus durables privés. Une opération interrompue devient `interrupted-unknown` au redémarrage, sans rejeu. L’oubli nécessite `forget:true,confirm:true`. Les gros résultats utilisent des fragments de 32 Kio, des quotas mémoire/disque et un TTL réglables ; l’expiration ne relance jamais l’action. Les reçus durables restent disponibles après expiration. Les modifications invalident les instantanés de texte. La découverte compacte, les ressources, notifications, mesures facultatives et fenêtre de contexte sont réglables séparément. HTTP est requête/réponse sans SSE dans cet hôte ; les abonnements pris en charge sont disponibles en MCP stdio direct, les autres clients utilisent TTL/actualisation.
+
+Les serveurs MCP distants sont facultatifs, configurés explicitement et limités par `allowTools`. Connectez-les depuis le panneau puis ouvrez une nouvelle connexion au chat. Les outils `remote.ID.NOM` nécessitent l’édition. Aucun moteur ni poids de modèle n’est téléchargé. Les anciens jobs peuvent être importés en lecture seule par `scripts/import_legacy_jobs.py` ; les données d’origine et documents restent conservés. Les détails de configuration, transport, migration et limites sont dans `Docs/MCP.md` du dépôt.

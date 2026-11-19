@@ -79,11 +79,12 @@ Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)
     preparePluginLanguages();
     prepareFileProviders();
     for (const auto &path : options_.files) open(path);
-    if (!options_.automated) startSdk();
+    if (!options_.disableAutomation && (!options_.automated || !options_.automationDescriptor.empty())) startSdk();
 }
 Reader::~Reader() {
     // Cancel immediately, including when an exception bypasses requestQuit().
     sdkStop_=true;updateCancel_=true;
+    stopAutomationRequests();assistant_.reset();if(automation_)automation_->stop();automation_.reset();
     // Join paged workers before unregistering syntax contributions or unloading plugins.
     for (auto &tab:tabs_) tab->paged.reset();
     if (comparison_.pending.valid()) comparison_.pending.wait();
@@ -92,8 +93,7 @@ Reader::~Reader() {
     for (auto &provider : fileProviders_) if (provider.pending.valid()) provider.pending.wait();
     if (releaseCheck_.valid()) releaseCheck_.wait();
     if (updateDownload_.valid()) updateDownload_.wait();
-    bridge_.reset();
-    if (sdk_.valid()) sdk_.wait();
+
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
     for (const auto &[id,language] : pluginSyntax_) cyui::unregisterCodeLanguage(id);
 #endif
@@ -467,12 +467,13 @@ void Reader::documents() {
     if (resetLayout_) {
         ImGui::DockBuilderRemoveNode(dock_); ImGui::DockBuilderAddNode(dock_,ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dock_,ImGui::GetMainViewport()->WorkSize);
-        editorDock_=dock_;
+        editorDock_=dock_;mcpDock_=0;
         if (sidebar_) { const auto left=ImGui::DockBuilderSplitNode(editorDock_,ImGuiDir_Left,.18f,nullptr,&editorDock_);ImGui::DockBuilderDockWindow("Open files###reader-files",left); }
         ImGui::DockBuilderFinish(dock_);
         for (const auto &tab : tabs_) { ImGui::DockBuilderDockWindow(title(tab).c_str(),editorDock_); tab->detached=false; }
         resetLayout_=false;
     }
+    if(mcpPanel_&&!mcpDock_){mcpDock_=ImGui::DockBuilderSplitNode(editorDock_,ImGuiDir_Right,.43f,nullptr,&editorDock_);ImGui::DockBuilderDockWindow("CyMCPSDK / MCP",mcpDock_);ImGui::DockBuilderFinish(dock_);}
     if (sidebar_) {
         if (ImGui::Begin((std::string(tr("Open files"))+"###reader-files").c_str(),&sidebar_)) {
             registerFilterOwner(filesFilter_);
@@ -596,7 +597,7 @@ void Reader::dialogs() {
         const char *actions[][3]={{"Documentation","help","F1"},{"Context help","help.context","Shift+F1"},
             {"Illustrated tour","help.tour",""},{"New file","new","Ctrl+N"},{"Open files...","open","Ctrl+O"},
             {"Save all","saveAll","Ctrl+Alt+S"},{"Find / replace","find","Ctrl+F"},{"Go to line","goto","Ctrl+G"},{"Search open documents","searchOpen","Ctrl+Shift+F"},
-            {"Extensions","plugins",""},{"Compare files","compare.open",""},{"Compare with saved version","compare.saved",""},{"Options","options",""},{"Updates","updates",""},{"CyToolsCore / MCP","mcp",""}};
+            {"Extensions","plugins",""},{"Compare files","compare.open",""},{"Compare with saved version","compare.saved",""},{"Options","options",""},{"Updates","updates",""},{"CyMCPSDK / MCP","mcp",""}};
         for (const auto &action : actions) {
             const auto id=uiId(std::string("action/")+action[1]);
             const std::string command=action[1];
@@ -627,6 +628,7 @@ void Reader::dialogs() {
 }
 void Reader::frame() {
     try {
+        pollAutomation();
         std::lock_guard lock(core_.mutex());
         std::erase_if(tabs_,[&](const auto &tab) { return !tab->paged && !core_.documents().contains(tab->id); });
         for (const auto &[id,live] : core_.documents()) if (!find(id)) { auto tab=std::make_shared<Tab>(live);tab->id=id;install(tab);tabs_.push_back(tab);active_=id; }
@@ -662,14 +664,19 @@ Json Reader::state() const {
         {"diskChanged",tab->diskChanged},{"undo",tab->editor.GetUndoIndex()},
         {"hasFind",tab->editor.HasFindString()},{"selection",tab->editor.GetCursorText(0)}});
     }
-    return {{"application","CyCodeReader"},{"active",active_},{"documents",docs},{"error",lastError_},
+    return {{"assistant",assistant_?assistant_->state():Json::object()},{"application","CyCodeReader"},{"active",active_},{"documents",docs},{"error",lastError_},
         {"pendingClose",closeId_},{"pendingOverwrite",overwrite_.tab},{"pendingDialog",bool(dialog_)},{"quit",quit_},{"theme",theme_},{"language",locale_},{"trace",trace_}};
 }
 void Reader::testAction(const Json &action) {
     std::lock_guard lock(core_.mutex());
     if (!options_.automated) throw std::runtime_error("Reader test action requires automated mode");
     const auto command=action.at("command").get<std::string>();
-    if (command=="setText") { if (auto tab=active()) { if (tab->paged) throw std::runtime_error("setText is not a paged operation"); tab->editor.SelectAll(); tab->editor.ReplaceTextPreservingTabs(action.at("text").get<std::string>()); sync(tab); } }
+    if(command=="assistant.remotes") {if(!assistant_)throw std::runtime_error("Assistant unavailable");assistant_->connectRemotes();}
+    else if(command=="assistant.models") {if(assistant_)assistant_->refreshModels();}
+    else if(command=="assistant.connect") {if(!assistant_)startSdk();if(!assistant_)throw std::runtime_error(sdkError_);assistant_->setAllowEdits(action.value("edit",false));assistant_->openConfigured(action.value("restore",false));mcpPanel_=true;}
+    else if(command=="assistant.send") {if(!assistant_)throw std::runtime_error("Assistant is unavailable");std::vector<std::filesystem::path> paths;for(const auto &path:action.value("attachments",Json::array()))paths.push_back(utf8Path(path.get<std::string>()));assistant_->send(action.at("text"),std::move(paths));}
+    else if(command=="assistant.cancel") {if(assistant_)assistant_->cancel();}
+    else if (command=="setText") { if (auto tab=active()) { if (tab->paged) throw std::runtime_error("setText is not a paged operation"); tab->editor.SelectAll(); tab->editor.ReplaceTextPreservingTabs(action.at("text").get<std::string>()); sync(tab); } }
     else if (command=="activate") { active_=action.at("id"); if (auto tab=active()) tab->focus=true; }
     else if (command=="detach") { if (auto tab=active()) tab->detached=true; }
     else if (command=="resolveClose") resolveClose(action.at("choice"));

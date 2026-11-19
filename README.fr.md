@@ -13,8 +13,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Licence de l’application</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.1.7</strong></a><br><strong>BÊTA</strong></p>
-      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-portable.zip">ZIP portable</a></p>
+      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.1.8</strong></a><br><strong>BÊTA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-portable.zip">ZIP portable</a></p>
     </td>
   </tr>
 </table>
@@ -26,21 +26,19 @@ leurs fichiers directement, les modifier avec une coloration syntaxique, cherche
 dans les documents et comparer des révisions. Construit avec CyUI, il fonctionne
 indépendamment de l’IDE CyCode.
 
-> **BÊTA · 0.1.7**
+> **BÊTA · 0.1.8**
 >
-> La 0.1.7 ajoute les services natifs Core partagés et l’édition paginée des grands
-> UTF-8, en conservant la correction de mise à jour 0.1.6, JetBrains Mono, le zoom
-> et la palette de code. Le mode paginé a des limites de fonctions et de récupération.
-> La validation du bureau et de l’installation reste à effectuer. Consultez les
-> [notes de version](VERSION.fr.md). Si la 0.1.4 ou la 0.1.5 affiche **Invalid update arguments**,
-> fermez Reader et installez manuellement la version actuelle une fois ; voir le
-> [guide de récupération](Docs/Releases/v0.1.6.fr.md).
+> La 0.1.8 ajoute l’assistant, la console et MCP natifs avec outils communs sur
+> les documents ouverts, édition explicite et reçus durables. Le texte paginé reste
+> un profil graphique. Consultez les [notes et limites](VERSION.fr.md).
+> Si la 0.1.4 ou la 0.1.5 affiche **Invalid update arguments**, suivez la
+> [récupération manuelle existante](Docs/Releases/v0.1.6.fr.md).
 
 [![CyCodeReader avec coloration C++, onglets, barre d’outils et minimap](Docs/images/editor.png)](Docs/images/editor.png)
 
 *Vues réelles de l’application v0.1.1, rendues à partir des données ImGui sur des
 documents d’exemple. Ces images illustrent l’interface ; elles ne valident pas
-le fonctionnement sur le bureau ou l’installateur de la v0.1.7 et précèdent sa nouvelle police et sa palette.*
+le fonctionnement sur le bureau ou l’installateur de la v0.1.8 et précèdent sa nouvelle police et sa palette.*
 
 ## À propos de CyCodeReader
 
@@ -68,15 +66,15 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 Les sources utilisent maintenant Core `0541cd0c438bcca507da232e9e1caa2156596910`, API native et
 commune 1, avec CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`.
 Les correctifs locaux de propositions de mots, indentation des blocs et occurrences
-sélectionnées sont conservés. Les téléchargements publics 0.1.7 restent inchangés ;
+sélectionnées sont conservés. Les téléchargements publics 0.1.8 restent inchangés ;
 leur paire initiale est décrite ci-dessous. Voir les [vérifications](Docs/Validation.md).
 
-## Core natif partagé en 0.1.7
+## Core natif partagé en 0.1.8
 
-La version 0.1.7 épingle Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
+La version 0.1.8 épingle Core `f5e6261bf8acf22d0b3241622ed4294322724fb9`
 et CyUI `0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. L’éditeur paginé
 natif partagé ouvre les grands UTF-8 avec pages asynchrones, Annuler/Rétablir,
-recherche et sauvegardes intégrales en streaming. Voir les [notes 0.1.7](VERSION.fr.md)
+recherche et sauvegardes intégrales en streaming. Voir les [notes 0.1.8](VERSION.fr.md)
 et [architecture, budgets et contrats manquants](Docs/PagedText.md).
 
 ## Fonctionnalités
@@ -103,9 +101,9 @@ et [architecture, budgets et contrats manquants](Docs/PagedText.md).
   typées et syntaxes, dont des moteurs natifs et fournisseurs de comparaisons.
   Un redémarrage est nécessaire ; les plugins natifs sont du code de confiance
   exécuté dans le processus.
-- **Automatisation et aide** : le SDK/MCP CyToolsCore optionnel accède aux mêmes
+- **Automatisation et aide** : le chat/CLI/MCP CyMCPSDK natif accède aux mêmes
   documents ordinaires et contrôles de révision ; le pont paginé reste à fournir. F1 ouvre le manuel CyDoc illustré
-  local. Le compagnon privé Python/SDK s’installe séparément.
+  local. Le compagnon console natif est fourni avec Reader ; configurez un fournisseur pour le chat.
 
 La recherche est littérale, avec une comparaison de casse limitée à l’ASCII.
 Recherche récursive dans un dossier, remplacement regex, macros, commandes externes
@@ -139,13 +137,12 @@ Les DLL du runtime MSVC sont fournies avec les paquets Windows. Linux et macOS
 restent des cibles prévues depuis les sources ; leur fonctionnement graphique
 complet n’est pas validé et cette version ne propose aucun paquet natif pour eux.
 
-1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-setup.exe), exécuter Setup pour l’utilisateur courant, puis ouvrir CyCodeReader depuis le menu Démarrer.
-2. Pour une copie portable, [télécharger le ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.7/CyCodeReader-0.1.7-windows-x64-portable.zip). Extraire le ZIP **complet** dans un dossier accessible en écriture et lancer `CyCodeReader.exe`, avec tous les dossiers fournis à côté.
+1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-setup.exe), exécuter Setup pour l’utilisateur courant, puis ouvrir CyCodeReader depuis le menu Démarrer.
+2. Pour une copie portable, [télécharger le ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-portable.zip). Extraire le ZIP **complet** dans un dossier accessible en écriture et lancer `CyCodeReader.exe`, avec tous les dossiers fournis à côté.
 3. Ouvrir les fichiers et choisir une syntaxe si nécessaire. Installer Git
-   séparément pour l’historique optionnel ; configurer le SDK privé uniquement
-   pour utiliser MCP.
+   séparément pour l’historique optionnel ; configurer un fournisseur pour le chat intégré ; MCP natif est inclus.
 
-Les [notes de release et sommes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.7)
+Les [notes de release et sommes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.8)
 accompagnent les deux téléchargements. Les réglages portables restent dans
 `data/reader` ; les réglages installés utilisent `%LOCALAPPDATA%/CyCodeReader/reader`.
 Les versions publiques vérifient GitHub Releases au démarrage par défaut pour les nouvelles installations. Une nouvelle
@@ -177,9 +174,11 @@ python scripts/build.py
 Le résolveur récupère la révision exacte de CyUI depuis son dépôt officiel.
 L’option `--cyui PATH` doit sélectionner un dépôt propre à la même révision ;
 aucun dépôt amont n’est réinitialisé. Les modules graphiques sont **Core, Code,
-CodeEditor, Commands, Inspector, Diagnostics et Diff**, avec un seul moteur
+CodeEditor, Commands, Inspector, Diagnostics, Diff et DocumentViews**, avec un seul moteur
 ImGui/TextEditor. Audio, Gallery, CEF et les démonstrations sont désactivés.
 CyDoc sélectionne séparément **image/gallery** pour le manuel.
+
+CyMCPSDK **Core/Platform/Http/MCP** est lié nativement ; l’interface utilise aussi **AI/ChatUI** et CyUI **DocumentViews**. Le dépôt SDK local correspondant est prioritaire, avec sa révision publiée dans [cymcp-source.lock.json](cymcp-source.lock.json). Voir la [configuration CLI/chat/MCP](Docs/MCP.md).
 
 La sortie Windows est `runtime/build-vs/Release` ; les autres compilations depuis
 les sources utilisent `runtime/build`. Les compilations ordinaires désactivent
@@ -194,7 +193,7 @@ compile pas les services de projet ou de langage.
 
 Le [guide de développement](Docs/Development.md) détaille les options de compilation,
 l’intégration de l’éditeur partagé, les paquets et la configuration optionnelle du
-wheel CyToolsCore verrouillé. La [génération documentaire](.CyDocBuild/README.md)
+SDK CyMCPSDK compilé depuis les sources verrouillées. La [génération documentaire](.CyDocBuild/README.md)
 utilise la chaîne CyDoc existante. Ces guides techniques sont en anglais.
 
 La [vitrine locale](website/README.md) se génère avec `python website/build.py`.
@@ -226,8 +225,8 @@ conservent leurs propres conditions.
 | [Tree-sitter](https://github.com/tree-sitter/tree-sitter) | [MIT](licenses/tree-sitter.txt) | Analyse incrémentale dans l’éditeur partagé. |
 | [Grammaires Tree-sitter](https://github.com/tree-sitter) | [Rust](licenses/tree-sitter-rust.txt), [Java](licenses/tree-sitter-java.txt), [JavaScript](licenses/tree-sitter-javascript.txt), [TypeScript](licenses/tree-sitter-typescript.txt), [HTML](licenses/tree-sitter-html.txt), [CSS](licenses/tree-sitter-css.txt) · MIT | Analyseurs de langages ; conserver la notice de chaque grammaire. |
 | [Lexilla / Scintilla](https://github.com/ScintillaOrg/lexilla) · [SciTE](https://www.scintilla.org/SciTE.html) | [Lexilla](licenses/Lexilla.txt), [Scintilla](licenses/Scintilla.txt), [SciTE](licenses/SciTE-Properties.txt) | Notices permissives des lexers, en-têtes publics et mots-clés ; aucun éditeur Scintilla ou plugin binaire Notepad++ n’est lié. |
-| CyToolsCore SDK 0.10.1 — distribution privée | [MIT](licenses/CyToolsCore.txt) | Compagnon SDK/MCP optionnel, fourni séparément par le wheel verrouillé du propriétaire. |
-| [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) | [MIT](licenses/MCP-Python.txt) | Transport MCP officiel dans l’environnement Python optionnel. |
+| [CyMCPSDK 0.7.1](https://github.com/MrMybal/CyMCPSDK) | [MIT](licenses/CyMCPSDK.txt) | Chat/CLI/MCP natif compilé depuis la révision publiée b0eea5e. |
+| [MD4C](https://github.com/mity/md4c) · [cpp-httplib](https://github.com/yhirose/cpp-httplib) · [PicoSHA2](https://github.com/okdshin/PicoSHA2) | [MIT](licenses/MD4C.txt) · [MIT](licenses/cpp-httplib.txt) · [MIT](licenses/PicoSHA2.txt) | Markdown du chat, HTTP local du SDK et empreintes. |
 | [CyDoc](https://github.com/MrMybal/CyDoc) | [MIT](https://github.com/MrMybal/CyDoc/blob/6ddf9a582defb2f11fbb3f992afef6f98dcadc93/LICENSE) | Lecteur hors ligne embarqué avec les modules image/gallery, sans runtime Three.js. |
 | [marked](https://github.com/markedjs/marked) | [MIT](https://github.com/markedjs/marked/blob/v17.0.1/LICENSE.md) | Compilation du Markdown lors de la génération. |
 | [PrismJS](https://github.com/PrismJS/prism) | [MIT](https://github.com/PrismJS/prism/blob/v1.30.0/LICENSE) | Coloration de la documentation lors de la génération. |

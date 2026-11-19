@@ -61,7 +61,11 @@ int main(int argc,char **argv) {
         const auto args=arguments(argc,argv);
         for (size_t i=1; i<args.size(); ++i) {
             auto next=[&]() -> std::string { if (i+1>=args.size()) throw std::runtime_error("Missing command line value"); return args[++i]; };
-            if (args[i]=="--theme") options.theme=next();
+            if (args[i]=="--automation-config") options.automationConfig=utf8Path(next());
+            else if(args[i]=="--automation-descriptor") options.automationDescriptor=utf8Path(next());
+            else if(args[i]=="--automation-data-dir") options.automationData=utf8Path(next());
+            else if(args[i]=="--no-automation") options.disableAutomation=true;
+            else if (args[i]=="--theme") options.theme=next();
             else if (args[i]=="--language") options.language=next();
             else if (args[i]=="--open") options.files.push_back(utf8Path(next()));
             else if (args[i]=="--test-frames") { frameLimit=std::stoi(next()); if (frameLimit<=0 || frameLimit>10000) throw std::runtime_error("Invalid test frame limit"); }

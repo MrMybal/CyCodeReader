@@ -65,7 +65,7 @@ bool PluginOptionsView::commit(Plugins &plugins, const std::string &plugin,
     for (const auto &proposal : edits) if (proposal.edit.committed()) {
         const auto error = validate(proposal.id, proposal.edit.value);
         if (!error.empty()) throw std::runtime_error(error);
-        std::visit([&](const auto &value) { patch[keys.at(proposal.id)] = value; }, proposal.edit.value);
+        std::visit([&](const auto &value) { using T=std::decay_t<decltype(value)>; if constexpr(std::is_same_v<T,bool>||std::is_same_v<T,std::int64_t>||std::is_same_v<T,double>||std::is_same_v<T,std::string>) patch[keys.at(proposal.id)] = value; else throw std::runtime_error("Unsupported plugin option type"); }, proposal.edit.value);
     }
     if (patch.empty()) return false;
     plugins.configure(plugin, patch);

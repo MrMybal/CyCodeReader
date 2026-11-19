@@ -45,35 +45,29 @@ void Reader::preparePluginLanguages() {
     }
 }
 void Reader::startSdk() {
-    if (sdk_.valid() && sdk_.wait_for(std::chrono::seconds(0))!=std::future_status::ready) return;
-    if (sdk_.valid()) sdk_.get();sdkStop_=false;sdkError_.clear();
-    serviceLogs_.append(cyui::LogLevel::info,"Starting CyToolsCore SDK service","CyToolsCore");
+    if(automation_)return;
     try {
-        if (!bridge_) {
+        automationStopping_=false;
+        const auto profile=options_.automationData.empty()?readerDataDirectory(options_.installation)/"automation/default":options_.automationData;
+        Json settings=Json::object();
+        const auto config=options_.automationConfig.empty()?profile/"settings.json":options_.automationConfig;
+        if(std::filesystem::is_regular_file(config))settings=Json::parse(readTextFileBytes(config));
+        sdkDescriptor_=options_.automationDescriptor.empty()?profile/"connection.json":options_.automationDescriptor;
 #ifdef _WIN32
-            const auto pid=GetCurrentProcessId();
+        cli_=options_.installation/"app"/"cycodereader_cli.exe";
 #else
-            const auto pid=getpid();
+        cli_=options_.installation/"app"/"cycodereader_cli";
 #endif
-            const auto directory=readerDataDirectory(options_.installation)/"bridge"/std::to_string(pid);
-            bridge_=std::make_unique<Bridge>(core_,directory/"native.json");sdkDescriptor_=directory/"core.json";
-        }
-        python_.clear();
-        if (const auto value=std::getenv("CYCODE_READER_PYTHON")) python_=utf8Path(value);
-        else for (auto path=options_.installation;!path.empty();path=path.parent_path()) {
-#ifdef _WIN32
-            const auto candidate=path/"runtime/python/Scripts/python.exe";
-#else
-            const auto candidate=path/"runtime/python/bin/python";
-#endif
-            if (std::filesystem::is_regular_file(candidate)) { python_=candidate;break; }if (path==path.parent_path()) break;
-        }
-        if (python_.empty() || !std::filesystem::is_regular_file(python_)) throw std::runtime_error(tr("Install the Reader SDK runtime with scripts/setup_sdk.py."));
-        const auto script=options_.installation/"app/tool.py";
-        if (!std::filesystem::is_regular_file(script)) throw std::runtime_error("Reader SDK app/tool.py is missing");
-        std::vector<std::string> argv={pathUtf8(python_),pathUtf8(script),"--desktop-service","--native-descriptor",pathUtf8(bridge_->descriptor()),"--service-descriptor",pathUtf8(sdkDescriptor_),"--data-dir",pathUtf8(sdkDescriptor_.parent_path()/"jobs")};
-        sdk_=std::async(std::launch::async,[this,argv] { return runProcess(argv,options_.installation,std::chrono::hours(24),256*1024,&sdkStop_); });
-    } catch (const std::exception &e) { sdkError_=e.what();serviceLogs_.append(cyui::LogLevel::error,sdkError_,"CyToolsCore"); }
+        automation_=std::make_shared<Automation>(profile,[this](const std::string &method,const Json &parameters,const cymcp::CallContext &context){
+            auto request=std::make_shared<AutomationRequest>();request->method=method;request->parameters=parameters;request->context=context;
+            auto result=request->reply.get_future();
+            {std::lock_guard lock(automationMutex_);if(automationStopping_)throw cymcp::Error("Cancelled","Reader is shutting down");
+             if(automationRequests_.size()>=128)throw cymcp::Error("Busy","Reader operation queue is full");automationRequests_.push_back(request);}
+            return result.get();
+        },true,AutomationOptions::fromJson(settings));
+        automation_->start(sdkDescriptor_);assistant_=std::make_unique<Assistant>(*automation_,settings);
+        sdkError_.clear();serviceLogs_.append(cyui::LogLevel::info,"CyMCPSDK native service ready","CyMCPSDK");
+    } catch(const std::exception &e){sdkError_=cymcp::redact_error_message(e.what());automation_.reset();serviceLogs_.append(cyui::LogLevel::error,sdkError_,"CyMCPSDK");}
 }
 void Reader::extensionPanels() {
     if (pluginsPanel_) {
@@ -129,30 +123,33 @@ void Reader::extensionPanels() {
         ImGui::End();
     } else for (auto &[id,view] : pluginOptions_) cancelInspectorDrafts(view.state);
     if (mcpPanel_) {
-        const bool visible=ImGui::Begin("CyToolsCore / MCP",&mcpPanel_);
+        const bool visible=ImGui::Begin("CyMCPSDK / MCP",&mcpPanel_);
         if (visible && active() && active()->paged) cyui::callout(cyui::Tone::warning,tr("The SDK/MCP session currently exposes ordinary documents only."));
         if (visible) {
             if (cyui::iconButton(cyui::icon::help,tr("MCP documentation"))) execute("help",{{"page","mcp"}});
-            const bool ready=sdk_.valid() && !sdkDescriptor_.empty() && std::filesystem::is_regular_file(sdkDescriptor_);
+            const bool ready=bool(automation_) && !sdkDescriptor_.empty() && std::filesystem::is_regular_file(sdkDescriptor_);
             cyui::badge(tr(ready ? "SDK service ready" : "SDK service unavailable"),ready ? cyui::Tone::success : cyui::Tone::warning);
 
+            if(ImGui::CollapsingHeader(tr("MCP connection"))){
             if (cyui::button(tr("Start SDK service"))) startSdk();
             ImGui::BeginDisabled(!ready);
             for (bool edit : {false,true}) if (cyui::button(tr(edit ? "Copy editing MCP configuration" : "Copy read-only MCP configuration"))) {
-                Json config={{"mcpServers",{{"CyCodeReader",{{"command",pathUtf8(python_)},{"args",Json::array({pathUtf8(options_.installation/"app/tool.py"),"--bridge-config",pathUtf8(sdkDescriptor_),"--access",edit ? "edit" : "read","mcp"})}}}}}};
+                Json config={{"mcpServers",{{"CyCodeReader",{{"command",pathUtf8(cli_)},{"args",Json::array({"--connect",pathUtf8(sdkDescriptor_),"--access",edit ? "edit" : "read","mcp"})}}}}}};
                 ImGui::SetClipboardText(config.dump(2).c_str());
             }ImGui::EndDisabled();
             cyui::textDim("%s",tr("The read identity cannot edit files or execute plugins. Saving remains explicit."));
-            if (bridge_) {
-                const auto status=bridge_->serviceStatus();
-                cyui::textDim("%s: %s",tr("Native text service"),status.at("service").at("state").get_ref<const std::string &>().c_str());
             }
+            if(!sdkError_.empty())cyui::textDim("%s",sdkError_.c_str());
+
+            if(ImGui::CollapsingHeader(tr("Service logs"))){
             if (cyui::button(tr("Copy logs"))) {
                 std::vector<cyui::LogEntry> rows;serviceLogs_.snapshot(rows,0);std::string text;
                 for (const auto &row : rows) text+=row.text+"\n";
                 ImGui::SetClipboardText(text.c_str());
             }ImGui::SameLine();if (cyui::button(tr("Clear logs"))) serviceLogs_.clear();
-            cyui::logView("##reader-service-log",serviceLogState_,serviceLogs_,{0,0});
+            cyui::logView("##reader-service-log",serviceLogState_,serviceLogs_,cyui::dp(0,120));
+            }
+            if(assistant_)assistant_->draw();
         }ImGui::End();
     }
     if (optionsPanel_) {

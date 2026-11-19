@@ -85,7 +85,7 @@ in licenses/ and are deployed with the application.
 ## Ownership and interactions
 
 ReaderCore still owns live documents, native revisions, plugins, persistence and
-disk-conflict validation. CyToolsCore still owns MCP identities, jobs and access
+disk-conflict validation. The native CyMCPSDK registry and Reader durable ledger own MCP identities, jobs and access
 control. No service or model is reimplemented by a UI module.
 
 External text edits enter the same native editor through pullLiveDocument, as

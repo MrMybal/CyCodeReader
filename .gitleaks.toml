@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "SHA-256 source checksums in the SDK dependency lock"
+condition = "AND"
+regexTarget = "line"
+paths = ['''(^|/)cymcp-source\.lock\.json$''']
+regexes = ['''^\s*"src/(api\.cpp|error_credentials\.hpp)"\s*:\s*"[a-f0-9]{64}",?\s*$''']

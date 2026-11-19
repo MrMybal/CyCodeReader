@@ -70,6 +70,7 @@ def files_in(stage):
 
 def write_manifest(stage, app_version):
     verify_documentation(stage / 'Documentation')
+    if not (stage/'app/cycodereader_cli.exe').is_file():raise RuntimeError('Native Reader CLI is missing')
     files = sorted(set(files_in(stage)) | {'package-files.json'})
     (stage / 'package-files.json').write_text(
         json.dumps({'version': app_version, 'files': files}, indent=2) + '\n', 'utf-8')
@@ -141,6 +142,7 @@ def main():
         for name in ('CyCodeReader.exe', 'CyCodeReaderUpdater.exe', 'locales/ui.json',
                      'fonts/JetBrainsMono-Regular.ttf', 'licenses/JetBrainsMono-OFL.txt',
                      'LICENSE', 'COPYRIGHT', 'msvcp140.dll', 'vcruntime140.dll',
+                     'app/cycodereader_cli.exe','app/msvcp140.dll','app/vcruntime140.dll','app/import_legacy_jobs.py',
                      'icons/CyCodeReader.png', 'icons/CyCodeReader.ico',
                      'icons/CyCodeReader-document.png', 'icons/CyCodeReader-document.ico',
                      'plugins/git.json', 'plugins/reader_git_plugin.dll'):

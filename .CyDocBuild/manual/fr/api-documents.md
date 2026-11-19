@@ -22,3 +22,4 @@ Ces contrats décrivent le service natif exposé par l’intégration SDK/MCP of
 - [`documents_save`](doc:operation-documents-save-documents-save) — Enregistrer un document nommé à la révision attendue après contrôle du disque.
 - [`documents_format`](doc:operation-documents-format-documents-format) — Modifier l’encodage ou les fins de ligne en attente à la révision attendue.
 - [`documents_close`](doc:operation-documents-close-documents-close) — Fermer un document à la révision attendue ; abandonner les changements exige un choix explicite.
+- [`documents_save_as`](doc:operation-documents-save-as-documents-save-as) — Enregistrer une copie sous un nouveau chemin sans écraser de fichier existant.

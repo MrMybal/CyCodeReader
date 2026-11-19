@@ -21,8 +21,7 @@ The native dependency cache needs JSON and Monocypher; headless ordinary TextSes
 The normal resolver uses its immutable published source revision and preserves
 dirty caches. The native service advertises cycode-core/1 through its compatible
 cycodereader-native/1 descriptor. Revisions, disk guards, read-only checks, bounded
-responses and EOF shutdown are enforced by the shared native owner. CyToolsCore
-still owns jobs, identities, permissions and MCP; no parallel scheduler is added.
+responses and EOF shutdown are enforced by the shared native owner. CyMCPSDK is linked natively; see [MCP](MCP.md) for the registry, private durable receipts, ChatUI, CLI and authenticated transports.
 
 Reader 671c588 with Core 84e4c78 passed all 17 service/view tests on Windows x64,
 Ubuntu x64 and macOS arm64, plus the separate seven-case headless build. Actual
@@ -30,8 +29,7 @@ plugins, encodings, guarded edits, IPC/EOF, shared editor/syntax, comparison/his
 filtering and platform/custom snippet completion chords are exercised on runners.
 The existing C++ text plugin ABI is unchanged. This does not establish GPU, IME
 or physical desktop acceptance. See Docs/Validation.md for exact provenance.
-Local application/test execution stays suspended while antivirus removals remain
-unresolved. Production compilation and data checks are separate evidence.
+Historical antivirus restrictions remain in force; this migration’s explicitly requested synthetic local acceptance is recorded separately in Docs/Validation.md.
 
 # Architecture
 
@@ -46,12 +44,11 @@ multi-resolution ICOs; Setup uses the application ICO and the PNG in its wizard.
 Only the four approved PNG/ICO files are deployed. The shared editor/native core
 and selected CyUI modules do not gain a rendering or image-module dependency.
 
-src/ owns Reader windows, document views, menus, dialogs and preferences. ReaderCore integrates the real CyToolsCore SDK/MCP through a private Python
-companion; CyCode project/LSP/VCS/build/debug services remain separate. Reader's
+src/ owns Reader windows, document views, menus, dialogs and preferences. Reader integrates CyMCPSDK natively through one shared operation registry; CyCode project/LSP/VCS/build/debug services remain separate. Reader's
 optional Git plugin provides read-only file comparisons through the generic
 comparison-provider contract, without importing those IDE services.
 Native editing does not require Python after compilation. The integrated
-CyToolsCore/MCP companion uses its own private Python runtime.
+CyMCPSDK is linked natively; see [MCP](MCP.md) for the registry, private durable receipts, ChatUI, CLI and authenticated transports.
 
 editor/ is a source library with API version 1. CyCode adds only that directory,
 using CYCODE_EDITOR_DEPS and CYCODE_EDITOR_BUILD_GUI to select its own dependency
@@ -108,16 +105,14 @@ one widget undo transaction. Unsynchronized local changes are refused. This comm
 adapter has a headless actual-widget test; full desktop acceptance stays separate.
 
 Bridge binds only loopback and authenticates bounded native JSON requests. It is
-private IPC. app/tool.py uses the real CyToolsCore Runtime, schemas, scheduler,
-identities, HTTP service and official MCP adapter. Each GUI process starts one SDK
-companion with distinct reader/writer credentials and endpoint files. The shared native Process component
+private IPC. app/tool.py is a standard-library forwarding shim; the native CyMCPSDK registry supplies schemas,
+identities, HTTP service and official MCP adapter. Each GUI process owns one native SDK service with distinct reader/writer credentials and endpoint files. The shared native Process component
 owns its hidden child-process tree and bounded logs; closing Reader stops it.
 After all dirty-document/save dialogs accept the exit, Reader immediately signals
 SDK/update cancellation. The SDL shell hides the main and detached windows before
 Reader joins its workers, including on exceptions, and skips further rendering
 after accepted closure. Shutdown still joins owned futures before destroying
-Core, plugins, ImGui and the OpenGL context. The SDK has no unconditional
-two-second wait before its existing process-tree cancellation.
+Core, plugins, ImGui and the OpenGL context. Remote discovery and providers receive cooperative cancellation during shutdown.
 There is no independent Python document model or recreated MCP scheduler.
 
 The Core Documents module performs strict UTF-16 surrogate conversion and explicit Windows-1252

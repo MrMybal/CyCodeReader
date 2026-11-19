@@ -4,7 +4,7 @@ title: CyCodeReader
 description: Choose a task in the code and text editor.
 section: Using Reader
 order: 0
-revision: 2
+revision: 3
 ---
 
 ## Start here {#getting-started}
@@ -13,7 +13,7 @@ CyCodeReader edits code and text files without opening an IDE project. Start wit
 
 ## Platforms {#platforms}
 
-Windows x64 packages include a portable edition and a per-user installer. An OpenGL 3.3 driver is required. The editor does not need Python; the optional [MCP companion](doc:mcp#connection) has separate prerequisites. Linux/macOS source builds are planned; no native packages are supplied here.
+Windows x64 packages include a portable edition and a per-user installer. An OpenGL 3.3 driver is required. The editor, native chat and [MCP companion](doc:mcp#connection) do not need Python. Configure a compatible provider for the assistant. Linux/macOS source builds are planned; no native packages are supplied here.
 
 ## Licence {#licensing}
 

@@ -148,7 +148,7 @@ void Reader::menus() {
         }
         ImGui::EndMenu();
     }
-    if (ImGui::MenuItem("CyToolsCore / MCP")) mcpPanel_=true;
+    if (ImGui::MenuItem("CyMCPSDK / MCP")) mcpPanel_=true;
     if (ImGui::MenuItem(cyui::trLabel("Options").c_str())) optionsPanel_=true;
     if (ImGui::MenuItem(cyui::trLabel("Updates").c_str())) updatePanel_=true;
     ImGui::EndMainMenuBar();

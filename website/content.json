@@ -40,8 +40,8 @@
     "fr": "Chapitres de la page"
   },
   "hero.status": {
-    "en": "BETA · 0.1.7 · Windows x64",
-    "fr": "BÊTA · 0.1.7 · Windows x64"
+    "en": "BETA · 0.1.8 · Windows x64",
+    "fr": "BÊTA · 0.1.8 · Windows x64"
   },
   "hero.heading": {
     "en": "Your files. Your workspace.",
@@ -356,12 +356,12 @@
     "fr": "Les mêmes documents, via MCP"
   },
   "extensions.mcp.body": {
-    "en": "The optional CyToolsCore SDK/MCP companion reads and edits ReaderCore’s live documents, using the same revisions, permissions and disk-change guards as the interface. Saving remains explicit.",
-    "fr": "Le compagnon CyToolsCore SDK/MCP optionnel lit et modifie les documents actifs de ReaderCore avec les mêmes révisions, permissions et contrôles disque que l’interface. L’enregistrement reste explicite."
+    "en": "Version 0.1.8’s native CyMCPSDK chat/CLI/MCP reads and edits ReaderCore’s live documents, using the same revisions, permissions and disk-change guards as the interface. Saving remains explicit.",
+    "fr": "Le chat/CLI/MCP CyMCPSDK natif de la version 0.1.8 lit et modifie les documents actifs de ReaderCore avec les mêmes révisions, permissions et contrôles disque que l’interface. L’enregistrement reste explicite."
   },
   "extensions.mcp.note": {
-    "en": "The owner’s pinned CyToolsCore wheel and a compatible private Python environment are supplied separately. Native text editing needs neither Python nor a CyCode checkout.",
-    "fr": "Le wheel CyToolsCore verrouillé du propriétaire et un environnement Python privé compatible sont fournis séparément. L’édition native ne nécessite ni Python ni dépôt local de CyCode."
+    "en": "The source-built CyMCPSDK chat and console companion ship with Reader 0.1.8. Native text editing needs neither Python nor a CyCode checkout.",
+    "fr": "Le chat et le compagnon console CyMCPSDK compilés depuis les sources sont fournis avec Reader 0.1.8. L’édition native ne nécessite ni Python ni dépôt local de CyCode."
   },
   "extensions.mcp.link": {
     "en": "Configure the SDK / MCP companion",
@@ -448,8 +448,8 @@
     "fr": "Reader nécessite-t-il Python ou un compte ?"
   },
   "faq.four.a": {
-    "en": "Native editing needs neither Python nor an account. The optional SDK/MCP companion has a separate private Python/CyToolsCore setup. Git is installed separately for file-history tools.",
-    "fr": "L’édition native ne nécessite ni Python ni compte. Le compagnon SDK/MCP optionnel a sa propre installation privée Python/CyToolsCore. Git s’installe séparément pour l’historique des fichiers."
+    "en": "Native editing needs neither Python nor an account. Native chat/CLI/MCP uses CyMCPSDK without a Python runtime. Git is installed separately for file-history tools.",
+    "fr": "L’édition native ne nécessite ni Python ni compte. Le chat/CLI/MCP natif utilise CyMCPSDK sans environnement Python. Git s’installe séparément pour l’historique des fichiers."
   },
   "download.eyebrow": {
     "en": "08 / GET CYCODE READER",
@@ -460,8 +460,8 @@
     "fr": "Un éditeur natif pour vos fichiers."
   },
   "download.body": {
-    "en": "Install version 0.1.7 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
-    "fr": "Installez la version 0.1.7 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
+    "en": "Install version 0.1.8 on Windows 10/11 x64 with the per-user Windows installer. A portable ZIP is also available: extract the complete archive into a writable folder and keep its supplied resources together.",
+    "fr": "Installez la version 0.1.8 sur Windows 10/11 x64 avec l’installateur Windows par utilisateur. Un ZIP portable est aussi disponible : extrayez toute l’archive dans un dossier accessible en écriture et conservez les ressources fournies ensemble."
   },
   "download.portable": {
     "en": "Portable ZIP",
@@ -484,8 +484,8 @@
     "fr": "Linux et macOS restent des cibles prévues depuis les sources. Cette version ne fournit ni paquets natifs ni validation graphique complète pour ces plateformes."
   },
   "download.updates": {
-    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit. If version 0.1.4 or 0.1.5 reports Invalid update arguments, close Reader and install 0.1.7 manually once; the older launcher cannot repair its own handoff.",
-    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites. Si la version 0.1.4 ou 0.1.5 affiche Invalid update arguments, fermez Reader et installez la 0.1.7 manuellement une fois ; l’ancien lanceur ne peut pas corriger sa propre transmission."
+    "en": "New installations check GitHub Releases at startup. Reader proposes available versions in the application, then downloads and verifies the correct package when you accept. Existing startup-check preferences are preserved; installation and restart remain explicit. If version 0.1.4 or 0.1.5 reports Invalid update arguments, close Reader and install 0.1.8 manually once; the older launcher cannot repair its own handoff.",
+    "fr": "Les nouvelles installations vérifient GitHub Releases au démarrage. Reader propose les versions disponibles dans l’application, puis télécharge et vérifie le bon paquet quand vous acceptez. Les préférences de vérification existantes sont conservées ; installation et redémarrage restent explicites. Si la version 0.1.4 ou 0.1.5 affiche Invalid update arguments, fermez Reader et installez la 0.1.8 manuellement une fois ; l’ancien lanceur ne peut pas corriger sa propre transmission."
   },
   "footer.body": {
     "en": "A separate editor. A shared engine.",

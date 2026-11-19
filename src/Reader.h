@@ -1,7 +1,9 @@
 #pragma once
 #include "Document.h"
 #include "Core.h"
-#include "Bridge.h"
+#include "Automation.h"
+#include "Assistant.h"
+#include <deque>
 #include "NativeProcess.h"
 #include "ModuleModels.h"
 #include "Updates.h"
@@ -24,7 +26,8 @@ struct Options {
     std::filesystem::path installation;
     std::vector<std::filesystem::path> files;
     std::string theme, language;
-    bool automated=false;
+    bool automated=false,disableAutomation=false;
+    std::filesystem::path automationConfig,automationDescriptor,automationData;
     ImTextureID logo=0;
 };
 class Reader {
@@ -195,11 +198,20 @@ class Reader {
     void error(const std::exception &exception);
     Options options_;
     Core core_;
-    std::unique_ptr<Bridge> bridge_;
-    std::future<cycode::ProcessResult> sdk_;
+    std::shared_ptr<Automation> automation_;
+    std::unique_ptr<Assistant> assistant_;
     std::atomic<bool> sdkStop_{false};
-    std::filesystem::path sdkDescriptor_,python_;
-    std::string sdkError_,pluginResult_;
+    std::filesystem::path sdkDescriptor_,cli_;
+    std::string sdkError_,pluginResult_,automationRevisionKey_;
+    struct AutomationRequest {
+        std::string method;Json parameters;cymcp::CallContext context;std::promise<Json> reply;
+    };
+    std::mutex automationMutex_;
+    std::deque<std::shared_ptr<AutomationRequest>> automationRequests_;
+    bool automationStopping_=false;
+    void pollAutomation();
+    void stopAutomationRequests();
+    Json automationDispatch(const std::string&,const Json&,const cymcp::CallContext&);
     bool pluginsPanel_=false,mcpPanel_=false,optionsPanel_=false;
     bool searchPanel_=false,searchFocus_=false;
     cyui::CodeEditor searchPreview_;
@@ -252,7 +264,7 @@ class Reader {
     int line_=1;
     uint64_t pagedLine_=1;
     size_t closingPaged_=0, nextPagedId_=size_t(1)<< (sizeof(size_t)*8-2);
-    ImGuiID dock_=0, editorDock_=0;
+    ImGuiID dock_=0, editorDock_=0,mcpDock_=0;
     std::string theme_="graphite", locale_="en", density_="compact", lastError_;
 };
 } // namespace cycode::reader

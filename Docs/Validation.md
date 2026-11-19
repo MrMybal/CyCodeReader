@@ -614,3 +614,123 @@ validation. The workflow requires matching numeric tag/CMake versions, a boolean
 prerelease profile and versioned notes. Tagged public builds reconstruct and test
 the packages on Windows/MSVC before uploading the installer, portable ZIP and
 SHA256SUMS.txt. Reader and its installer were not launched during preparation.
+
+
+## 0.1.8 native CyMCPSDK migration — local acceptance, 2026-11-20
+
+This migration's supplied integration request explicitly asked to compile, launch
+and test the application locally without GitHub workflows. The following synthetic
+local execution was performed under that request. No Actions workflow was enabled,
+run or edited; antivirus settings and quarantined files were not changed.
+
+- Native Core lock/cache: `7d0a468a490733c920694b3c41dc980f50c7cfea`, source API 1.
+  Reader selects the lightweight Documents/TextSession/TextBridge/Process/Snippets/
+  PagedText components, with one native document owner, rather than the full Engine.
+- CyUI: `6ef01cfcdb197f3a89d64618ce5ef8818c704728`, clean local checkout.
+  One ImGui/TextEditor backend remains; upstream CyUI/SDK sources were not edited.
+- CyMCPSDK: local 0.7.1 sources based on
+  `791d4d7d7680213b282ec8529d248a10f8494d77`, including the owner's reviewed local
+  changes. The exact frozen input digest is
+  `1eae447381a54570771858be32421deea6cc993b472d9c6bafb5722fb8fe0969`.
+  `cymcp-source.lock.json` records each file hash; this preparation snapshot preceded the published SDK revision used for release.
+- Console modules: Core, Platform, Http, MCP. GUI additionally links AI and ChatUI.
+  Local inference-engine management, SDK examples/tests/benchmarks and standalone
+  ChatApp are disabled. Reader application tests use their separate opt-in build.
+- Windows x64 / MSVC 19.40 Release builds succeeded. Linux/macOS migration builds,
+  physical desktop interaction and real provider accounts remain unverified.
+
+Executed builds and acceptance:
+
+```powershell
+python -B scripts/build.py --build-dir runtime/build-cymcp-vs --cyui $env:CYUI_DIR --public-updates
+python -B scripts/build.py --core-only --run-tests --build-dir runtime/tests-cymcp-headless-vs --public-updates
+python -B tests/test_cymcp.py runtime/build-cymcp-vs/Release/cycodereader_cli.exe
+python -B tests/test_chat_gui.py runtime/build-cymcp-vs/Release/CyCodeReader.exe runtime/cymcp-acceptance
+python -B scripts/package_windows.py --build runtime/build-cymcp-vs --output runtime/cymcp-dist --require-public-updates
+```
+
+Nine native CTests passed: Git plugin, distribution fixture generation, native
+updater/distribution guards, documents, Core text session, original native bridge,
+CyMCPSDK acceptance, queued-mutation cancellation and snippets. A queued mutation was cancelled while waiting for the real native document lock; its text/revision stayed unchanged and its cancelled receipt persisted. Direct modern MCP 2026 stdio subscriptions delivered resource-change notifications, and cancellation freed a subscription slot for reuse.
+
+The final production CLI acceptance also passed
+seven scenario groups: discovery/help/schema/error exit codes; native revision,
+save-as, dirty-close and disk guards; same-instance HTTP/CLI/MCP rights including
+forged-principal refusal; complete UTF-8 chunk recovery from disk with owner/TTL
+checks and no mutation replay; resource invalidation and metadata-only metrics;
+quota refusal before mutation and interrupted receipt recovery; original raw bridge,
+`--desktop-service`, Python forwarding and read-only legacy SQLite ownership import.
+A competing profile cannot replace/remove another instance's private descriptor.
+
+The real hidden SDL/OpenGL application and CyMCP::ChatUI passed a loopback provider
+fixture, with 13 actual generation requests. Assertions covered an assistant tool
+editing the real unsaved GUI buffer, actual editor selection/Undo/Redo, external MCP
+read/edit/refusal on that GUI, streamed partial text and cancellation, restored full
+private history, reduced API context preserving the system/current/tool groups,
+explicit text attachment delivery, real model-catalogue refresh, provider errors,
+and an explicitly allowlisted native remote MCP tool plus its permission failure.
+The source file stayed unchanged on disk. All SDL windows remained hidden. This
+uses synthetic services and data, not a live commercial provider or user document.
+
+The portable ZIP and Inno Setup installer were built locally. The final ZIP has
+84 managed files. It was independently extracted into a verified temporary child
+of runtime/cymcp-acceptance; its CLI and GUI/native service actually launched there.
+The companion is in `app/`, with its own MSVC runtime DLLs, so older update path
+validators accept it and it can run without relying on the parent's DLL search path.
+The optional standard-library legacy importer also ships there. No Python runtime,
+SDK wheel, CyToolsCore component or retired Python MCP notice is in the package.
+The compiled installer was not installed over the user's installation.
+
+Command actually tested from the extracted distribution:
+
+```powershell
+.\app\cycodereader_cli.exe --data-dir cli-profile invoke automation_status --json '{}'
+```
+
+It returned valid JSON, exit code 0, SDK 0.7.1 and the exact source digest above.
+The same executable supports `list`, `describe NAME`, `invoke NAME --json-file FILE`,
+`jsonl`, `serve`, `mcp`, `--connect DESCRIPTOR --access read|edit`, and original bridge
+launch options. See [MCP](MCP.md) for transport/authentication, all 30 GUI / 22 headless
+operations, the 21-operation legacy bridge profile, permissions, modules, independent
+optimization switches, cancellation and durable result recovery.
+
+Final artifacts and SHA-256:
+
+- CyCodeReader-0.1.8-windows-x64-portable.zip:
+  `89fb3c20f95e6486675a89f0dad715d294be9612b2895e3cd7b2dd1190d7858c`
+- CyCodeReader-0.1.8-windows-x64-setup.exe:
+  `20db13fcda81517fb4bc1f9a7a6e73d83213c482da875c143bf598d0ab0b8e91`
+
+The bilingual CyDoc export passed: 122 localized pages, 816 routes, 30 operation
+contracts per locale and complete translations. Source syntax/data checks and
+`git diff --check` passed. Current source/build/config/package integration has no
+CyToolsCore import/dependency; historical validation and release notes retain their
+original component/version names. The 0.1.8 publication updates README, release notes and showcase download metadata together.
+
+Limits: paged automation remains GUI-only; HTTP is authenticated loopback JSON
+request/response without SSE in this host. Direct stdio MCP supports the SDK's
+change subscriptions, while the GUI proxy uses refresh/TTL and exposes tools;
+remote notifications are not subscribed by this adapter. Native plugin callbacks
+remain trusted/cooperative. Provider fields edited in the panel are session settings;
+use settings.json for persistence. The release pins published SDK revision b0eea5e, whose source inputs exactly match the validated preparation snapshot.
+The preceding acceptance was performed before the separately authorized commit, push and release publication.
+
+
+### Published-source release build
+
+The release build pins the published SDK commit
+`b0eea5e9b35ae6cea660843e9c03bf25554f7944`. Its source content matches the
+preparation snapshot above; UTF-8 source text is normalized to LF before freezing.
+The canonical digest is
+`011a6c230dafb8e89aa6d7ff3a7cefea42c6995656dde28f96702e93d8f1f1c8`.
+A clean GitHub dependency resolution verified all 58 selected SDK inputs.
+
+The final Windows Release executables were rebuilt from this source pin and the
+updated 122-page bilingual manual, with application/SDK tests disabled in the
+production build and public updates enabled. The earlier synthetic acceptance
+remains the runtime evidence; no native application or installer was relaunched
+during this publication pass. Portable contents, compiled SDK provenance,
+checksums and the installer compiler staging manifest were checked. The installer
+container was not independently unpacked or installed. The local showcase build
+passed its EN/FR and resource checks. GitHub Pages deployment is separate from
+source and binary publication.

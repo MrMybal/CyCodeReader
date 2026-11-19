@@ -65,6 +65,12 @@ LABELS.update({'Recover cancelled input before editing or saving.':'Récupérez 
 
 LABELS.update({'No suggestions':'Aucune suggestion'})
 
+LABELS.update({'Assistant connection': 'Connexion de l’assistant', 'Detect providers': 'Détecter les fournisseurs', 'Detected provider': 'Fournisseur détecté', 'Provider ID': 'Identifiant du fournisseur', 'Model': 'Modèle', 'Endpoint': 'Adresse du service', 'API key environment variable': 'Variable d’environnement de la clé API', 'Available models': 'Modèles disponibles', 'Allow document edits': 'Autoriser la modification des documents', 'Keep private chat history': 'Conserver l’historique privé du chat', 'Compact tool discovery': 'Découverte compacte des outils', 'Limit API context window': 'Limiter la fenêtre de contexte API', 'Context size (KiB)': 'Taille du contexte (Kio)', 'Recent turns': 'Tours récents', 'Connect / new chat': 'Connexion / nouveau chat', 'Restore chat': 'Restaurer le chat', 'Reconnect': 'Reconnecter', 'Attachment path': 'Chemin de la pièce jointe', 'Attach file': 'Joindre le fichier', 'Changing permissions applies when opening a new connection.': 'Les permissions changées s’appliquent à l’ouverture d’une nouvelle connexion.', 'Connect configured MCP servers': 'Connecter les serveurs MCP configurés', 'After remote discovery, open a new chat connection to refresh its tools.': 'Après la découverte distante, ouvrez une nouvelle connexion au chat pour actualiser ses outils.'})
+
+LABELS.update({'MCP connection':'Connexion MCP','Service logs':'Journaux du service'})
+
+LABELS.update({'Refresh models':'Actualiser les modèles'})
+
 if __name__ == "__main__":
     path=Path(__file__).resolve().parents[1]/"locales/ui.json"
     path.write_text(json.dumps({key:{"en":key,"fr":value} for key,value in LABELS.items()},indent=2,ensure_ascii=False)+"\n",encoding="utf-8")

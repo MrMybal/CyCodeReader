@@ -3,7 +3,7 @@
 Read README.md, Docs/Architecture.md and Docs/Validation.md.
 This is the independent native C++20 code/text editor. ReaderCore is a compatibility
 name for CyCode::TextSession; CyCode owns native documents, plugins and transport.
-Reader owns graphical editing, its commands, Undo/Redo and presentation. CyToolsCore owns jobs/identities/permissions/MCP.
+Reader owns graphical editing, its commands, Undo/Redo and presentation. CyMCPSDK supplies the shared native registry, providers, ChatUI and MCP; Reader persists durable job receipts.
 CyCode language servers, project services, Git and debugger remain separate.
 
 - `editor/` owns the shared graphical adapters; CyCode/common now owns Paths,
@@ -26,8 +26,7 @@ CyCode language servers, project services, Git and debugger remain separate.
   These are headless/service checks, not desktop platform acceptance. Local native
   execution remains suspended during the antivirus investigation.
 
-- Use the actual CyToolsCore SDK; read its Docs/AgentGuide.md, MCP.md, Protocol.md
-  and TaskFiles.md. Keep user documents persistent; never stage them as task artifacts.
+- Use the source-locked local CyMCPSDK, not a Python service. Read Docs/MCP.md and the SDK Integration guide. Keep user documents persistent; never stage them as task artifacts.
 - GUI and MCP must share ReaderCore and its revision/disk guards. Plugins cross
   the versioned C ABI with UTF-8 JSON only; no STL/ImGui objects across the boundary.
 

@@ -3,11 +3,11 @@
   "protocolVersion": "1.0",
   "id": "cy.code.reader",
   "name": "CyCodeReader",
-  "version": "0.1.7",
-  "description": "Live native code/text documents and extension commands through CyToolsCore.",
+  "version": "0.1.8",
+  "description": "Native Reader operations shared by CyMCPSDK chat, CLI and MCP.",
   "vendor": "Cyberalien",
   "author": "Cyberalien",
-  "executable": "python app/tool.py",
+  "executable": "cycodereader_cli",
   "categories": [
     "development"
   ],
@@ -21,7 +21,10 @@
     "cancellation",
     "live-documents",
     "document-search",
-    "native-plugins"
+    "native-plugins",
+    "chat",
+    "cli",
+    "durable-receipts"
   ],
   "backends": [],
   "platforms": [
@@ -67,6 +70,7 @@
     {
       "id": "documents_list",
       "name": "Documents List",
+      "nativeMethod": "documents.list",
       "description": "List documents currently open in this Reader instance.",
       "inputSchema": {
         "type": "object",
@@ -124,18 +128,14 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false
+      "readOnly": true,
+      "guiOnly": false
     },
     {
       "id": "documents_read",
       "name": "Documents Read",
+      "nativeMethod": "documents.read",
       "description": "Read an open live document by issued ID. Paths are persistent user files, never SDK task artifacts.",
       "inputSchema": {
         "type": "object",
@@ -192,18 +192,14 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false
+      "readOnly": true,
+      "guiOnly": false
     },
     {
       "id": "documents_open",
       "name": "Documents Open",
+      "nativeMethod": "documents.open",
       "description": "Open a user file; auto detects UTF-8/BOM and UTF-16 BOM, or use an explicit encoding (Windows-1252 is never guessed). Requires filesystem.read. GUI shows it on its next frame.",
       "inputSchema": {
         "type": "object",
@@ -269,23 +265,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "filesystem.read"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "documents_new",
       "name": "Documents New",
+      "nativeMethod": "documents.new",
       "description": "Create an unsaved native document.",
       "inputSchema": {
         "type": "object",
@@ -335,23 +324,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "documents_replace",
       "name": "Documents Replace",
+      "nativeMethod": "documents.replace",
       "description": "Replace an open buffer at expectedRevision; does not save. Read-only documents and obsolete revisions are rejected.",
       "inputSchema": {
         "type": "object",
@@ -418,23 +400,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "documents_save",
       "name": "Documents Save",
+      "nativeMethod": "documents.save",
       "description": "Save an already-named document at expectedRevision using its native disk baseline and guarded atomic replacement.",
       "inputSchema": {
         "type": "object",
@@ -496,23 +471,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "documents_format",
       "name": "Documents Format",
+      "nativeMethod": "documents.format",
       "description": "Change the pending encoding/newline convention at expectedRevision. Unrepresentable characters fail without lossy replacement. Changes remain unsaved until documents_save.",
       "inputSchema": {
         "type": "object",
@@ -592,23 +560,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "documents_close",
       "name": "Documents Close",
+      "nativeMethod": "documents.close",
       "description": "Close an open document at expectedRevision. Dirty documents require explicit discard=true.",
       "inputSchema": {
         "type": "object",
@@ -644,23 +605,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "search_open_documents",
       "name": "Search Open Documents",
+      "nativeMethod": "search.openDocuments",
       "description": "Bounded literal search over current live buffers. Results use zero-based UTF-8 byte offsets and one-based lines/byte columns. Case-insensitive matching folds ASCII only.",
       "inputSchema": {
         "type": "object",
@@ -671,6 +625,9 @@
             "maxLength": 4096
           },
           "caseSensitive": {
+            "type": "boolean"
+          },
+          "wholeWord": {
             "type": "boolean"
           }
         },
@@ -729,18 +686,14 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false
+      "readOnly": true,
+      "guiOnly": false
     },
     {
       "id": "text_transform",
       "name": "Text Transform",
+      "nativeMethod": "text.transform",
       "description": "Apply a native full-document text transformation at expectedRevision. Case conversion preserves non-ASCII bytes; no automatic save.",
       "inputSchema": {
         "type": "object",
@@ -814,23 +767,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "plugins_list",
       "name": "Plugins List",
+      "nativeMethod": "plugins.list",
       "description": "Inspect loaded native/data plugins, commands, options, language definitions and load errors.",
       "inputSchema": {
         "type": "object",
@@ -860,18 +806,14 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false
+      "readOnly": true,
+      "guiOnly": false
     },
     {
       "id": "plugins_configure",
       "name": "Plugins Configure",
+      "nativeMethod": "plugins.configure",
       "description": "Validate declared plugin option types and update this instance. No plugin code executes.",
       "inputSchema": {
         "type": "object",
@@ -911,23 +853,16 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
     },
     {
       "id": "plugins_invoke",
       "name": "Plugins Invoke",
+      "nativeMethod": "plugins.invoke",
       "description": "Execute a trusted plugin command against an open guarded buffer. A returned text field updates its unsaved document. Native extensions run in process and cannot be forcibly cancelled or sandboxed; cancellation is checked before/after invocation.",
       "inputSchema": {
         "type": "object",
@@ -1010,20 +945,672 @@
         ],
         "additionalProperties": false
       },
-      "resourceRequirements": {
-        "ramBytes": 16777216
-      },
-      "supportedBackends": [],
       "permissions": [
         "plugins.execute",
         "workspace.write"
       ],
-      "canRunAsync": true,
-      "canCancel": true,
-      "supportsProgress": false,
-      "exclusiveGroups": [
-        "reader-mutations"
-      ]
+      "readOnly": false,
+      "guiOnly": false
+    },
+    {
+      "id": "documents_save_as",
+      "name": "Documents Save As",
+      "nativeMethod": "documents.saveAs",
+      "description": "Save a guarded document under a NEW path; original preserved. Existing destinations require the GUI confirmation flow.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision",
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": false
+    },
+    {
+      "id": "automation_status",
+      "name": "Automation Status",
+      "nativeMethod": "automation.status",
+      "description": "Inspect SDK version, exact source identity, mode, permissions and supported optimization switches.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": false
+    },
+    {
+      "id": "jobs_list",
+      "name": "Jobs List",
+      "nativeMethod": "jobs.list",
+      "description": "List only this authenticated identity's durable operation receipts, newest first. Never replays interrupted work.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": false
+    },
+    {
+      "id": "jobs_get",
+      "name": "Jobs Get",
+      "nativeMethod": "jobs.get",
+      "description": "Recover the complete durable result/status for an issued job identity, including after transient SDK result expiry. Unknown outcomes require reconciliation, never replay.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": false
+    },
+    {
+      "id": "jobs_cancel",
+      "name": "Jobs Cancel",
+      "nativeMethod": "jobs.cancel",
+      "description": "Request cooperative cancellation of this identity's active job. Cancellation does not roll back an already committed edit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "cancel": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "id",
+          "cancel"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": false,
+      "guiOnly": false
+    },
+    {
+      "id": "resources_read",
+      "name": "Resources Read",
+      "nativeMethod": "resources.read",
+      "description": "Read a registered document snapshot or private result chunk by its issued URI; no arbitrary filesystem or URL access.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": false
+    },
+    {
+      "id": "resources_grep",
+      "name": "Resources Grep",
+      "nativeMethod": "resources.grep",
+      "description": "Search registered text resources with native streaming literal grep, using the issued cursor for continuation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ignoreCase": {
+            "type": "boolean"
+          },
+          "cursor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": false
+    },
+    {
+      "id": "automation_metrics",
+      "name": "Automation Metrics",
+      "nativeMethod": "automation.metrics",
+      "description": "Read optional metadata-only duration/volume/cache metrics. No messages, arguments, results, keys or tokens are recorded.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": false
+    },
+    {
+      "id": "ui_state",
+      "name": "Ui State",
+      "nativeMethod": "ui.state",
+      "description": "Inspect actual GUI tabs, active document and appearance without copying all document texts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": true
+    },
+    {
+      "id": "ui_activate_document",
+      "name": "Ui Activate Document",
+      "nativeMethod": "ui.activate",
+      "description": "Focus an already-open document by its issued identity.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": true
+    },
+    {
+      "id": "editor_read_selection",
+      "name": "Editor Read Selection",
+      "nativeMethod": "editor.selection",
+      "description": "Read the actual selected text of an ordinary GUI document, with zero-based UTF-16 coordinates and current native revision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": true,
+      "guiOnly": true
+    },
+    {
+      "id": "editor_replace_selection",
+      "name": "Editor Replace Selection",
+      "nativeMethod": "editor.replaceSelection",
+      "description": "Replace the actual ordinary-editor selection in one Undo transaction at expectedRevision. Never saves.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 4194304
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": true
+    },
+    {
+      "id": "editor_undo",
+      "name": "Editor Undo",
+      "nativeMethod": "editor.undo",
+      "description": "Use the real GUI undo history at expectedRevision. Requires an ordinary editable tab; does not save.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": true
+    },
+    {
+      "id": "editor_redo",
+      "name": "Editor Redo",
+      "nativeMethod": "editor.redo",
+      "description": "Use the real GUI redo history at expectedRevision. Requires an ordinary editable tab; does not save.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "path": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "dirty": {
+            "type": "boolean"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "encoding": {
+            "type": "string"
+          },
+          "lineEnding": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "revision",
+          "dirty",
+          "readOnly",
+          "encoding",
+          "lineEnding",
+          "text"
+        ],
+        "additionalProperties": false
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": true
+    },
+    {
+      "id": "editor_goto",
+      "name": "Editor Goto",
+      "nativeMethod": "editor.goto",
+      "description": "Move the ordinary GUI caret using zero-based UTF-16 line/character coordinates at expectedRevision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "character": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "expectedRevision",
+          "line",
+          "character"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": true
+    },
+    {
+      "id": "ui_preferences",
+      "name": "Ui Preferences",
+      "nativeMethod": "ui.preferences",
+      "description": "Change selected view options on the GUI thread; no document save or arbitrary command execution.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "theme": {
+            "type": "string",
+            "enum": [
+              "graphite",
+              "mid-grey",
+              "light-grey",
+              "amber-night",
+              "violet",
+              "navy"
+            ]
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "en",
+              "fr"
+            ]
+          },
+          "wrap": {
+            "type": "boolean"
+          },
+          "minimap": {
+            "type": "boolean"
+          },
+          "whitespace": {
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [
+        "workspace.write"
+      ],
+      "readOnly": false,
+      "guiOnly": true
+    },
+    {
+      "id": "jobs_forget",
+      "name": "Forget receipt",
+      "nativeMethod": "jobs.forget",
+      "description": "Delete one owned, completed durable receipt only with explicit confirm=true. Never reruns the operation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "forget": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "confirm": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "forget",
+          "confirm"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object"
+      },
+      "permissions": [],
+      "readOnly": false,
+      "guiOnly": false
     }
   ],
   "standaloneExecutable": "CyCodeReader.exe",

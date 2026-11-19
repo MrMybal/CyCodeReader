@@ -11,5 +11,22 @@
   "text_transform": "Appliquer une transformation de tout le document à la révision attendue.",
   "plugins_list": "Consulter les plugins, commandes, options, syntaxes et erreurs de chargement.",
   "plugins_configure": "Valider les types des options déclarées et modifier les préférences du plugin.",
-  "plugins_invoke": "Exécuter une commande de plugin de confiance sur un document avec contrôle de révision."
+  "plugins_invoke": "Exécuter une commande de plugin de confiance sur un document avec contrôle de révision.",
+  "documents_save_as": "Enregistrer une copie sous un nouveau chemin sans écraser de fichier existant.",
+  "automation_status": "Consulter la révision du SDK, les capacités et les options effectives.",
+  "jobs_list": "Lister les reçus durables appartenant à cette identité, par pages.",
+  "jobs_get": "Récupérer le résultat durable d’une opération sans la rejouer.",
+  "jobs_cancel": "Demander l’annulation coopérative d’une opération appartenant à cette identité.",
+  "jobs_forget": "Supprimer un reçu terminé appartenant à cette identité avec confirmation explicite.",
+  "resources_read": "Lire un manifeste de résultat privé ou un fragment borné.",
+  "resources_grep": "Rechercher dans les instantanés de texte enregistrés sans parcourir le disque.",
+  "automation_metrics": "Consulter les mesures techniques facultatives sans contenu des documents.",
+  "ui_state": "Consulter l’état de l’interface et les documents de cette instance.",
+  "ui_activate_document": "Activer un document déjà ouvert dans cette interface.",
+  "editor_read_selection": "Lire la sélection réelle et ses coordonnées UTF-16.",
+  "editor_replace_selection": "Remplacer la sélection réelle à la révision attendue, sans enregistrer.",
+  "editor_undo": "Annuler une modification dans l’historique du véritable éditeur.",
+  "editor_redo": "Rétablir une modification dans l’historique du véritable éditeur.",
+  "editor_goto": "Déplacer le curseur à une position UTF-16 valide.",
+  "ui_preferences": "Modifier le thème, la langue ou les options de présentation prises en charge."
 }

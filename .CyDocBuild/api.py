@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 WORK = Path(__file__).resolve().parent
-GROUPS = {'documents': ('Documents', 'Documents'), 'search': ('Live search', 'Recherche dans les documents'), 'text': ('Text transforms', 'Transformations de texte'), 'plugins': ('Extensions', 'Extensions')}
+GROUPS = {'documents': ('Documents', 'Documents'), 'search': ('Live search', 'Recherche dans les documents'), 'text': ('Text transforms', 'Transformations de texte'), 'plugins': ('Extensions', 'Extensions'), 'automation': ('Automation', 'Automatisation'), 'jobs': ('Durable jobs', 'Tâches durables'), 'resources': ('Resources', 'Ressources'), 'ui': ('Interface', 'Interface'), 'editor': ('Editor', 'Éditeur')}
 
 FIELD = {
     'path': ('User file path permitted by the connection identity.', 'Chemin du fichier utilisateur autorisé par l’identité de connexion.'),
@@ -63,14 +63,14 @@ def generate():
             stem = identity.rsplit('_', 1)[0]
             relations = [{'key': other['id'], 'name': other['id']} for other in operations if other['id'] != identity and other['id'].rsplit('_', 1)[0] == stem][:8]
             signature = identity + '({' + ', '.join(p['name'] + ('?' if p['optional'] else '') + ': ' + p['type'] for p in parameters) + '}) -> JSON'
-            contract = t('Use the official MCP tool `op_' + identity + '` through a connected CyToolsCore client. This is an operation contract, not a C++ function. Read the [shared request and transaction rules](doc:api-links#contract) before making changes.', 'Utilisez l’outil MCP officiel `op_' + identity + '` depuis un client CyToolsCore connecté. Il s’agit d’un contrat d’opération, pas d’une fonction C++. Consultez les [règles communes des requêtes et transactions](doc:api-links#contract) avant toute modification.')
+            contract = t('Use the official MCP tool `' + identity + '` through a connected CyMCPSDK client. This is an operation contract, not a C++ function. Read the [shared request and transaction rules](doc:api-links#contract) before making changes.', 'Utilisez l’outil MCP officiel `' + identity + '` depuis un client CyMCPSDK connecté. Il s’agit d’un contrat d’opération, pas d’une fonction C++. Consultez les [règles communes des requêtes et transactions](doc:api-links#contract) avant toute modification.')
             # Large schemas remain complete and readable, but do not need tens
             # of thousands of Prism spans in every locale's startup payload.
             def block(schema):
                 text = json.dumps(schema, ensure_ascii=False, indent=2)
                 return '\n\n```' + ('json' if len(text) < 2500 else 'text') + '\n' + text + '\n```\n'
             schemas = '\n## ' + t('Input schema', 'Schéma d’entrée') + ' {#input-schema}' + block(inputs) + '\n## ' + t('Result schema', 'Schéma du résultat') + ' {#result-schema}' + block(outputs)
-            symbols.append({'name': identity, 'key': identity, 'group': group, 'kind': 'operation', 'language': 'text', 'summary': summary, 'description': summary + '\n\n' + contract, 'signature': signature, 'parameters': parameters, 'returnType': 'JSON', 'returns': t('Result described below. For an asynchronous call, poll the returned job with `cy_get_job`; completion of the request does not by itself prove that an external process succeeded.', 'Résultat décrit ci-dessous. Pour un appel asynchrone, suivez la tâche retournée avec `cy_get_job` ; la fin de la requête ne prouve pas à elle seule la réussite d’un processus externe.'), 'references': relations, 'schemas': schemas, 'revision': hashlib.sha256(json.dumps(op, sort_keys=True).encode()).hexdigest()[:12]})
+            symbols.append({'name': identity, 'key': identity, 'group': group, 'kind': 'operation', 'language': 'text', 'summary': summary, 'description': summary + '\n\n' + contract, 'signature': signature, 'parameters': parameters, 'returnType': 'JSON', 'returns': t('Validated result returned directly. Use jobs_list/jobs_get to reconcile durable receipts after interrupted responses. A buffer mutation does not imply an explicit save.', 'Résultat validé retourné directement. Utilisez jobs_list/jobs_get pour consulter les reçus durables après une réponse interrompue. Une modification du tampon ne vaut pas enregistrement explicite.'), 'references': relations, 'schemas': schemas, 'revision': hashlib.sha256(json.dumps(op, sort_keys=True).encode()).hexdigest()[:12]})
         (cache / ('api-' + locale + '.json')).write_text(json.dumps({'symbols': symbols}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         for index, (group, names) in enumerate(GROUPS.items()):
             selected = [symbol for symbol in symbols if symbol['group'] == group]

@@ -1270,5 +1270,105 @@
   "No suggestions": {
     "en": "No suggestions",
     "fr": "Aucune suggestion"
+  },
+  "Assistant connection": {
+    "en": "Assistant connection",
+    "fr": "Connexion de l’assistant"
+  },
+  "Detect providers": {
+    "en": "Detect providers",
+    "fr": "Détecter les fournisseurs"
+  },
+  "Detected provider": {
+    "en": "Detected provider",
+    "fr": "Fournisseur détecté"
+  },
+  "Provider ID": {
+    "en": "Provider ID",
+    "fr": "Identifiant du fournisseur"
+  },
+  "Model": {
+    "en": "Model",
+    "fr": "Modèle"
+  },
+  "Endpoint": {
+    "en": "Endpoint",
+    "fr": "Adresse du service"
+  },
+  "API key environment variable": {
+    "en": "API key environment variable",
+    "fr": "Variable d’environnement de la clé API"
+  },
+  "Available models": {
+    "en": "Available models",
+    "fr": "Modèles disponibles"
+  },
+  "Allow document edits": {
+    "en": "Allow document edits",
+    "fr": "Autoriser la modification des documents"
+  },
+  "Keep private chat history": {
+    "en": "Keep private chat history",
+    "fr": "Conserver l’historique privé du chat"
+  },
+  "Compact tool discovery": {
+    "en": "Compact tool discovery",
+    "fr": "Découverte compacte des outils"
+  },
+  "Limit API context window": {
+    "en": "Limit API context window",
+    "fr": "Limiter la fenêtre de contexte API"
+  },
+  "Context size (KiB)": {
+    "en": "Context size (KiB)",
+    "fr": "Taille du contexte (Kio)"
+  },
+  "Recent turns": {
+    "en": "Recent turns",
+    "fr": "Tours récents"
+  },
+  "Connect / new chat": {
+    "en": "Connect / new chat",
+    "fr": "Connexion / nouveau chat"
+  },
+  "Restore chat": {
+    "en": "Restore chat",
+    "fr": "Restaurer le chat"
+  },
+  "Reconnect": {
+    "en": "Reconnect",
+    "fr": "Reconnecter"
+  },
+  "Attachment path": {
+    "en": "Attachment path",
+    "fr": "Chemin de la pièce jointe"
+  },
+  "Attach file": {
+    "en": "Attach file",
+    "fr": "Joindre le fichier"
+  },
+  "Changing permissions applies when opening a new connection.": {
+    "en": "Changing permissions applies when opening a new connection.",
+    "fr": "Les permissions changées s’appliquent à l’ouverture d’une nouvelle connexion."
+  },
+  "Connect configured MCP servers": {
+    "en": "Connect configured MCP servers",
+    "fr": "Connecter les serveurs MCP configurés"
+  },
+  "After remote discovery, open a new chat connection to refresh its tools.": {
+    "en": "After remote discovery, open a new chat connection to refresh its tools.",
+    "fr": "Après la découverte distante, ouvrez une nouvelle connexion au chat pour actualiser ses outils."
+  },
+  "MCP connection": {
+    "en": "MCP connection",
+    "fr": "Connexion MCP"
+  },
+  "Service logs": {
+    "en": "Service logs",
+    "fr": "Journaux du service"
+  },
+  "Refresh models": {
+    "en": "Refresh models",
+    "fr": "Actualiser les modèles"
   }
 }

@@ -1,3 +1,4 @@
+#include "automation_cli.h"
 #include "Core.h"
 #include "Bridge.h"
 #include "cycode/Paths.h"
@@ -17,10 +18,6 @@ int main(int argc,char **argv) {
 #else
         for (int i=0;i<argc;++i) args.emplace_back(argv[i]);
 #endif
-        if (args.size()<3 || args[1]!="--serve") throw std::runtime_error("Usage: cycodereader_cli --serve DESCRIPTOR [--plugins DIRECTORY] [FILES...]");
-        std::filesystem::path plugins;size_t first=3;if (args.size()>4 && args[3]=="--plugins") { plugins=cycode::utf8Path(args[4]);first=5; }
-        cycode::reader::Core core(plugins);
-        for (size_t i=first;i<args.size();++i) core.add(cycode::reader::Document::open(cycode::utf8Path(args[i])));
-        cycode::reader::Bridge bridge(core,cycode::utf8Path(args[2]));std::string line;std::getline(std::cin,line);return 0;
+        return cycode::reader::automationCli(args);
     } catch (const std::exception &e) { std::cerr<<e.what()<<'\n';return 1; }
 }

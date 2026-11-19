@@ -16,8 +16,7 @@ Dependencies retain their own licenses and copyright notices.
 | Tree-sitter and Rust/Java/JS/TS/HTML/CSS grammars | MIT | https://github.com/tree-sitter |
 | SDL3 | zlib | https://github.com/libsdl-org/SDL |
 | nlohmann/json | MIT | https://github.com/nlohmann/json |
-| CyToolsCore 0.10.1 | MIT | Owner's checksum-pinned local SDK wheel |
-| MCP Python SDK 1.30.0 | MIT | https://github.com/modelcontextprotocol/python-sdk |
+| CyMCPSDK 0.7.1 | MIT | Reviewed local SDK source snapshot; Core/Platform/Http/MCP/AI/ChatUI |
 
 Notices are preserved in licenses/. Exact source revisions and SHA-256 archive
 hashes are in dependencies.lock.json; the immutable CyUI Git revision is in
@@ -45,3 +44,5 @@ Local help uses [CyDoc](https://github.com/MrMybal/CyDoc), MIT, pinned by
 `.CyDocBuild/cydoc.lock.json`. The exported help includes its MIT notice
 and the Marked, PrismJS and esbuild notices in `Documentation/DocData/licenses/`.
 Only image/gallery runtime modules are distributed; no Three.js runtime is included.
+
+ChatUI also links MD4C (MIT); see licenses/MD4C.txt. CyMCPSDK Http uses cpp-httplib and PicoSHA2 (MIT); see licenses.

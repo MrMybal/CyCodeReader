@@ -3,7 +3,7 @@
 [README](../README.md) · [README français](../README.fr.md) · [Architecture](Architecture.md)
 
 Run commands from the repository root. This guide retains the detailed build,
-shared-editor, extension and private SDK setup material from the original README.
+shared-editor, extension and native SDK integration material from the original README.
 For user tasks, use the [English manual](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview)
 or [French manual](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
 Platform/runtime evidence is maintained separately in [Validation.md](Validation.md).
@@ -132,7 +132,7 @@ python scripts/build.py --core-only --run-tests
 ```
 
 The native editor needs no CyCode checkout or Python runtime. The MCP companion
-uses a separate private Python/CyToolsCore installation (below). Source archives are
+links CyMCPSDK natively (below). Source archives are
 version/hash pinned; no downloaded dependencies, runtimes, personal preferences or
 binaries belong in Git.
 
@@ -167,28 +167,9 @@ searches currently open buffers, including unsaved text. Folder search, regex
 replacement, macros, arbitrary external run commands, advanced encodings and full
 Notepad++ feature coverage remain future work.
 
-## CyToolsCore / MCP
+## CyMCPSDK / MCP
 
-Install the owner's checksum-pinned SDK wheel in this repository's private runtime:
-
-```sh
-python scripts/setup_sdk.py --sdk-wheel ../CyToolsCore/dist/cytools_core-0.10.1-py3-none-any.whl
-```
-
-The wheel and runtime are not published in this repository. The native Reader starts
-one real CyToolsCore service per instance when that private Python is available;
-CYCODE_READER_PYTHON can select another compatible interpreter. The CyToolsCore/MCP
-panel reports service status and copies separate read-only/editing MCP configurations.
-Each instance has private endpoint/credential files; do not share or commit data/.
-SDK 0.10.1 and official MCP SDK 1.30.0 are used, not a custom job/MCP implementation.
-
-The SDK operates on the same ReaderCore documents as the GUI: list/read/new/open,
-replace/save/close, encoding/newline conversion, search, transformations and plugins.
-Expected revisions, read-only state, dirty-close guards and disk baselines are checked.
-Read-only identities cannot edit/open arbitrary files or invoke plugins. Saving is
-explicit. Plugins require plugins.execute plus workspace.write; opening a supplied
-path requires filesystem.read. Source documents are persistent files and are never
-SDK task artifacts. See [Docs/MCP.md](MCP.md) for CLI/service usage and tests.
+The native SDK is built from the published source revision selected by cymcp-source.lock.json, preferring a matching local checkout. UTF-8 source line endings are normalized to LF for reproducible hashes. No pip or private Python runtime is used. Run `python scripts/setup_sdk.py` to verify/freeze the source snapshot; normal CMake builds do this automatically. See [MCP](MCP.md) for modules, CLI, chat, permissions, migration and local acceptance.
 
 
 ## Documentation

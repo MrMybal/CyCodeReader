@@ -5,7 +5,7 @@ description: Read the application and bundled dependency notices.
 section: Using Reader
 order: 200
 parent: overview
-revision: 4
+revision: 5
 ---
 
 ## Application {#licence}
@@ -20,3 +20,5 @@ JetBrains Mono Regular 2.304 is bundled unmodified under the SIL Open Font Licen
 
 
 Native CyCode Core remains GPL-3.0-only (`licenses/CyCode-Core.txt`). PagedText uses Monocypher 4.0.3 under BSD-2-Clause or CC0-1.0, with its full notice in `licenses/Monocypher.txt`.
+
+CyMCPSDK 0.7.1 (Core/Platform/Http/MCP/AI/ChatUI), MD4C, cpp-httplib and PicoSHA2 are MIT components. Their notices ship in the application’s licenses directory. The SDK is built from its pinned published source revision; no Python SDK runtime is required.
