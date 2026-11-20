@@ -19,8 +19,11 @@ The application keeps graphical Undo/Redo, preferences and distribution policy.
 
 Use --core-root <CyCode> for an explicit clean checkout at the exact locked revision. Default
 builds resolve the immutable lock and refuse modified dependency caches. Native
-tests require --run-tests and remain suspended locally during the antivirus
-investigation; historical workflows supplied earlier Windows/Linux/macOS evidence. All Actions remain disabled by the owner.
+tests require explicit opt-in (--run-tests for CTest). The owner separately authorized
+the 2026-11-20 local MCP/CLI/hidden-chat acceptance for the Free profile update;
+this does not authorize unrelated native launches or changes to protection.
+Historical workflows supplied earlier Windows/Linux/macOS evidence. All Actions
+remain disabled by the owner.
 
 ## Core/IDE alignment — 2026-11-13
 
@@ -168,6 +171,23 @@ replacement, macros, arbitrary external run commands, advanced encodings and ful
 Notepad++ feature coverage remain future work.
 
 ## CyMCPSDK / MCP
+
+Version 0.1.9 pins SDK 0.7.2 `e562c731a146d599e3404718ea8414bb5b96b66d`
+(includes `34d4bca`) and Core `b902736b0edb9a76365a47778af8a223d50e5b83`.
+Free is the default, including configurations without an explicit profile. The
+registry uses `Policy::allow_all()` and `LocalHttpServer::UnauthenticatedLoopback`
+on 127.0.0.1. The local matching SDK checkout is compiled through its frozen,
+hash-verified source snapshot. The official GitHub pin remains the fallback when
+that checkout is unavailable. Other profiles select host control and/or tokens
+independently; argument and output schemas are always validated.
+
+Opt-in acceptance commands (they launch only synthetic, owned processes):
+
+```powershell
+python -B tests/test_access_profiles.py runtime/build-cymcp-vs/Release/CyCodeReader.exe runtime/free-access-acceptance
+python -B tests/test_cymcp.py runtime/build-cymcp-vs/Release/cycodereader_cli.exe
+python -B tests/test_chat_gui.py runtime/build-cymcp-vs/Release/CyCodeReader.exe runtime/free-chat-acceptance
+```
 
 The native SDK is built from the published source revision selected by cymcp-source.lock.json, preferring a matching local checkout. UTF-8 source line endings are normalized to LF for reproducible hashes. No pip or private Python runtime is used. Run `python scripts/setup_sdk.py` to verify/freeze the source snapshot; normal CMake builds do this automatically. See [MCP](MCP.md) for modules, CLI, chat, permissions, migration and local acceptance.
 

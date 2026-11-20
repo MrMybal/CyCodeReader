@@ -21,7 +21,7 @@ The native dependency cache needs JSON and Monocypher; headless ordinary TextSes
 The normal resolver uses its immutable published source revision and preserves
 dirty caches. The native service advertises cycode-core/1 through its compatible
 cycodereader-native/1 descriptor. Revisions, disk guards, read-only checks, bounded
-responses and EOF shutdown are enforced by the shared native owner. CyMCPSDK is linked natively; see [MCP](MCP.md) for the registry, private durable receipts, ChatUI, CLI and authenticated transports.
+responses and EOF shutdown are enforced by the shared native owner. CyMCPSDK is linked natively; see [MCP](MCP.md) for the registry, private durable receipts, ChatUI, CLI and local MCP access profiles.
 
 Reader 671c588 with Core 84e4c78 passed all 17 service/view tests on Windows x64,
 Ubuntu x64 and macOS arm64, plus the separate seven-case headless build. Actual
@@ -48,7 +48,7 @@ src/ owns Reader windows, document views, menus, dialogs and preferences. Reader
 optional Git plugin provides read-only file comparisons through the generic
 comparison-provider contract, without importing those IDE services.
 Native editing does not require Python after compilation. The integrated
-CyMCPSDK is linked natively; see [MCP](MCP.md) for the registry, private durable receipts, ChatUI, CLI and authenticated transports.
+CyMCPSDK is linked natively; see [MCP](MCP.md) for the registry, private durable receipts, ChatUI, CLI and local MCP access profiles.
 
 editor/ is a source library with API version 1. CyCode adds only that directory,
 using CYCODE_EDITOR_DEPS and CYCODE_EDITOR_BUILD_GUI to select its own dependency
@@ -106,7 +106,7 @@ adapter has a headless actual-widget test; full desktop acceptance stays separat
 
 Bridge binds only loopback and authenticates bounded native JSON requests. It is
 private IPC. app/tool.py is a standard-library forwarding shim; the native CyMCPSDK registry supplies schemas,
-identities, HTTP service and official MCP adapter. Each GUI process owns one native SDK service with distinct reader/writer credentials and endpoint files. The shared native Process component
+identities, HTTP service and official MCP adapter. Each GUI process owns one native SDK service. Free defaults to address-only loopback and an allow-all registry; controlled/token profiles remain explicit settings. Protected keeps distinct reader/writer credentials. Chat read/edit remains an independent explicit choice. Endpoint descriptors advertise the effective profile; argument, revision and disk guards apply to every profile. The shared native Process component
 owns its hidden child-process tree and bounded logs; closing Reader stops it.
 After all dirty-document/save dialogs accept the exit, Reader immediately signals
 SDK/update cancellation. The SDL shell hides the main and detached windows before

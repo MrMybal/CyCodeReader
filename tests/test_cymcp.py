@@ -71,7 +71,8 @@ def service(cli,root,files=(),config=None):
 
 
 def request(endpoint,role,message,mcp=False,session=None):
-    headers={'Content-Type':'application/json','Authorization':'Bearer '+endpoint[role+'Token']}
+    headers={'Content-Type':'application/json'}
+    if endpoint.get('requireToken',True):headers['Authorization']='Bearer '+endpoint[role+'Token']
     if session:headers['Mcp-Session-Id']=session;headers['MCP-Protocol-Version']='2025-11-25'
     req=urllib.request.Request(endpoint['mcpUrl' if mcp else 'url'],data=json.dumps(message).encode(),headers=headers)
     try:
@@ -91,7 +92,9 @@ def main():
         ops=json.loads(run('--data-dir',root/'list','list').stdout);assert len(ops)==22
         assert json.loads(run('--data-dir',root/'list','describe','documents_read').stdout)['name']=='documents_read'
         assert json.loads(run('--data-dir',root/'list','invoke','automation_status','--json','{}').stdout)['sdk']=='CyMCPSDK'
-        run('--data-dir',root/'list','invoke','documents_new','--json','{}',code=3)
+        assert json.loads(run('--data-dir',root/'free-default','invoke','documents_new','--json','{}').stdout)['id']
+        protected=root/'protected.json';protected.write_text(json.dumps({'accessProfile':'protected'}))
+        run('--data-dir',root/'controlled','--config',protected,'invoke','documents_new','--json','{}',code=3)
         run('--data-dir',root/'list','invoke','documents_read','--json','{}',code=2)
         report.append('CLI help/list/describe/invoke, JSON and exit codes')
         with Lines([cli,'--data-dir',root/'jsonl','--access','edit','jsonl']) as lines:
@@ -112,7 +115,7 @@ def main():
             assert call('jobs_forget',{'id':receipt['id'],'forget':True,'confirm':True})['result']['forgotten']==receipt['id']
         assert json.loads(run('--data-dir',root/'jsonl','--access','edit','invoke','jobs_list','--json','{}').stdout)['total']>0
         report.append('Persistent JSONL buffers, save-as/dirty-close/disk/revision guards, owner receipts and explicit forgetting')
-        config=root/'settings.json';config.write_text(json.dumps({'metrics':True,'resultTtlSeconds':2,'cacheTtlSeconds':60}))
+        config=root/'settings.json';config.write_text(json.dumps({'accessProfile':'protected','metrics':True,'resultTtlSeconds':2,'cacheTtlSeconds':60}))
         text='SYNTHETIC_SECRET '+'😀café '*130000+'\n';file=root/'large.txt';file.write_text(text,encoding='utf-8')
         with service(cli,root/'http',[file],config) as (ep,descriptor):
             def call(n,a=None,role='edit'):return request(ep,role,invoke(n,a))[0]
@@ -177,7 +180,7 @@ def main():
                 if raw.poll() is not None:raise RuntimeError(raw.stderr.read().decode())
                 if time.monotonic()>deadline:raise TimeoutError('Old native bridge')
                 time.sleep(.01)
-            legacy=subprocess.Popen([str(cli),'--desktop-service','--native-descriptor',str(native),'--service-descriptor',str(compat),'--data-dir',str(root/'compat')],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            legacy=subprocess.Popen([str(cli),'--desktop-service','--native-descriptor',str(native),'--service-descriptor',str(compat),'--data-dir',str(root/'compat'),'--config',str(protected)],stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
             while not compat.exists():
                 if legacy.poll() is not None:raise RuntimeError(legacy.stderr.read().decode())
                 if time.monotonic()>deadline:raise TimeoutError('Legacy SDK adapter')

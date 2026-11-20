@@ -52,6 +52,7 @@ void Reader::startSdk() {
         Json settings=Json::object();
         const auto config=options_.automationConfig.empty()?profile/"settings.json":options_.automationConfig;
         if(std::filesystem::is_regular_file(config))settings=Json::parse(readTextFileBytes(config));
+        sdkConfig_=config;sdkAccessProfile_=accessProfileName(AutomationOptions::fromJson(settings).accessProfile);
         sdkDescriptor_=options_.automationDescriptor.empty()?profile/"connection.json":options_.automationDescriptor;
 #ifdef _WIN32
         cli_=options_.installation/"app"/"cycodereader_cli.exe";
@@ -132,12 +133,32 @@ void Reader::extensionPanels() {
 
             if(ImGui::CollapsingHeader(tr("MCP connection"))){
             if (cyui::button(tr("Start SDK service"))) startSdk();
+            if(ImGui::BeginCombo(tr("MCP access profile"),tr(sdkAccessProfile_=="free"?"Free":sdkAccessProfile_=="local_controlled"?"Local controlled":sdkAccessProfile_=="token_only"?"Token only":"Protected"))){
+                for(const auto &item:std::vector<std::pair<const char*,const char*>>{{"free","Free"},{"local_controlled","Local controlled"},{"token_only","Token only"},{"protected","Protected"}}){
+                    if(ImGui::Selectable(tr(item.second),sdkAccessProfile_==item.first))try{
+                        std::optional<std::string> baseline;
+                        if(std::filesystem::exists(sdkConfig_))baseline=readTextFileBytes(sdkConfig_);
+                        auto settings=baseline?Json::parse(*baseline):Json::object();
+                        settings.erase("access_profile");settings["accessProfile"]=item.first;
+                        if(!std::filesystem::exists(sdkConfig_.parent_path()))cymcp::private_directory(sdkConfig_.parent_path());
+                        writeTextFileAtomic(sdkConfig_,settings.dump(2)+"\n",baseline);sdkAccessProfile_=item.first;
+                    }catch(const std::exception&e){sdkError_=cymcp::redact_error_message(e.what());}
+                }ImGui::EndCombo();
+            }
+            cyui::textDim("%s",tr("MCP profile changes apply after restarting Reader."));
+            if(ready){
+                const auto state=automation_->status();
+                cyui::textDim("%s: %s",tr("Active MCP profile"),state.at("accessProfile").get_ref<const std::string&>().c_str());
+                if(cyui::button(tr("Copy MCP address"))){const auto connection=Json::parse(readTextFileBytes(sdkDescriptor_));ImGui::SetClipboardText(connection.at("mcpUrl").get_ref<const std::string&>().c_str());}
+            }
             ImGui::BeginDisabled(!ready);
-            for (bool edit : {false,true}) if (cyui::button(tr(edit ? "Copy editing MCP configuration" : "Copy read-only MCP configuration"))) {
+            const bool controlled=ready&&automation_->status().at("controlOperations").get<bool>();
+            const bool tokenRequired=ready&&automation_->status().at("requireToken").get<bool>();
+            for (bool edit : {false,true}) if ((!edit||(controlled&&tokenRequired))&&cyui::button(tr(!controlled ? "Copy MCP configuration" : edit ? "Copy editing MCP configuration" : "Copy read-only MCP configuration"))) {
                 Json config={{"mcpServers",{{"CyCodeReader",{{"command",pathUtf8(cli_)},{"args",Json::array({"--connect",pathUtf8(sdkDescriptor_),"--access",edit ? "edit" : "read","mcp"})}}}}}};
                 ImGui::SetClipboardText(config.dump(2).c_str());
             }ImGui::EndDisabled();
-            cyui::textDim("%s",tr("The read identity cannot edit files or execute plugins. Saving remains explicit."));
+            cyui::textDim("%s",tr(controlled ? "The read identity cannot edit files or execute plugins. Saving remains explicit." : "All exposed MCP operations are available. Saving remains explicit."));
             }
             if(!sdkError_.empty())cyui::textDim("%s",sdkError_.c_str());
 

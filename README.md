@@ -13,8 +13,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Application license</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.8.md"><strong>0.1.8</strong></a><br><strong>BETA</strong></p>
-      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-setup.exe"><strong>Install CyCodeReader</strong></a><br><sub>Windows x64 · installer</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-portable.zip">Portable ZIP</a></p>
+      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.9.md"><strong>0.1.9</strong></a><br><strong>BETA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe"><strong>Install CyCodeReader</strong></a><br><sub>Windows x64 · installer</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip">Portable ZIP</a></p>
     </td>
   </tr>
 </table>
@@ -25,11 +25,11 @@ A native code and text editor for developers who want to open files directly,
 edit with syntax highlighting, search live documents and compare revisions.
 Built with CyUI, it runs independently of the CyCode IDE.
 
-> **BETA · 0.1.8**
+> **BETA · 0.1.9**
 >
-> Version 0.1.8 adds the native assistant, console and MCP with shared live-document
-> tools, explicit editing and durable operation receipts. Paged editing remains a
-> GUI profile. Read the [release notes and limits](Docs/Releases/v0.1.8.md).
+> Version 0.1.9 makes **Free** the default local MCP profile: connect by address
+> without a token, with all exposed operations available. Explicit profile choices
+> and document guards are preserved. Read the [release notes and limits](Docs/Releases/v0.1.9.md).
 > If 0.1.4 or 0.1.5 reports **Invalid update arguments**, use the existing
 > [manual recovery procedure](Docs/Releases/v0.1.6.md).
 
@@ -37,7 +37,7 @@ Built with CyUI, it runs independently of the CyCode IDE.
 
 *Actual v0.1.1 application views rendered from ImGui draw data on sample documents.
 The screenshots illustrate the interface; they do not establish desktop or
-installer acceptance for v0.1.8, and predate its new code font and palette.*
+installer acceptance for v0.1.9, and predate its new code font and palette.*
 
 ## About CyCodeReader
 
@@ -58,14 +58,24 @@ installed in PATH. Reader does not provide the IDE's commit/build/debug workflow
 | **Read-only comparison** | **Git file history** |
 | [![Side-by-side syntax-colored comparison](Docs/images/compare.png)](Docs/images/compare.png) | [![Sample file revisions and the selected commit diff](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Native services in 0.1.8
+## Native services in 0.1.9
 
-Version 0.1.8 pins Core `7d0a468a490733c920694b3c41dc980f50c7cfea`, CyUI
-`6ef01cfcdb197f3a89d64618ce5ef8818c704728` and CyMCPSDK 0.7.1
-`b0eea5e9b35ae6cea660843e9c03bf25554f7944`. Reader uses one native document owner with
-source API 1. Local document-word suggestions, block indentation and selected-word
-occurrences remain available. Chat, CLI and MCP share guarded live-document tools;
-see [setup and operation coverage](Docs/MCP.md) and the [release notes](Docs/Releases/v0.1.8.md).
+Version 0.1.9 pins Core `b902736b0edb9a76365a47778af8a223d50e5b83`, CyUI
+`6ef01cfcdb197f3a89d64618ce5ef8818c704728` and CyMCPSDK 0.7.2
+`e562c731a146d599e3404718ea8414bb5b96b66d` (includes `34d4bca`).
+The SDK is built from its local matching sources, with the exact official GitHub
+revision as fallback. Local MCP defaults to **Free**: connect using the copied
+address, without a token or an extra operation approval. Configurations without
+an explicit profile use Free; existing profile choices are preserved.
+Local controlled, Token only and Protected remain available in the MCP panel.
+Profile changes apply after restarting Reader. The assistant's document-edit
+permission remains separate and starts disabled.
+
+Reader keeps one native document owner with source API 1. Argument schemas,
+revision/read-only/disk guards and explicit saves remain active in every profile.
+Local document-word suggestions, block indentation and selected-word occurrences
+remain available. See [setup and operation coverage](Docs/MCP.md) and the
+[release notes](Docs/Releases/v0.1.9.md).
 
 The shared paged editor handles large UTF-8 files with asynchronous pages,
 Undo/Redo, search and complete streamed saves. Its GUI profile and limits are
@@ -124,12 +134,12 @@ The Windows packages include app-local MSVC runtime DLLs. Linux and macOS remain
 intended source targets; complete desktop operation is unverified and no native
 packages for them are supplied in this release.
 
-1. [Download the Windows installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-setup.exe), run Setup for the current user, then open CyCodeReader from the Start menu.
-2. If you prefer a portable copy, [download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-portable.zip). Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`, keeping all supplied directories beside it.
+1. [Download the Windows installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe), run Setup for the current user, then open CyCodeReader from the Start menu.
+2. If you prefer a portable copy, [download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip). Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`, keeping all supplied directories beside it.
 3. Open files and choose a syntax if needed. Install Git separately for its
    optional file-history tools; configure a provider for the built-in chat; native MCP is included.
 
-[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.8)
+[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.9)
 accompany both downloads. Portable settings stay in `data/reader`; installed
 settings use `%LOCALAPPDATA%/CyCodeReader/reader`. Public builds check GitHub
 Releases at startup by default on new installations. An available version is
@@ -206,7 +216,7 @@ see [COPYRIGHT](COPYRIGHT). Third-party components retain their own terms.
 | [Tree-sitter](https://github.com/tree-sitter/tree-sitter) | [MIT](licenses/tree-sitter.txt) | Incremental parsing in the shared editor. |
 | [Tree-sitter grammars](https://github.com/tree-sitter) | [Rust](licenses/tree-sitter-rust.txt), [Java](licenses/tree-sitter-java.txt), [JavaScript](licenses/tree-sitter-javascript.txt), [TypeScript](licenses/tree-sitter-typescript.txt), [HTML](licenses/tree-sitter-html.txt), [CSS](licenses/tree-sitter-css.txt) · MIT | Language parsers; preserve each grammar’s notice. |
 | [Lexilla / Scintilla](https://github.com/ScintillaOrg/lexilla) · [SciTE](https://www.scintilla.org/SciTE.html) | [Lexilla](licenses/Lexilla.txt), [Scintilla](licenses/Scintilla.txt), [SciTE](licenses/SciTE-Properties.txt) | Permissive notices for syntax lexers, public headers and keyword data; no Scintilla editor or Notepad++ plugin binary is linked. |
-| [CyMCPSDK 0.7.1](https://github.com/MrMybal/CyMCPSDK) | [MIT](licenses/CyMCPSDK.txt) | Native chat/CLI/MCP compiled from published source revision b0eea5e. |
+| [CyMCPSDK 0.7.2](https://github.com/MrMybal/CyMCPSDK) | [MIT](licenses/CyMCPSDK.txt) | Current-source native chat/CLI/MCP; source revision e562c73. |
 | [MD4C](https://github.com/mity/md4c) · [cpp-httplib](https://github.com/yhirose/cpp-httplib) · [PicoSHA2](https://github.com/okdshin/PicoSHA2) | [MIT](licenses/MD4C.txt) · [MIT](licenses/cpp-httplib.txt) · [MIT](licenses/PicoSHA2.txt) | Chat Markdown, SDK loopback HTTP and hashing. |
 | [CyDoc](https://github.com/MrMybal/CyDoc) | [MIT](https://github.com/MrMybal/CyDoc/blob/6ddf9a582defb2f11fbb3f992afef6f98dcadc93/LICENSE) | Bundled offline reader with image/gallery modules; no Three.js runtime. |
 | [marked](https://github.com/markedjs/marked) | [MIT](https://github.com/markedjs/marked/blob/v17.0.1/LICENSE.md) | Build-time Markdown compilation. |
@@ -226,7 +236,7 @@ not automatically grant access to private dependencies.
 - [Product website](https://mrmybal.github.io/CyCodeReader/).
 
 - [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
-- [Release notes](Docs/Releases/v0.1.8.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
+- [Release notes](Docs/Releases/v0.1.9.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
 - [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
 - [CyCode Core](https://github.com/MrMybal/CyCode) — the shared native document/project engine.
 - [CyCodeIDE](https://github.com/MrMybal/CyCodeIDE) — the IDE consuming Core and this same graphical `editor/` library.

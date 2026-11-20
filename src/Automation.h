@@ -7,7 +7,9 @@
 #include <future>
 #include <map>
 namespace cycode::reader {
+const char* accessProfileName(cymcp::LocalAccessProfile);
 struct AutomationOptions {
+    cymcp::LocalAccessProfile accessProfile=cymcp::LocalAccessProfile::free;
     bool compact=true,resources=true,notifications=true,metrics=false,diskResults=true,allowPlugins=false,namedCopies=true;
     size_t inlineBytes=16384,resultMemoryBytes=64*1024*1024,resultDiskBytes=512*1024*1024;
     int resultTtlSeconds=300,cacheTtlSeconds=30;

@@ -18,6 +18,7 @@ class Provider(BaseHTTPRequestHandler):
     cancelled=False
     remote_ok=False
     remote_error=False
+    chat_read_denied=False
     def log_message(self,*args):pass
     def do_GET(self):
         body=json.dumps({'data':[{'id':'synthetic-tools'}]}).encode();self.send_response(200);self.send_header('Content-Type','application/json');self.end_headers();self.wfile.write(body)
@@ -49,6 +50,11 @@ class Provider(BaseHTTPRequestHandler):
                 else:
                     assert json.loads(tools[-1]['content'])['text']=='int changed_by_chat;\n'
                     emit({'content':'Modified the live Reader buffer. '});time.sleep(.1);emit({'content':'Saving remains explicit.'},'stop')
+            elif text=='denied-edit':
+                if not tools:tool('documents_new',{})
+                else:
+                    type(self).chat_read_denied=json.loads(tools[-1]['content'])['error']['code']=='AccessDenied'
+                    emit({'content':'Chat read permission preserved.'},'stop')
             elif text=='remote':
                 if not tools:tool('remote.other.automation_status',{})
                 elif len(tools)==1:
@@ -72,7 +78,8 @@ def main():
         with tempfile.TemporaryDirectory(prefix='reader-chat-') as temporary:
             root=Path(temporary);file=root/'synthetic.cpp';file.write_text('int original;\n')
             attachment=root/'attachment.txt';attachment.write_text('SYNTHETIC_ATTACHMENT')
-            settings={'chat':{'provider':'openai-compatible','model':'synthetic-tools','baseUrl':f'http://127.0.0.1:{server.server_port}/v1','compact':False,'contextEnabled':True,'contextKiB':16,'recentTurns':1},'remoteServers':[{'id':'other','command':str(cli),'args':['--data-dir',str(root/'remote'),'--full-tools','mcp'],'allowTools':['automation_status','documents_new']}]}
+            protected=root/'remote-protected.json';protected.write_text(json.dumps({'accessProfile':'protected'}))
+            settings={'accessProfile':'free','chat':{'provider':'openai-compatible','model':'synthetic-tools','baseUrl':f'http://127.0.0.1:{server.server_port}/v1','compact':False,'contextEnabled':True,'contextKiB':16,'recentTurns':1},'remoteServers':[{'id':'other','command':str(cli),'args':['--data-dir',str(root/'remote'),'--config',str(protected),'--full-tools','mcp'],'allowTools':['automation_status','documents_new']}]}
             config=root/'settings.json';config.write_text(json.dumps(settings));script=[]
             def action(frame,command,**values):script.append(dict(frame=frame,command=command,**values))
             action(2,'assistant.remotes');action(120,'assistant.connect',edit=True);action(180,'assistant.models');action(240,'assistant.send',text='edit')
@@ -83,9 +90,10 @@ def main():
             action(2600,'checkpoint',name='history');action(2650,'assistant.send',text='error');action(2850,'checkpoint',name='error')
             # Reconnect on the same restored history, keeping the failure visible in the checkpoint.
             action(2900,'assistant.connect',edit=True,restore=True);action(3000,'assistant.models');action(3050,'assistant.send',text='attach',attachments=[str(attachment)])
+            action(3300,'checkpoint',name='models');action(3400,'assistant.connect',edit=False);action(3500,'assistant.send',text='denied-edit')
             script_file=root/'script.json';script_file.write_text(json.dumps(script))
             descriptor=root/'connection.json';report=output/'chat-gui.json';capture=output/'chat-gui.bmp'
-            command=[str(app),'--test-hidden','--test-frames','3350','--test-script',str(script_file),'--test-report',str(report),'--capture',str(capture),'--automation-config',str(config),'--automation-data-dir',str(root/'profile'),'--automation-descriptor',str(descriptor),'--open',str(file)]
+            command=[str(app),'--test-hidden','--test-frames','3900','--test-script',str(script_file),'--test-report',str(report),'--capture',str(capture),'--automation-config',str(config),'--automation-data-dir',str(root/'profile'),'--automation-descriptor',str(descriptor),'--open',str(file)]
             process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
             try:
                 deadline=time.monotonic()+25
@@ -110,7 +118,7 @@ def main():
                 session=headers['Mcp-Session-Id']
                 def mcp(name,args,role='edit'):
                     return request(ep,role,{'jsonrpc':'2.0','id':2,'method':'tools/call','params':{'name':'cy_tools_call','arguments':{'name':name,'arguments':args}}},True,session)[0]['result']
-                assert mcp('documents_new',{},'read')['isError']
+                assert not mcp('automation_status',{},'read')['structuredContent']['controlOperations']
                 current=mcp('documents_read',{'id':doc['id']})['structuredContent']
                 changed=mcp('documents_replace',{'id':doc['id'],'expectedRevision':current['revision'],'text':'int from_external_mcp;\n'})['structuredContent']
                 assert changed['text']=='int from_external_mcp;\n'
@@ -125,7 +133,7 @@ def main():
             assert check['streaming']['assistant']['busy'] and 'Streaming' in str(check['streaming']['assistant']['messages'])
             assert not check['cancelled']['assistant']['busy'] and Provider.cancelled
             assert check['restored']['assistant']['messages'] and check['restored']['assistant']['connected']
-            assert Provider.remote_ok and Provider.remote_error
+            assert Provider.remote_ok and Provider.remote_error and Provider.chat_read_denied
             assert check['error']['assistant']['error'],check['error']['assistant']
             final_history=check['history']['assistant']['messages'];assert all(any(tag in m['text'] for m in final_history) for tag in ['longA','longB','longC'])
             last=max((r for r in Provider.requests if any('longC' in str(m.get('content','')) for m in r['messages'])),key=lambda r:len(r['messages']))
@@ -133,8 +141,8 @@ def main():
             assert last['messages'][0]['role']=='system'
             assert (root/'profile/conversations').is_dir()
             assert any('SYNTHETIC_ATTACHMENT' in json.dumps(r) for r in Provider.requests), 'attached text must reach the provider'
-            assert state['assistant']['models'], 'real provider model discovery'
-            summary={'passed':['actual hidden GUI/editor CLI selection/Undo/Redo','ChatUI native tool edits the real unsaved buffer','streaming/cancellation','private history restoration','allowlisted remote tool and denied remote mutation','bounded API context preserves full UI history/system','provider error surfaced'],'requests':len(Provider.requests),'capture':str(capture)}
+            assert check['models']['assistant']['models'], 'real provider model discovery before changing connection'
+            summary={'passed':['actual hidden GUI/editor CLI selection/Undo/Redo','chat read-only choice denies document mutations','ChatUI native tool edits the real unsaved buffer','streaming/cancellation','private history restoration','allowlisted remote tool and denied remote mutation','bounded API context preserves full UI history/system','provider error surfaced'],'requests':len(Provider.requests),'capture':str(capture)}
             (output/'chat-summary.json').write_text(json.dumps(summary,indent=2));print(json.dumps(summary,indent=2))
     finally:server.shutdown();server.server_close();thread.join(2)
 

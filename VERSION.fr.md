@@ -1,68 +1,60 @@
-# CyCodeReader 0.1.8
+# CyCodeReader 0.1.9
 
-[English](Docs/Releases/v0.1.8.md) · [README français](README.fr.md)
+[English](Docs/Releases/v0.1.9.md) · [README français](README.fr.md)
 
 20 novembre 2026 · **BÊTA** · Windows x64.
 
-## Assistant et automatisation natifs
+## Profils d’accès MCP local
 
-- Remplacement du service SDK Python optionnel par CyMCPSDK 0.7.1 compilé depuis ses sources.
-- Chat CyMCP::ChatUI intégré à côté du code : réponses progressives, annulation,
-  pièces jointes explicites, détection des fournisseurs/modèles et historique privé.
-- Un registre partagé entre chat, console et MCP : 30 opérations dans l’interface,
-  22 dans une session texte autonome sans fenêtre.
-- Actions sur les vrais tampons, sélections, curseur et Annuler/Rétablir, sur le
-  thread graphique. L’édition est explicite, avec contrôles de révision, lecture
-  seule, fermeture des modifications et conflit disque. L’enregistrement reste
-  explicite ; Enregistrer sous refuse une destination existante.
-- Compagnon `app/cycodereader_cli.exe` : list, describe, invoke JSON, JSONL, service
-  autonome et MCP. `--connect` pilote une instance ouverte. Conservation de
-  `--serve`, `--desktop-service` et du lanceur Python de compatibilité.
-- Reçus de tâches durables privés, annulation coopérative, quotas avant exécution,
-  résultats temporaires fragmentés et suppression explicite des reçus.
-  Une expiration ou une réponse interrompue ne rejoue jamais automatiquement l’action.
-- Découverte compacte, ressources/grep, invalidation et notifications, mesures
-  techniques facultatives et fenêtre de contexte API réglable.
-- Connexion facultative à des outils MCP distants configurés et autorisés explicitement.
-- Core `7d0a468`, CyUI `6ef01cf` et SDK publié `b0eea5e`, API source 1.
-  Éditeur paginé, JetBrains Mono, zoom, palette et récupération de mise à jour conservés.
+- **Free** devient le profil par défaut des nouvelles installations et des
+  configurations sans choix explicite. Connectez-vous à l’adresse copiée
+  `http://127.0.0.1:PORT/mcp` sans jeton ; toutes les opérations enregistrées sont
+  autorisées sans confirmation supplémentaire. Le registre utilise `Policy::allow_all()`.
+- Les choix explicites sont conservés. **Local contrôlé** garde les lectures par
+  adresse seule sous la politique de l’hôte ; **Jeton seul** exige un jeton et
+  autorise toutes les opérations ; **Protégé** exige un jeton et conserve les
+  permissions lecture/édition.
+- Le profil se choisit dans **CyMCPSDK / MCP** et s’applique au redémarrage.
+  Les réglages acceptent `accessProfile`, avec `access_profile` comme alias.
+  Un choix inconnu ou contradictoire bloque le démarrage du service.
+- Copie directe de l’adresse MCP. La console accepte aussi `--connect URL`, en
+  plus des descripteurs privés. Une adresse protégée sans identifiants valides
+  est refusée ; la CLI remonte une erreur d’authentification.
+- Validation des arguments, révisions actives, lecture seule et conflits disque
+  conservés. L’enregistrement reste explicite. **Autoriser la modification des
+  documents** demeure un choix indépendant du chat, désactivé par défaut.
+- CyMCPSDK 0.7.2 compilé depuis les sources à la révision
+  `e562c731a146d599e3404718ea8414bb5b96b66d` (inclut `34d4bca`) ; Core passe à
+  `b902736b0edb9a76365a47778af8a223d50e5b83`. CyUI reste à
+  `6ef01cfcdb197f3a89d64618ce5ef8818c704728`, avec un seul backend d’édition.
 
-## Démarrer
+## Se connecter
 
-Ouvrez **CyMCPSDK / MCP**, configurez un fournisseur et un modèle capables d’appeler
-des outils, puis connectez-vous. L’assistant commence en lecture ; autorisez les
-modifications volontairement pour une nouvelle connexion. Les clés API proviennent
-d’une variable d’environnement nommée. Placez les réglages persistants dans
-`settings.json` ; les champs modifiés dans le panneau concernent la session.
-Les services de modèles locaux sont pris en charge sans téléchargement de moteur
-ni de poids par Reader.
-
-Le panneau copie aussi les configurations MCP lecture/édition. Consultez le
-[guide CLI/MCP](Docs/MCP.md) pour les commandes, descripteurs locaux authentifiés,
-connexions et import des anciennes tâches.
+Ouvrez **CyMCPSDK / MCP → Connexion MCP**, puis copiez l’adresse ou la
+configuration. Avec Free, aucun jeton ni confirmation d’opération supplémentaire
+n’est nécessaire. Pour garder un accès contrôlé avec jeton, choisissez **Protégé**
+et redémarrez Reader, ou définissez `"accessProfile":"protected"` dans les
+réglages du profil. Les choix explicites existants sont respectés. Voir le
+[guide CLI, chat et MCP](Docs/MCP.md).
 
 ## Téléchargements
 
-- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-setup.exe).
-- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/CyCodeReader-0.1.8-windows-x64-portable.zip).
-- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.8/SHA256SUMS.txt).
+- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe).
+- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip).
+- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/SHA256SUMS.txt).
 
-Extrayez le ZIP complet et conservez ses ressources et `data/`. La console et ses
-DLL se trouvent dans `app/`, un emplacement accepté par les anciens validateurs de
-paquets. L’importeur facultatif des anciennes tâches y figure également.
-Pour **Invalid update arguments** en 0.1.4/0.1.5, suivez la
+Extrayez l’archive portable complète en conservant `data/` et les plugins
+personnalisés. La console native et ses DLL restent dans `app/`. Aucun SDK Python
+n’est à installer. Pour **Invalid update arguments** en 0.1.4/0.1.5, suivez la
 [récupération manuelle existante](Docs/Releases/v0.1.6.fr.md).
 
-## Limites et vérification
+## Limites
 
-Les documents ordinaires restent limités à 4 Mio. Les UTF-8 plus grands utilisent
-le profil paginé de l’interface, sans exposition à cette session d’automatisation.
-HTTP fonctionne en requête/réponse locale authentifiée, sans SSE dans cet hôte ;
-le stdio direct prend en charge les abonnements du SDK. Les outils distants doivent
-être autorisés explicitement ; cet adaptateur ne s’abonne pas à leurs notifications.
-Les plugins natifs restent du code de confiance dans le processus, non interruptible de force.
-
-Compilations Windows Release, régressions natives, scénarios synthétiques chat/CLI/MCP
-et paquet portable extrait vérifiés localement. Fournisseurs commerciaux,
-installation/mise à jour interactive, saisie physique, Linux et macOS restent à
-valider pour cette migration. Voir le [bilan de validation](Docs/Validation.md).
+Les documents ordinaires restent limités à 4 Mio ; les UTF-8 plus grands utilisent
+le profil paginé graphique, sans exposition à cette session d’automatisation.
+HTTP est local en requête/réponse, sans SSE dans cet hôte. Le stdio direct prend
+en charge les abonnements du SDK. Les outils distants doivent être configurés et
+autorisés explicitement. Les plugins natifs restent du code de confiance dans le
+processus. Windows x64 est la cible des paquets. Les comptes de fournisseurs commerciaux,
+l’installation/mise à jour interactive, Linux et macOS n’ont pas été validés
+pour cette mise à jour. Voir le [périmètre de validation](Docs/Validation.md).

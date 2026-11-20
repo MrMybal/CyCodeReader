@@ -5,7 +5,7 @@ description: Use the portable or installed edition update flow.
 section: Using Reader
 order: 180
 parent: overview
-revision: 5
+revision: 6
 ---
 
 ## Editions {#updates}
@@ -15,6 +15,8 @@ Extract the complete portable ZIP into a writable folder and keep `portable.flag
 Public release builds check GitHub Releases in the background at startup by default on new installations. A newer compatible version opens the Updates panel. Use **Download update**, then **Close and install update** after reviewing the version. Existing preferences are preserved; **Updates → Check for updates at startup** enables or disables future startup checks. Manual checks remain available in this panel. There is no separate update download to choose on GitHub. Development/preparation builds may disable checks. No private GitHub credentials are collected by Reader's updater. Review the available version and checksum-verified download before accepting an update.
 
 Portable updates use their compatible ZIP/native helper; installed editions use their installer path. Save or discard documents and close other instances when requested. Cancel preserves the running work. Application closure/restart and update acceptance are explicit actions; opening this manual never installs anything. Linux/macOS updating is not provided.
+
+When updating to 0.1.9, MCP configurations without an explicit profile use Free (address only, all exposed operations). Explicit choices are preserved. To require a token and controlled read/edit permissions, select Protected in the MCP panel and restart Reader. See [access profiles](doc:mcp#access-profiles).
 
 ## Recover from an older update launcher {#recovery}
 

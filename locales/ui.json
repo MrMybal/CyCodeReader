@@ -1370,5 +1370,45 @@
   "Refresh models": {
     "en": "Refresh models",
     "fr": "Actualiser les modèles"
+  },
+  "MCP access profile": {
+    "en": "MCP access profile",
+    "fr": "Profil d’accès MCP"
+  },
+  "Free": {
+    "en": "Free",
+    "fr": "Free"
+  },
+  "Local controlled": {
+    "en": "Local controlled",
+    "fr": "Local contrôlé"
+  },
+  "Token only": {
+    "en": "Token only",
+    "fr": "Jeton seul"
+  },
+  "Protected": {
+    "en": "Protected",
+    "fr": "Protégé"
+  },
+  "MCP profile changes apply after restarting Reader.": {
+    "en": "MCP profile changes apply after restarting Reader.",
+    "fr": "Le profil MCP sera appliqué au redémarrage de Reader."
+  },
+  "Active MCP profile": {
+    "en": "Active MCP profile",
+    "fr": "Profil MCP actif"
+  },
+  "Copy MCP address": {
+    "en": "Copy MCP address",
+    "fr": "Copier l’adresse MCP"
+  },
+  "Copy MCP configuration": {
+    "en": "Copy MCP configuration",
+    "fr": "Copier la configuration MCP"
+  },
+  "All exposed MCP operations are available. Saving remains explicit.": {
+    "en": "All exposed MCP operations are available. Saving remains explicit.",
+    "fr": "Toutes les opérations MCP exposées sont accessibles. L’enregistrement reste explicite."
   }
 }

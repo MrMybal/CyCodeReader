@@ -201,7 +201,8 @@ class Reader {
     std::shared_ptr<Automation> automation_;
     std::unique_ptr<Assistant> assistant_;
     std::atomic<bool> sdkStop_{false};
-    std::filesystem::path sdkDescriptor_,cli_;
+    std::filesystem::path sdkDescriptor_,sdkConfig_,cli_;
+    std::string sdkAccessProfile_="free";
     std::string sdkError_,pluginResult_,automationRevisionKey_;
     struct AutomationRequest {
         std::string method;Json parameters;cymcp::CallContext context;std::promise<Json> reply;

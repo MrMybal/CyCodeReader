@@ -16,7 +16,7 @@ Dependencies retain their own licenses and copyright notices.
 | Tree-sitter and Rust/Java/JS/TS/HTML/CSS grammars | MIT | https://github.com/tree-sitter |
 | SDL3 | zlib | https://github.com/libsdl-org/SDL |
 | nlohmann/json | MIT | https://github.com/nlohmann/json |
-| CyMCPSDK 0.7.1 | MIT | Reviewed local SDK source snapshot; Core/Platform/Http/MCP/AI/ChatUI |
+| CyMCPSDK 0.7.2 | MIT | Reviewed local SDK source snapshot; Core/Platform/Http/MCP/AI/ChatUI |
 
 Notices are preserved in licenses/. Exact source revisions and SHA-256 archive
 hashes are in dependencies.lock.json; the immutable CyUI Git revision is in

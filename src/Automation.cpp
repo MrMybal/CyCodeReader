@@ -52,8 +52,33 @@ struct Automation::ProfileLease {
     ~ProfileLease(){if(handle>=0){::flock(handle,LOCK_UN);::close(handle);}}
 #endif
 };
+const char* accessProfileName(cymcp::LocalAccessProfile profile){
+    switch(profile){
+    case cymcp::LocalAccessProfile::free:return "free";
+    case cymcp::LocalAccessProfile::local_controlled:return "local_controlled";
+    case cymcp::LocalAccessProfile::token_only:return "token_only";
+    case cymcp::LocalAccessProfile::protected_access:return "protected";
+    }
+    throw cymcp::Error("InvalidOptions","Unknown local MCP access profile");
+}
 AutomationOptions AutomationOptions::fromJson(const Json &j){
-    AutomationOptions o;o.compact=j.value("compact",o.compact);o.resources=j.value("resources",o.resources);
+    AutomationOptions o;
+    const auto parseProfile=[](const Json &value){
+        if(!value.is_string())throw cymcp::Error("InvalidOptions","MCP access profile must be a string");
+        const auto name=value.get<std::string>();
+        if(name=="free")return cymcp::LocalAccessProfile::free;
+        if(name=="local_controlled")return cymcp::LocalAccessProfile::local_controlled;
+        if(name=="token_only")return cymcp::LocalAccessProfile::token_only;
+        if(name=="protected"||name=="protected_access")return cymcp::LocalAccessProfile::protected_access;
+        throw cymcp::Error("InvalidOptions","Unknown local MCP access profile");
+    };
+    if(j.contains("accessProfile"))o.accessProfile=parseProfile(j.at("accessProfile"));
+    if(j.contains("access_profile")){
+        const auto profile=parseProfile(j.at("access_profile"));
+        if(j.contains("accessProfile")&&profile!=o.accessProfile)throw cymcp::Error("InvalidOptions","Conflicting MCP access profiles");
+        o.accessProfile=profile;
+    }
+    o.compact=j.value("compact",o.compact);o.resources=j.value("resources",o.resources);
     o.notifications=j.value("notifications",o.notifications);o.metrics=j.value("metrics",o.metrics);
     o.diskResults=j.value("diskResults",o.diskResults);o.allowPlugins=j.value("allowPlugins",o.allowPlugins);
     o.inlineBytes=j.value("inlineBytes",o.inlineBytes);o.resultMemoryBytes=j.value("resultMemoryBytes",o.resultMemoryBytes);
@@ -73,7 +98,10 @@ Automation::Automation(std::filesystem::path data,Dispatch dispatch,bool gui,Aut
     else{profileId_=cymcp::random_token(16);write(identity,Json{{"id",profileId_}});}
     if(options_.notifications)changes_=std::make_shared<cymcp::ChangeFeed>();
     if(options_.metrics){cymcp::PerformanceOptions p;p.jsonl_file=data_/"performance.jsonl";performance_=std::make_shared<cymcp::PerformanceMonitor>(p);}
-    registry_=std::make_shared<cymcp::Registry>(cymcp::Policy([this](const auto &c,const auto &n,const auto &){return allowed(n,c)?cymcp::Decision::allow:cymcp::Decision::deny;}));
+    const auto policy=cymcp::local_access_settings(options_.accessProfile).control_operations
+        ? cymcp::Policy([this](const auto &c,const auto &n,const auto &){return allowed(n,c)?cymcp::Decision::allow:cymcp::Decision::deny;})
+        : cymcp::Policy::allow_all();
+    registry_=std::make_shared<cymcp::Registry>(policy);
     registry_->set_change_feed(changes_);registry_->set_performance_monitor(performance_);
     cymcp::ResourceOptions storage;storage.chunk_bytes=32768;storage.max_stored_bytes=options_.resultMemoryBytes;
     storage.result_ttl=std::chrono::seconds(options_.resultTtlSeconds);storage.max_disk_bytes=options_.resultDiskBytes;
@@ -111,7 +139,10 @@ std::shared_ptr<cymcp::Registry> Automation::view(const std::string &principal) 
         const auto name=description.at("name").get<std::string>();cymcp::Operation op;
         op.name=name;op.description=description.at("description");op.input_schema=description.at("inputSchema");
         op.output_schema=description.value("outputSchema",object());op.read_only=contracts_.at(name).value("readOnly",contracts_.at(name).at("permissions").empty());
-        op.handler=[this,principal,name](const Json &p,const cymcp::CallContext &context){auto c=context;c.principal=principal;return registry_->invoke(name,p,c);};
+        op.handler=[this,principal,name](const Json &p,const cymcp::CallContext &context){auto c=context;c.principal=principal;
+            // Chat permissions are an independent explicit user choice.
+            if(principal.starts_with("chat-")&&!allowed(name,c))throw cymcp::Error("AccessDenied","Chat document editing is disabled");
+            return registry_->invoke(name,p,c);};
         result->add(std::move(op));
     }
     result->set_change_feed(changes_);return result;
@@ -231,19 +262,31 @@ void Automation::start(const std::filesystem::path &descriptor){
         if(previous.value("protocol","")!="cycodereader-cymcp/1"||previous.value("profileId","")!=profileId_)
             throw cymcp::Error("DescriptorBusy","Preserve an existing descriptor belonging to another profile; choose a separate path");
     }
-    readToken_=cymcp::random_token();editToken_=cymcp::random_token();
+    readToken_.clear();editToken_.clear();
     cymcp::ToolGatewayOptions gateway;gateway.inline_bytes=options_.inlineBytes;
     serverTools_=options_.compact?std::make_shared<cymcp::ToolGateway>(registry_,gateway,resources_)->tools():registry_;
     serverMcp_=mcp(serverTools_);
-    server_=std::make_unique<cymcp::LocalHttpServer>(cymcp::TokenAuthenticator([this](std::string_view token){
-        if(cymcp::constant_time_equal(std::string(token),readToken_))return std::string("read");
-        if(cymcp::constant_time_equal(std::string(token),editToken_))return std::string("edit");
-        throw cymcp::Error("AuthenticationRequired","Invalid Reader credential");
-    }),[this](const Json&m,const cymcp::CallContext&c){return request(m,c);},4,20*1024*1024);
+    const auto access=cymcp::local_access_settings(options_.accessProfile);
+    const auto endpoint=[this](const Json&m,const cymcp::CallContext&incoming){
+        auto c=incoming;
+        // An address-only controlled caller receives the read identity, never JSON-supplied rights.
+        if(c.principal=="unauthenticated-local")c.principal="read";
+        return request(m,c);
+    };
+    if(access.require_token){
+        readToken_=cymcp::random_token();editToken_=cymcp::random_token();
+        server_=std::make_unique<cymcp::LocalHttpServer>(cymcp::TokenAuthenticator([this](std::string_view token){
+            if(cymcp::constant_time_equal(std::string(token),readToken_))return std::string("read");
+            if(cymcp::constant_time_equal(std::string(token),editToken_))return std::string("edit");
+            throw cymcp::Error("AuthenticationRequired","Invalid Reader credential");
+        }),endpoint,4,20*1024*1024);
+    }else server_=std::make_unique<cymcp::LocalHttpServer>(cymcp::LocalHttpServer::UnauthenticatedLoopback{},endpoint,4,20*1024*1024);
     const auto port=server_->start();
-    const auto value=Json{{"protocol","cycodereader-cymcp/1"},{"profileId",profileId_},
+    auto value=Json{{"protocol","cycodereader-cymcp/1"},{"profileId",profileId_},
         {"url","http://127.0.0.1:"+std::to_string(port)+"/v1"},{"mcpUrl","http://127.0.0.1:"+std::to_string(port)+"/mcp"},
-        {"readToken",readToken_},{"editToken",editToken_},{"sdkVersion",cymcp::version}};
+        {"accessProfile",accessProfileName(options_.accessProfile)},{"requireToken",access.require_token},
+        {"controlOperations",access.control_operations},{"sdkVersion",cymcp::version}};
+    if(access.require_token){value["readToken"]=readToken_;value["editToken"]=editToken_;}
     write(descriptor_,value);published_=value.dump();ownsDescriptor_=true;
 }
 void Automation::stop(){
@@ -260,8 +303,10 @@ void Automation::changed(){
     if(changes_)changes_->publish("resources");
 }
 Json Automation::status() const{return {{"sdk","CyMCPSDK"},{"version",cymcp::version},{"sourceRevision",CYCODE_READER_CYMCP_REVISION},
-    {"sourceDigest",CYCODE_READER_CYMCP_DIGEST},{"operations",registry_->size()},{"gui",gui_},{"compact",options_.compact},
-    {"resources",options_.resources},{"notifications",options_.notifications},{"metrics",options_.metrics},{"pluginsAllowed",options_.allowPlugins},
+    {"sourceDigest",CYCODE_READER_CYMCP_DIGEST},{"accessProfile",accessProfileName(options_.accessProfile)},
+    {"requireToken",cymcp::local_access_settings(options_.accessProfile).require_token},
+    {"controlOperations",cymcp::local_access_settings(options_.accessProfile).control_operations},{"operations",registry_->size()},{"gui",gui_},{"compact",options_.compact},
+    {"resources",options_.resources},{"notifications",options_.notifications},{"metrics",options_.metrics},{"pluginsAllowed",!cymcp::local_access_settings(options_.accessProfile).control_operations||options_.allowPlugins},{"chatPluginsAllowed",options_.allowPlugins},
     {"pagedAutomation",false},{"durableJobResults",true},{"resourceStorage",resources_->storage_stats()},{"durableJobBytes",options_.durableJobBytes},{"maxDurableJobs",options_.maxDurableJobs}};}
 Json dispatchTextSession(Core &core,const std::string &method,const Json &p,const cymcp::CallContext &c){
     c.cancellation.check();std::lock_guard lock(core.mutex());c.cancellation.check();

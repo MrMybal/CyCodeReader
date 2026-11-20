@@ -734,3 +734,81 @@ checksums and the installer compiler staging manifest were checked. The installe
 container was not independently unpacked or installed. The local showcase build
 passed its EN/FR and resource checks. GitHub Pages deployment is separate from
 source and binary publication.
+
+
+## Local Free access profiles — 2026-11-20 (development source)
+
+The owner explicitly requested local MCP/CLI/chat execution for this update,
+superseding the earlier suspension for these scoped acceptance runs. Windows x64
+Release builds use Core `b902736b0edb9a76365a47778af8a223d50e5b83` (source API 1),
+unchanged CyUI `6ef01cfcdb197f3a89d64618ce5ef8818c704728`, and CyMCPSDK 0.7.2
+`e562c731a146d599e3404718ea8414bb5b96b66d`, which includes `34d4bca`.
+The SDK was compiled from the clean local sibling checkout through the frozen
+UTF-8/LF input manifest, digest
+`d859aec2c5469481cadc44fb2629b90918b33bb868db20d0f54dbace75ba7b2d`.
+No SDK/CyUI source was edited. GUI and console share the native registry and
+ordinary-document owner; no full Core Engine or second editor was introduced.
+
+The production build keeps BUILD_TESTING and SDK tests/examples/benchmarks off.
+These separately invoked application acceptance scripts passed on the final
+compiled binaries:
+
+```powershell
+python -B scripts/build.py --build-dir runtime/build-cymcp-vs --cyui ../CyImgui_Interface --public-updates
+python -B tests/test_access_profiles.py runtime/build-cymcp-vs/Release/CyCodeReader.exe runtime/free-access-acceptance
+python -B tests/test_cymcp.py runtime/build-cymcp-vs/Release/cycodereader_cli.exe
+python -B tests/test_chat_gui.py runtime/build-cymcp-vs/Release/CyCodeReader.exe runtime/free-chat-acceptance
+```
+
+Seven configuration cases verify the Free default, both configuration key forms,
+the Protected alias, explicit choices and rejection of unknown, mistyped or
+conflicting profiles. Four real SDL/OpenGL Reader instances, all hidden and using
+synthetic private documents, verify Free, Local controlled, Token only and
+Protected. Free reads and modifies the real GUI buffer over MCP without a token
+or an operation approval. The CLI also connects and discovers all 30 GUI tools
+using the address alone. Invalid arguments and stale revisions still fail.
+Local controlled permits anonymous reads and refuses mutations, including forged
+JSON principals. Token only and Protected reject missing/invalid tokens with
+HTTP 401; Protected separates read/edit rights, while Token only permits edits
+with either valid credential. Original files remain unchanged because no save is
+requested. Existing configuration bytes and unrelated provider choices remain
+unchanged; descriptors are removed on normal exit.
+
+All seven CLI regression groups passed: help/discovery/errors; live revision,
+save-as/dirty-close/disk guards and durable receipts; HTTP/MCP ownership, private
+UTF-8 chunks, TTL and metadata-only metrics; full stdio discovery; quota and
+interrupted-receipt recovery; original raw/desktop-service/Python forwarding;
+read-only legacy SQLite import. The final chat acceptance runs under Free with
+15 requests to a synthetic loopback provider. Eight scenario groups cover actual
+editor selection/Undo/Redo, chat read-only denial, an assistant edit of the real
+unsaved buffer, streaming/cancellation, restored private history, explicitly
+allowlisted remote tools and remote denial, bounded API context, and provider
+errors. Attachment delivery and actual model catalogue refresh also passed.
+
+Source checks parse 39 Python and 18 JSON files. The bilingual manual builds
+122 pages and 818 validated routes; offline DOM checks pass. No GitHub workflow
+was launched or changed. This is a local development update, with no new tag,
+release, installer or online documentation deployment. Commercial provider
+accounts, visible desktop interaction, installation and Linux/macOS execution
+were not tested. Earlier release evidence above retains its original revisions.
+
+
+## 0.1.9 publication build — 2026-11-20
+
+Version 0.1.9 packages the Free access-profile implementation validated above,
+with the same Core, CyUI, SDK revision and source digest. Production Windows x64
+Release binaries are rebuilt with public updates enabled and BUILD_TESTING=OFF.
+The version/catalogue metadata, bilingual README, release notes, manual and
+showcase destinations move to 0.1.9 together. Previous French release notes are
+retained at Docs/Releases/v0.1.8.fr.md.
+
+The earlier four-profile GUI, seven CLI scenario groups and eight chat scenario
+groups remain the runtime evidence for this implementation. This publication
+does not relaunch the application, native tests or installer. Source/data checks,
+the complete 122-page bilingual manual (822 routes) and offline DOM checks pass. Portable
+inventory, native SDK provenance, bundled documentation, checksums and the Inno
+compiler staging manifest are verified before publishing the packages. Installer
+metadata is inspected; its inner payload is not independently unpacked and the
+installer is not executed. Linux/macOS and interactive installation/update remain
+unverified. No workflow is changed, enabled or dispatched; GitHub Pages deployment
+is separate from this source and binary publication.

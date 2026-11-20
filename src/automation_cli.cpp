@@ -17,11 +17,15 @@ Json readJson(const std::filesystem::path &p){
 Json remoteRequest(const Json &descriptor,const std::string &access,const Json &message,const cymcp::Cancellation &cancel={}){
     if(descriptor.value("protocol","")!="cycodereader-cymcp/1")throw cymcp::Error("UnsupportedDescriptor","Copy a current Reader CyMCPSDK connection descriptor");
     const auto url=descriptor.at("url").get<std::string>();const auto parsed=cymcp::parse_url(url);
-    if(!parsed.loopback||parsed.scheme!="http")throw cymcp::Error("InvalidDescriptor","Reader instance must use authenticated loopback HTTP");
+    if(!parsed.loopback||parsed.scheme!="http")throw cymcp::Error("InvalidDescriptor","Reader instance must use loopback HTTP");
     cymcp::HttpRequest request;request.method="POST";request.url=url;request.body=message.dump();
-    request.headers={{"Authorization","Bearer "+descriptor.at(access=="edit"?"editToken":"readToken").get<std::string>()},{"Content-Type","application/json"}};
+    request.headers={{"Content-Type","application/json"}};
+    if(descriptor.value("requireToken",true))request.headers["Authorization"]="Bearer "+descriptor.at(access=="edit"?"editToken":"readToken").get<std::string>();
     request.max_response_bytes=64*1024*1024;
-    const auto reply=cymcp::HttpClient().perform(request,cancel);auto result=cymcp::parse_json(reply.body,64*1024*1024);
+    const auto reply=cymcp::HttpClient().perform(request,cancel);
+    if(reply.status==401)throw cymcp::Error("AuthenticationRequired","Reader requires a valid token; connect using its private descriptor");
+    if(reply.status==403)throw cymcp::Error("AccessDenied","Reader service denied access");
+    auto result=cymcp::parse_json(reply.body,64*1024*1024);
     if(result.contains("error"))throw cymcp::Error(result["error"].value("code","RemoteError"),result["error"].value("message","Reader rejected the request"));
     if(reply.status!=200)throw cymcp::Error("RemoteError","Reader service rejected the request");return result;
 }
@@ -55,10 +59,10 @@ int automationCli(const std::vector<std::string> &args){
         if(command=="help"){
             std::cout<<"CyCodeReader native CLI\n"
               "  list | describe [OPERATION] | invoke OPERATION --json JSON | jsonl | serve | mcp\n"
-              "  --connect DESCRIPTOR --access read|edit  (the actual running GUI instance)\n"
+              "  --connect DESCRIPTOR|URL --access read|edit  (the actual running GUI instance)\n"
               "  --file FILE --data-dir DIRECTORY        (isolated headless text session)\n"
               "  --json-file FILE --config FILE --plugins DIRECTORY --full-tools\n"
-              "  serve --descriptor FILE                (authenticated loopback MCP/JSON)\n"
+              "  serve --descriptor FILE                (loopback MCP/JSON; Free by default)\n"
               "  --desktop-service --native-descriptor FILE --service-descriptor FILE (legacy SDK host)\n"
               "  --serve FILE [--plugins DIRECTORY] [FILES...] (original native bridge)\n"
               "Edits never save implicitly. Use jsonl/serve or --connect for multi-call revisions.\n";return 0;
@@ -82,7 +86,13 @@ int automationCli(const std::vector<std::string> &args){
             host=std::make_unique<Automation>(utf8Path(data),[&](const auto &m,const auto &p,const auto &c){return native.empty()?dispatchTextSession(*core,m,p,c):legacyEndpointRequest(utf8Path(native),m,p,c);},false,options);
             if(settings.contains("remoteServers"))host->connectRemotes(settings.at("remoteServers"));registry=host->view(access);
         }else{
-            endpoint=readJson(utf8Path(connect));const auto advertised=remoteRequest(endpoint,access,{{"method","describe"}});
+            if(connect.starts_with("http://")){
+                auto url=cymcp::parse_url(connect);
+                if(!url.loopback||url.scheme!="http"||(url.target!="/mcp"&&url.target!="/v1"))throw cymcp::Error("InvalidDescriptor","Use a loopback Reader /mcp or /v1 address");
+                const auto base=connect.substr(0,connect.size()-url.target.size());
+                endpoint={{"protocol","cycodereader-cymcp/1"},{"url",base+"/v1"},{"requireToken",false}};
+            }else endpoint=readJson(utf8Path(connect));
+            const auto advertised=remoteRequest(endpoint,access,{{"method","describe"}});
             registry=std::make_shared<cymcp::Registry>(cymcp::Policy::allow_all());
             for(const auto &spec:advertised.at("operations")){
                 cymcp::Operation op;op.name=spec.at("name");op.description=spec.at("description");

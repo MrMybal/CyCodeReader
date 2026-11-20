@@ -5,7 +5,7 @@ description: Utilisez le parcours de l’édition portable ou installée.
 section: Utiliser Reader
 order: 180
 parent: overview
-sourceRevision: 5
+sourceRevision: 6
 ---
 
 ## Éditions {#updates}
@@ -15,6 +15,8 @@ Extrayez tout le ZIP portable dans un dossier accessible en écriture et gardez 
 Les nouvelles installations publiques vérifient GitHub Releases en arrière-plan au démarrage par défaut. Une version compatible plus récente ouvre le panneau Mises à jour. Utilisez **Télécharger la mise à jour**, puis **Fermer et installer la mise à jour** après avoir examiné la version. Les préférences existantes sont conservées ; **Mises à jour → Vérifier les mises à jour au démarrage** active ou désactive les prochaines vérifications. Le panneau permet aussi une vérification manuelle. Aucun téléchargement de mise à jour séparé n’est à choisir sur GitHub. Les compilations de développement ou de préparation peuvent désactiver ces vérifications. Reader ne collecte pas d’identifiants GitHub privés pour son actualisation. Examinez la version disponible et le téléchargement vérifié par empreinte avant d’accepter.
 
 L’édition portable utilise son ZIP et assistant natif compatibles ; l’édition installée suit son installateur. Enregistrez ou abandonnez les documents et fermez les autres instances si demandé. Annuler préserve le travail en cours. Fermeture, redémarrage et acceptation sont explicites ; ouvrir ce manuel n’installe rien. L’actualisation Linux/macOS n’est pas fournie.
+
+Au passage en 0.1.9, les configurations MCP sans choix explicite utilisent Free (adresse seule, toutes les opérations exposées). Les profils choisis sont conservés. Pour exiger un jeton et des permissions lecture/édition contrôlées, choisissez Protégé dans le panneau MCP puis redémarrez Reader. Voir les [profils d’accès](doc:mcp#access-profiles).
 
 ## Récupérer depuis un ancien lanceur {#recovery}
 

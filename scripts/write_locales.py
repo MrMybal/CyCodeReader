@@ -71,6 +71,8 @@ LABELS.update({'MCP connection':'Connexion MCP','Service logs':'Journaux du serv
 
 LABELS.update({'Refresh models':'Actualiser les modèles'})
 
+LABELS.update({'MCP access profile': 'Profil d’accès MCP', 'Free': 'Free', 'Local controlled': 'Local contrôlé', 'Token only': 'Jeton seul', 'Protected': 'Protégé', 'MCP profile changes apply after restarting Reader.': 'Le profil MCP sera appliqué au redémarrage de Reader.', 'Active MCP profile': 'Profil MCP actif', 'Copy MCP address': 'Copier l’adresse MCP', 'Copy MCP configuration': 'Copier la configuration MCP', 'All exposed MCP operations are available. Saving remains explicit.': 'Toutes les opérations MCP exposées sont accessibles. L’enregistrement reste explicite.'})
+
 if __name__ == "__main__":
     path=Path(__file__).resolve().parents[1]/"locales/ui.json"
     path.write_text(json.dumps({key:{"en":key,"fr":value} for key,value in LABELS.items()},indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
