@@ -4,7 +4,7 @@ title: CyCodeReader
 description: Choisissez une tâche dans l’éditeur de code et de texte.
 section: Utiliser Reader
 order: 0
-sourceRevision: 4
+sourceRevision: 5
 ---
 
 ## Commencer {#getting-started}
@@ -20,3 +20,8 @@ La 0.1.9 utilise Free comme profil MCP local par défaut : connexion par adresse
 ## Licence {#licensing}
 
 CyCodeReader est sous GPL-3.0-only. Ses dépendances conservent leurs licences ; consultez les [licences](doc:licences#licence).
+
+
+La 0.1.10 ajoute la coloration Zig/ZON et les choix manuels de syntaxe mémorisés
+pour les fichiers enregistrés. Voir les [modes](doc:syntax-plugins#zig-and-zon).
+La coloration n’inclut ni ZLS, ni compilation, ni débogage, ni service sémantique.

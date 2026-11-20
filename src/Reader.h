@@ -1,5 +1,6 @@
 #pragma once
 #include "Document.h"
+#include "SyntaxModes.h"
 #include "Core.h"
 #include "Automation.h"
 #include "Assistant.h"
@@ -47,6 +48,7 @@ class Reader {
     friend struct ReaderUpdateTests;
     friend struct ReaderComparisonTests;
     friend struct ReaderExperienceTests;
+    friend struct ReaderSyntaxTests;
     struct Tab {
         explicit Tab(std::shared_ptr<LiveDocument> entry) : live(std::move(entry)),document(live->document),editor(codeEditor.native()) {}
         std::unique_ptr<cycode::PagedTextEditor> paged;
@@ -63,7 +65,9 @@ class Reader {
         TextEditor &editor; // Advanced native hooks use the same common editor instance.
         Syntax syntax;
         std::string syntaxPath;
-        std::string language="auto";
+        std::string language="auto",languagePath;
+        std::uint64_t languageCatalogue=0;
+        bool languageInitialized=false;
         bool focus=true, diskChanged=false, detached=false;
         size_t version=0;
         uint64_t appliedRevision=0;
@@ -75,6 +79,8 @@ class Reader {
         size_t tab=0;
         std::string initial, error;
         std::vector<std::string> files;
+        std::vector<std::pair<std::string,std::string>> filterValues;
+        std::vector<SDL_DialogFileFilter> filters;
     };
     struct PendingSave {
         size_t tab=0;
@@ -88,6 +94,9 @@ class Reader {
     void sync(const std::shared_ptr<Tab> &tab);
     void install(const std::shared_ptr<Tab> &tab);
     void setLanguage(const std::shared_ptr<Tab> &tab);
+    std::string syntaxName(const std::shared_ptr<Tab> &) const;
+    Json preferences_=Json::object();
+    SyntaxPreferences syntaxPreferences_;
     void save(const std::shared_ptr<Tab> &tab, bool as=false);
     void saveAs(const std::shared_ptr<Tab> &tab, const std::filesystem::path &path);
     void commitSave(const PendingSave &pending);
@@ -177,6 +186,8 @@ class Reader {
         std::string kind,before,after,leftLabel,rightLabel,path,command,message;
         size_t left=0,right=0,provider=0;
         uint64_t leftRevision=0,rightRevision=0;
+        cyui::CodeLanguage language=cyui::CodeLanguage::plain;
+        uint64_t catalogue=0;
         std::filesystem::file_time_type fileTime{};
         uintmax_t fileSize=0;
         bool diskChanged=false;

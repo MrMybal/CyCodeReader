@@ -59,7 +59,7 @@ void Reader::pollHistoryDiff() {
     const bool source=tab && pathUtf8(tab->path())==history_.path && history_.provider<fileProviders_.size();
     const bool wanted=history_.open && source && !diff.params.empty();
     const bool live=wanted && diff.params.value("afterRevision","").empty();
-    const auto key=wanted ? Json{{"document",tab->id},{"path",history_.path},{"provider",history_.provider},{"generation",history_.generation},{"params",diff.params},{"revision",live ? tab->live->revision : 0},{"language",static_cast<int>(tab->codeEditor.language())}}.dump() : std::string{};
+    const auto key=wanted ? Json{{"document",tab->id},{"path",history_.path},{"provider",history_.provider},{"generation",history_.generation},{"params",diff.params},{"revision",live ? tab->live->revision : 0},{"language",static_cast<int>(tab->codeEditor.language())},{"catalogue",cyui::codeLanguageRevision()}}.dump() : std::string{};
     if (diff.loadedKey!=key || !wanted) diff.ready=false;
     if (diff.pending.valid() && diff.pending.wait_for(std::chrono::seconds(0))==std::future_status::ready) {
         const auto requested=std::move(diff.pendingKey);diff.pendingKey.clear();
@@ -72,9 +72,12 @@ void Reader::pollHistoryDiff() {
                 if (comparison.at("path")!=history_.path || comparison.at("beforeLabel").get_ref<const std::string&>().size()>4096 || comparison.at("afterLabel").get_ref<const std::string&>().size()>4096) throw std::runtime_error("Invalid file comparison result");
                 auto before=normalizeEditorText(comparison.at("before").get<std::string>()),after=normalizeEditorText(comparison.at("after").get<std::string>());
                 auto document=makeDiffDocument(before,after,tab->codeEditor.language());
+                const bool contentChanged=before!=diff.before || after!=diff.after;
                 diff.document=std::move(document);diff.before=std::move(before);diff.after=std::move(after);diff.beforeLabel=comparison.at("beforeLabel");diff.afterLabel=comparison.at("afterLabel");
-                const bool split=diff.state.split;diff.state={};diff.state.split=split;
-                if (!diff.document.hunks().empty()) { diff.state.hunk=0;diff.state.focus=diff.document.hunks().front(); }
+                if(contentChanged){
+                    const bool split=diff.state.split;diff.state={};diff.state.split=split;
+                    if (!diff.document.hunks().empty()) { diff.state.hunk=0;diff.state.focus=diff.document.hunks().front(); }
+                }
                 diff.ready=true;diff.message.clear();
             }
         } catch (const std::exception &error) {

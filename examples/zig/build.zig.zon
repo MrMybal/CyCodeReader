@@ -1,0 +1,7 @@
+.{
+    .name = .reader_syntax_example,
+    .version = "0.0.0",
+    .paths = .{ "build.zig", "demo.zig" },
+    // Syntax literals; these fields do not define a build configuration.
+    .sample = .{ .text = "été 🛠", .value = nan, .limit = inf, .enabled = true },
+}

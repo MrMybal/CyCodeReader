@@ -1410,5 +1410,21 @@
   "All exposed MCP operations are available. Saving remains explicit.": {
     "en": "All exposed MCP operations are available. Saving remains explicit.",
     "fr": "Toutes les opérations MCP exposées sont accessibles. L’enregistrement reste explicite."
+  },
+  "Unavailable syntax": {
+    "en": "Unavailable syntax",
+    "fr": "Syntaxe indisponible"
+  },
+  "Code and text files": {
+    "en": "Code and text files",
+    "fr": "Fichiers de code et de texte"
+  },
+  "Zig and ZON files": {
+    "en": "Zig and ZON files",
+    "fr": "Fichiers Zig et ZON"
+  },
+  "All files": {
+    "en": "All files",
+    "fr": "Tous les fichiers"
   }
 }

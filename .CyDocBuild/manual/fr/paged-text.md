@@ -5,7 +5,7 @@ description: Modifiez de grands fichiers avec le stockage natif et des pages asy
 section: Utiliser Reader
 order: 35
 parent: editing
-sourceRevision: 3
+sourceRevision: 4
 ---
 
 ## Ouvrir et naviguer {#paged}
@@ -66,3 +66,9 @@ incident est absente. Éditions non enregistrées et saisies annulées sont vola
 enregistrez votre travail utile. Les contrats communs manquants de session/récupération
 Core et de coloration CyUI en streaming sont décrits dans le guide développeur des
 sources. Voir les [limites générales](doc:limits#limits).
+
+
+Zig/ZON utilisent le même contexte lexical complet en cache et des plages UTF-8
+recalées sur le fragment. Changer la syntaxe préserve texte, Annuler natif,
+sélection et défilement. Un fragment suivant réutilise l’instantané sans relire
+tout le fichier. Voir les [modes et plugins](doc:syntax-plugins#zig-and-zon).

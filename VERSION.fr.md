@@ -1,60 +1,56 @@
-# CyCodeReader 0.1.9
+# CyCodeReader 0.1.10
 
-[English](Docs/Releases/v0.1.9.md) · [README français](README.fr.md)
+[English](Docs/Releases/v0.1.10.md) · [README français](README.fr.md)
 
 20 novembre 2026 · **BÊTA** · Windows x64.
 
-## Profils d’accès MCP local
+## Zig et ZON
 
-- **Free** devient le profil par défaut des nouvelles installations et des
-  configurations sans choix explicite. Connectez-vous à l’adresse copiée
-  `http://127.0.0.1:PORT/mcp` sans jeton ; toutes les opérations enregistrées sont
-  autorisées sans confirmation supplémentaire. Le registre utilise `Policy::allow_all()`.
-- Les choix explicites sont conservés. **Local contrôlé** garde les lectures par
-  adresse seule sous la politique de l’hôte ; **Jeton seul** exige un jeton et
-  autorise toutes les opérations ; **Protégé** exige un jeton et conserve les
-  permissions lecture/édition.
-- Le profil se choisit dans **CyMCPSDK / MCP** et s’applique au redémarrage.
-  Les réglages acceptent `accessProfile`, avec `access_profile` comme alias.
-  Un choix inconnu ou contradictoire bloque le démarrage du service.
-- Copie directe de l’adresse MCP. La console accepte aussi `--connect URL`, en
-  plus des descripteurs privés. Une adresse protégée sans identifiants valides
-  est refusée ; la CLI remonte une erreur d’authentification.
-- Validation des arguments, révisions actives, lecture seule et conflits disque
-  conservés. L’enregistrement reste explicite. **Autoriser la modification des
-  documents** demeure un choix indépendant du chat, désactivé par défaut.
-- CyMCPSDK 0.7.2 compilé depuis les sources à la révision
-  `e562c731a146d599e3404718ea8414bb5b96b66d` (inclut `34d4bca`) ; Core passe à
-  `b902736b0edb9a76365a47778af8a223d50e5b83`. CyUI reste à
-  `6ef01cfcdb197f3a89d64618ce5ef8818c704728`, avec un seul backend d’édition.
+- Ajout des profils communs CyUI Zig et Zig Object Notation, pour un catalogue de
+  104 modes intégrés. Reconnaissance de `.zig`, `build.zig`, `.zon` et
+  `build.zig.zon`. La détection automatique garde la priorité des plugins.
+- Un même langage dans l’éditeur, les aperçus de recherche et les comparaisons
+  de fichiers/onglets/versions enregistrées/historique. Changer la coloration
+  préserve texte, révisions, sélection et Annuler ; l’état des diffs est conservé.
+- Choix manuels mémorisés par identifiants texte stables, distincts d’Automatique.
+  Restauration à la réouverture des fichiers enregistrés, conservation après
+  édition et Enregistrer sous. Identifiants de plugins absents et préférences
+  sans rapport conservés.
+- Filtres natifs et badges Zig/ZON ; Tous les fichiers reste le filtre par défaut.
+- Plages lexicales contextualisées découpées sur les fragments UTF-8 paginés,
+  avec validation des offsets et frontières de caractères. Cache lexical borné
+  existant réutilisé.
+- CyUI épinglé à `e8ccec0a96ed820fc46e86059e010efafcef687e`, contenant cette
+  implémentation. Core `b902736b0edb9a76365a47778af8a223d50e5b83` et CyMCPSDK 0.7.2
+  `e562c731a146d599e3404718ea8414bb5b96b66d` restent inchangés.
 
-## Se connecter
-
-Ouvrez **CyMCPSDK / MCP → Connexion MCP**, puis copiez l’adresse ou la
-configuration. Avec Free, aucun jeton ni confirmation d’opération supplémentaire
-n’est nécessaire. Pour garder un accès contrôlé avec jeton, choisissez **Protégé**
-et redémarrez Reader, ou définissez `"accessProfile":"protected"` dans les
-réglages du profil. Les choix explicites existants sont respectés. Voir le
-[guide CLI, chat et MCP](Docs/MCP.md).
+Choisissez **Syntaxe → Automatique**, **Zig**, **ZON** ou **Texte brut**. Voir les
+[modes et leur persistance](Docs/SyntaxModes.md) et les
+[exemples bilingues](examples/zig/README.md).
 
 ## Téléchargements
 
-- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe).
-- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip).
-- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/SHA256SUMS.txt).
+- [Installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-setup.exe).
+- [ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-portable.zip).
+- [Empreintes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/SHA256SUMS.txt).
 
-Extrayez l’archive portable complète en conservant `data/` et les plugins
-personnalisés. La console native et ses DLL restent dans `app/`. Aucun SDK Python
-n’est à installer. Pour **Invalid update arguments** en 0.1.4/0.1.5, suivez la
-[récupération manuelle existante](Docs/Releases/v0.1.6.fr.md).
+Extrayez le ZIP complet en conservant `data/` et les plugins personnalisés.
+Chat natif, CLI/MCP, Free et profils contrôlés/avec jeton restent disponibles.
+L’enregistrement reste explicite. La [récupération de l’ancien lanceur](Docs/Releases/v0.1.6.fr.md)
+reste applicable à **Invalid update arguments** sur les installations 0.1.4/0.1.5.
 
 ## Limites
 
-Les documents ordinaires restent limités à 4 Mio ; les UTF-8 plus grands utilisent
-le profil paginé graphique, sans exposition à cette session d’automatisation.
-HTTP est local en requête/réponse, sans SSE dans cet hôte. Le stdio direct prend
-en charge les abonnements du SDK. Les outils distants doivent être configurés et
-autorisés explicitement. Les plugins natifs restent du code de confiance dans le
-processus. Windows x64 est la cible des paquets. Les comptes de fournisseurs commerciaux,
-l’installation/mise à jour interactive, Linux et macOS n’ont pas été validés
-pour cette mise à jour. Voir le [périmètre de validation](Docs/Validation.md).
+Il s’agit de coloration hors ligne, sans ZLS, compilateur Zig, débogueur ni analyse
+sémantique. Les documents ordinaires restent limités à 4 Mio ; les UTF-8 plus
+volumineux utilisent le profil paginé. La coloration contextualisée est limitée
+à 32 Mio ; au-delà le texte reste brut sans lecture intégrale pour la coloration.
+Automatisation paginée et récupération des buffers non enregistrés, de session
+complète et d’historique Annuler restent indisponibles. Les préférences de syntaxe
+ne restaurent pas le contenu non enregistré. Voir les [limites paginées](Docs/PagedText.md).
+
+Compilation Windows Release, contrôles de sources/données, documentation locale
+et fixtures de régression compilées uniquement ont été vérifiés. L’exécution
+native/graphique et de l’installateur reste non testée sous les restrictions
+antivirus du poste. Aucun paquet ni validation d’exécution Linux/macOS n’est
+fourni. Voir le [périmètre de validation](Docs/Validation.md).

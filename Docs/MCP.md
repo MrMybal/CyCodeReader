@@ -1,8 +1,8 @@
 # Native chat, CLI and MCP
 
-Reader 0.1.9 links CyMCPSDK 0.7.2 built from source. `cymcp-source.lock.json` pins published Git revision `e562c731a146d599e3404718ea8414bb5b96b66d` and every frozen input hash (UTF-8 source text is normalized to LF). The local sibling CyMCPSDK checkout is preferred when it matches; otherwise, if unavailable, the resolver fetches the exact official GitHub revision. Builds use an ignored digest-named snapshot and preserve modified local checkouts. The application has no Python SDK service or wheel dependency.
+Reader 0.1.10 links CyMCPSDK 0.7.2 built from source. `cymcp-source.lock.json` pins published Git revision `e562c731a146d599e3404718ea8414bb5b96b66d` and every frozen input hash (UTF-8 source text is normalized to LF). The local sibling CyMCPSDK checkout is preferred when it matches; otherwise, if unavailable, the resolver fetches the exact official GitHub revision. Builds use an ignored digest-named snapshot and preserve modified local checkouts. The application has no Python SDK service or wheel dependency.
 
-Reader uses Core `b902736b0edb9a76365a47778af8a223d50e5b83`, native source API 1. One Core TextSession owns the documents. GUI dispatch runs on the UI thread and uses the actual editor and its Undo history. The full Core project Engine is not instantiated. CyUI is pinned at `6ef01cfcdb197f3a89d64618ce5ef8818c704728`.
+Reader uses Core `b902736b0edb9a76365a47778af8a223d50e5b83`, native source API 1. One Core TextSession owns the documents. GUI dispatch runs on the UI thread and uses the actual editor and its Undo history. The full Core project Engine is not instantiated. CyUI is pinned at `e8ccec0a96ed820fc46e86059e010efafcef687e`, including the shared Zig/ZON syntax profiles.
 
 ## Terminal
 

@@ -37,7 +37,7 @@ CTest and through the official MCP SDK.
 
 Reader registers each language as `<plugin-id>/<language-id>` in `CyUI::Code`.
 The Language menu is generated from that registry, grouped alphabetically; all
-101 built-in modes and contributed languages use the same selection and file
+104 built-in modes (including Zig/ZON) and contributed languages use the same selection and file
 associations. No app-owned copy of the built-in list is maintained. Unregistering
 a language invalidates cached colors without editing text or adding an Undo step.
 

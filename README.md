@@ -13,8 +13,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Application license</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.9.md"><strong>0.1.9</strong></a><br><strong>BETA</strong></p>
-      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe"><strong>Install CyCodeReader</strong></a><br><sub>Windows x64 · installer</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip">Portable ZIP</a></p>
+      <p><sub>Version</sub><br><a href="Docs/Releases/v0.1.10.md"><strong>0.1.10</strong></a><br><strong>BETA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-setup.exe"><strong>Install CyCodeReader</strong></a><br><sub>Windows x64 · installer</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-portable.zip">Portable ZIP</a></p>
     </td>
   </tr>
 </table>
@@ -25,11 +25,11 @@ A native code and text editor for developers who want to open files directly,
 edit with syntax highlighting, search live documents and compare revisions.
 Built with CyUI, it runs independently of the CyCode IDE.
 
-> **BETA · 0.1.9**
+> **BETA · 0.1.10**
 >
-> Version 0.1.9 makes **Free** the default local MCP profile: connect by address
-> without a token, with all exposed operations available. Explicit profile choices
-> and document guards are preserved. Read the [release notes and limits](Docs/Releases/v0.1.9.md).
+> Version 0.1.10 adds **Zig/ZON** highlighting and persistent manual syntax choices
+> across the editor, previews and comparisons. Existing document guards and Free
+> MCP profiles remain. Read the [release notes and limits](Docs/Releases/v0.1.10.md).
 > If 0.1.4 or 0.1.5 reports **Invalid update arguments**, use the existing
 > [manual recovery procedure](Docs/Releases/v0.1.6.md).
 
@@ -37,7 +37,7 @@ Built with CyUI, it runs independently of the CyCode IDE.
 
 *Actual v0.1.1 application views rendered from ImGui draw data on sample documents.
 The screenshots illustrate the interface; they do not establish desktop or
-installer acceptance for v0.1.9, and predate its new code font and palette.*
+installer acceptance for v0.1.10, and predate its new code font and palette.*
 
 ## About CyCodeReader
 
@@ -58,10 +58,20 @@ installed in PATH. Reader does not provide the IDE's commit/build/debug workflow
 | **Read-only comparison** | **Git file history** |
 | [![Side-by-side syntax-colored comparison](Docs/images/compare.png)](Docs/images/compare.png) | [![Sample file revisions and the selected commit diff](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Native services in 0.1.9
+## Zig / ZON
 
-Version 0.1.9 pins Core `b902736b0edb9a76365a47778af8a223d50e5b83`, CyUI
-`6ef01cfcdb197f3a89d64618ce5ef8818c704728` and CyMCPSDK 0.7.2
+Version 0.1.10 adds the common CyUI Zig/ZON profiles for `.zig`, `build.zig`,
+`.zon` and `build.zig.zon`. Automatic detection honors plugin associations;
+manual syntax choices are remembered by stable IDs for saved files and follow
+edits and Save As. Editor/search previews and file/history comparisons share the
+selected mode. Paged views reuse contextual UTF-8 spans up to 32 MiB.
+See [syntax modes](Docs/SyntaxModes.md) and [sample files](examples/zig/README.md).
+No ZLS, Zig compiler, debugger or semantic service is included.
+
+## Native services in 0.1.10
+
+Version 0.1.10 pins Core `b902736b0edb9a76365a47778af8a223d50e5b83`, CyUI
+`e8ccec0a96ed820fc46e86059e010efafcef687e` and CyMCPSDK 0.7.2
 `e562c731a146d599e3404718ea8414bb5b96b66d` (includes `34d4bca`).
 The SDK is built from its local matching sources, with the exact official GitHub
 revision as fallback. Local MCP defaults to **Free**: connect using the copied
@@ -75,7 +85,7 @@ Reader keeps one native document owner with source API 1. Argument schemas,
 revision/read-only/disk guards and explicit saves remain active in every profile.
 Local document-word suggestions, block indentation and selected-word occurrences
 remain available. See [setup and operation coverage](Docs/MCP.md) and the
-[release notes](Docs/Releases/v0.1.9.md).
+[release notes](Docs/Releases/v0.1.10.md).
 
 The shared paged editor handles large UTF-8 files with asynchronous pages,
 Undo/Redo, search and complete streamed saves. Its GUI profile and limits are
@@ -88,8 +98,8 @@ separate from ordinary-document automation; see [the large-file guide](Docs/Page
 - **Code readability:** bundled JetBrains Mono under SIL OFL 1.1; Ctrl + mouse
   wheel scales the hovered code view from 50 to 300%, including previews and diffs.
   Orange strings, green comments and vertical guides limited to code blocks.
-- **Syntax:** 102 shared CyUI modes, including C/C++/Unreal, C#, Rust, Java,
-  JavaScript/TypeScript, HTML/CSS, Python, Lua, JSON, Markdown, HLSL, GLSL and Verse.
+- **Syntax:** 104 shared CyUI modes, including C/C++/Unreal, C#, Rust, Java,
+  JavaScript/TypeScript, Zig/ZON, HTML/CSS, Python, Lua, JSON, Markdown, HLSL, GLSL and Verse.
   Log syntax distinguishes Error and Warning lines. Syntax works without language
   toolchains; semantic completion, compilation and UEFN integration are not included.
 - **Find and compare:** literal find/replace, open-document results with previews,
@@ -134,12 +144,12 @@ The Windows packages include app-local MSVC runtime DLLs. Linux and macOS remain
 intended source targets; complete desktop operation is unverified and no native
 packages for them are supplied in this release.
 
-1. [Download the Windows installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe), run Setup for the current user, then open CyCodeReader from the Start menu.
-2. If you prefer a portable copy, [download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip). Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`, keeping all supplied directories beside it.
+1. [Download the Windows installer](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-setup.exe), run Setup for the current user, then open CyCodeReader from the Start menu.
+2. If you prefer a portable copy, [download the portable ZIP](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-portable.zip). Extract the **entire** ZIP to a writable folder and start `CyCodeReader.exe`, keeping all supplied directories beside it.
 3. Open files and choose a syntax if needed. Install Git separately for its
    optional file-history tools; configure a provider for the built-in chat; native MCP is included.
 
-[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.9)
+[Release notes and SHA-256 checksums](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.10)
 accompany both downloads. Portable settings stay in `data/reader`; installed
 settings use `%LOCALAPPDATA%/CyCodeReader/reader`. Public builds check GitHub
 Releases at startup by default on new installations. An available version is
@@ -236,7 +246,7 @@ not automatically grant access to private dependencies.
 - [Product website](https://mrmybal.github.io/CyCodeReader/).
 
 - [English documentation](https://mrmybal.github.io/CyCodeReader/Documentation.html#/en/overview) · [Documentation française](https://mrmybal.github.io/CyCodeReader/Documentation.html#/fr/overview).
-- [Release notes](Docs/Releases/v0.1.9.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
+- [Release notes](Docs/Releases/v0.1.10.md) · [Downloads](https://github.com/MrMybal/CyCodeReader/releases).
 - [Source repository](https://github.com/MrMybal/CyCodeReader) · [Issue tracker](https://github.com/MrMybal/CyCodeReader/issues).
 - [CyCode Core](https://github.com/MrMybal/CyCode) — the shared native document/project engine.
 - [CyCodeIDE](https://github.com/MrMybal/CyCodeIDE) — the IDE consuming Core and this same graphical `editor/` library.

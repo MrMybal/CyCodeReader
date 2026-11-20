@@ -1,10 +1,10 @@
-# Native paged text integration (working sources, 2026-11-13)
+# Native paged text integration — 0.1.10
 
-Core is pinned to `0541cd0c438bcca507da232e9e1caa2156596910` and CyUI to
-`0ba1ba663b4b2bf46d066a32829bc91ea2743cba`. Public v0.1.6 packages predate this
-integration, which is included in 0.1.7. The limitations below apply to its
-standalone and shared editor profiles. Public 0.1.7 uses the earlier Core
-f5e6261bf8acf22d0b3241622ed4294322724fb9; this newer lock is an unreleased source alignment.
+Version 0.1.10 uses Core `b902736b0edb9a76365a47778af8a223d50e5b83` and
+CyUI `e8ccec0a96ed820fc46e86059e010efafcef687e`. This CyUI pin adds Zig/ZON;
+Reader 0.1.10 includes both profiles. The bounded native storage,
+transactions and streaming saves below remain unchanged. See
+[syntax modes](SyntaxModes.md) for shared lexical context and persisted choices.
 
 ## Ownership and threading
 

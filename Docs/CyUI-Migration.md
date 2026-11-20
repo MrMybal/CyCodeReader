@@ -1,5 +1,14 @@
 # Modular CyUI migration
 
+## Zig/ZON source integration — 2026-11-20
+
+The current lock is CyUI `e8ccec0a96ed820fc46e86059e010efafcef687e`,
+verified to contain the Zig/ZON catalogue, style mappings and Lexilla implementation.
+Only Reader sources and its own dependency cache changed. Builtin menus and path
+detection remain common CyUI APIs. See [syntax modes](SyntaxModes.md) for persisted
+IDs, view propagation and contextual paged fragments. Older pins below describe
+the corresponding historical migrations.
+
 The current source integration adds CyUI PagedCodeEditor through the existing CodeEditor module and the shared editor/PagedTextEditor adapter. See [PagedText.md](PagedText.md) for native ownership and explicit streaming-syntax/recovery gaps. Ordinary font, palette, zoom and brace guides remain shared.
 
 ## Shared ordinary-editor assistance — 2026-11-12

@@ -79,10 +79,12 @@ MenuModel Reader::menuModel(const std::string &menu) const {
             for (const auto &language : catalogue) if (language.language!=cyui::CodeLanguage::plain && initial(language.name)==key) {
                 std::string keywords=language.id;for (const auto &ext : language.extensions) keywords+=" ."+ext;
                 for (const auto &file : language.filenames) keywords+=" "+file;
-                add(group.children,language.name,"syntax",{{"language",language.id}},"",bool(tab),tab && tab->codeEditor.language()==language.language,keywords);
+                add(group.children,language.name,"syntax",{{"language",language.id}},"",bool(tab),tab && tab->language!="auto" && syntaxModeId(tab->language)==language.id,keywords);
             }
             if (!group.children.empty()) rows.push_back(std::move(group));
         }
+        if(tab && tab->language!="auto" && tab->language!="plain" && tab->codeEditor.language()==cyui::CodeLanguage::plain)
+            add(rows,std::string(tr("Unavailable syntax"))+": "+tab->language,"syntax",{{"language",tab->language}},"",false,true);
     } else if (menu=="Help") {
         add(rows,"Documentation","help",{},"F1");
         add(rows,"Context help","help.context",{},"Shift+F1");

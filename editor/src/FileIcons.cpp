@@ -37,6 +37,10 @@ void drawFileIcon(ImDrawList *draw, ImVec2 pos, float size, const std::string &p
     } else if (ext == ".rs") {
         badge = "R";
         colour = p.warning;
+    } else if (ext == ".zig") {
+        badge = "Z";colour = p.warning;
+    } else if (ext == ".zon") {
+        badge = "{}";colour = syntax.type;
     } else if (ext == ".java") {
         badge = "J";
         colour = p.warning;

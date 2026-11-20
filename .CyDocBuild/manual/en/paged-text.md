@@ -5,7 +5,7 @@ description: Edit large files through native storage and asynchronous pages.
 section: Using Reader
 order: 35
 parent: editing
-revision: 3
+revision: 4
 ---
 
 ## Open and navigate {#paged}
@@ -60,3 +60,9 @@ exposes ordinary documents only. Durable crash recovery is unavailable. Unsaved
 paged edits and cancelled input are volatile; save useful work explicitly. The
 missing common Core session/recovery and CyUI streaming-lexer contracts are
 documented in the source developer guide. See [all limits](doc:limits#limits).
+
+
+Zig/ZON use the same cached full lexical context and fragment-local UTF-8 spans.
+Changing the syntax keeps text, native Undo, selection and scrolling. Rendering
+a subsequent fragment reuses the snapshot instead of rereading the complete file.
+See [manual modes and plugins](doc:syntax-plugins#zig-and-zon).

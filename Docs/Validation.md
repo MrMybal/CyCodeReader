@@ -812,3 +812,64 @@ metadata is inspected; its inner payload is not independently unpacked and the
 installer is not executed. Linux/macOS and interactive installation/update remain
 unverified. No workflow is changed, enabled or dispatched; GitHub Pages deployment
 is separate from this source and binary publication.
+
+
+## Zig/ZON integration in working sources — 2026-11-20
+
+Reader pins published CyUI `e8ccec0a96ed820fc46e86059e010efafcef687e`. The clean
+Reader-owned cache was checked for the Zig/ZON enum/catalogue entries, shared
+style mappings and actual LexZig implementation included by CMake's lexer glob.
+The earlier 6ef01cf pin does not contain this implementation. The developer CyUI
+checkout and Core/SDK locks are unchanged. No keyword/lexer copy is added to Reader.
+
+The ordinary CodeEditor, open-document search preview, file/tab/saved and history
+comparisons share the selected mode. Manual syntax IDs persist separately from
+Automatic; unavailable plugin IDs and unrelated preferences survive. File-dialog
+filters include Zig/ZON and catalogue extensions while All files stays the default.
+Paged rendering reuses bounded contextual lexical snapshots and clips/validates
+fragment-local UTF-8 spans. Its existing 32 MiB syntax budget remains; larger
+sources display plain text without a complete coloring read. Code and document
+ownership, native revisions and Undo are unchanged.
+
+Windows x64 MSVC Release production compilation succeeds with BUILD_TESTING,
+CYUI_BUILD_TESTS and SDK tests OFF, using the default exact Reader cache rather
+than a development override. Nine non-native Python dependency-policy checks
+pass (four CyUI, five existing Core checks). Source syntax/data validation parses
+40 Python and 18 JSON files. MSVC /Zs accepts five fixtures without linking or
+executing them: new SyntaxModes, existing paged_text_editor_tests,
+EditorIntegration, Comparison and Experience. Prepared cases cover Zig/ZON
+filename detection, selected languages on CodeDocument/editor/diff, plugin
+precedence/removal, restored manual/automatic/absent-plugin modes, editing/Save As,
+Unicode spans, preserved selection/text/Undo and existing paged workflows.
+These assertions are prepared acceptance cases, not runtime evidence.
+
+The complete EN/FR manual builds 122 localized pages and 828 routes; offline DOM
+checks pass. Existing translations are byte-value identical after generation,
+with only four intended labels added. Examples include Zig, build.zig and ZON
+with Unicode. No application, helper, native test executable or installer is run
+under the current antivirus suspension. GUI opening/dialog, scrolling/DPI/theme,
+actual edits/Undo, restart restoration and runtime page/lexer acceptance remain
+unexecuted. Linux/macOS and ZLS/compiler/debugger/semantic services are not
+validated or added. No workflow, commit, push, release or deployment is performed.
+The public 0.1.9 binaries predate this working-source update.
+
+
+## 0.1.10 publication build — 2026-11-20
+
+Version 0.1.10 publishes the Zig/ZON integration described above, at the same
+verified CyUI e8ccec0 source pin and unchanged Core/SDK pins. README and release
+notes are complete in EN/FR; the manual and showcase metadata advance together.
+The original French 0.1.9 notes are retained at Docs/Releases/v0.1.9.fr.md.
+
+Windows x64 production Release is rebuilt with public updates enabled and
+BUILD_TESTING/CyUI/SDK tests OFF. The nine non-native dependency checks and five
+MSVC /Zs fixtures remain the implementation evidence; no native application or
+test is launched during publication. Source/data checks, the complete 122-page bilingual manual (832 routes), offline
+DOM checks, package inventory, compiled dependency provenance and SHA-256 checks
+pass locally. The 84-file portable package matches the final build and manual;
+its executable includes the shared Zig/ZON implementation. The ZIP is inspected/extracted. Installer metadata and
+its shared compiler staging manifest are checked; its inner payload is not
+independently unpacked and it is not installed/executed. Native/desktop/runtime
+and Linux/macOS acceptance remain unverified under the current restrictions.
+No workflow is changed or launched. GitHub Pages deployment remains separate
+from source and binary publication.

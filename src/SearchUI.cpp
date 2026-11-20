@@ -236,7 +236,7 @@ void Reader::searchWindows() {
                     if (cyui::button(tr("Open result in paged source"))) navigateSearch(match);
                     cyui::textDim("%s",tr("Paged results open in the source view; no full-text preview copy."));
                 } else if (tab && match.at("revision")==tab->live->revision) {
-                    const auto key=match.dump()+find_.key+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(static_cast<int>(tab->codeEditor.language()));
+                    const auto key=match.dump()+find_.key+"/"+std::to_string(cyui::palette().warning)+"/"+std::to_string(static_cast<int>(tab->codeEditor.language()))+"/"+std::to_string(cyui::codeLanguageRevision());
                     if (key!=searchPreviewKey_) {
                         searchPreviewKey_=key;
                         configureCodeEditor(searchPreview_,editorFont_);

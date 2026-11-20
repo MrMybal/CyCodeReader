@@ -172,7 +172,7 @@ Notepad++ feature coverage remain future work.
 
 ## CyMCPSDK / MCP
 
-Version 0.1.9 pins SDK 0.7.2 `e562c731a146d599e3404718ea8414bb5b96b66d`
+Version 0.1.10 pins SDK 0.7.2 `e562c731a146d599e3404718ea8414bb5b96b66d`
 (includes `34d4bca`) and Core `b902736b0edb9a76365a47778af8a223d50e5b83`.
 Free is the default, including configurations without an explicit profile. The
 registry uses `Policy::allow_all()` and `LocalHttpServer::UnauthenticatedLoopback`

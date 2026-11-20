@@ -5,7 +5,7 @@ description: Use the portable or installed edition update flow.
 section: Using Reader
 order: 180
 parent: overview
-revision: 6
+revision: 7
 ---
 
 ## Editions {#updates}
@@ -23,3 +23,8 @@ When updating to 0.1.9, MCP configurations without an explicit profile use Free 
 If Reader 0.1.4 or 0.1.5 shows **Invalid update arguments**, the update helper stopped before installing anything. Close Reader and manually run the current Windows installer at your existing installed location once. The corrected launcher is included from 0.1.6; the older executable cannot fix its own handoff by downloading another package.
 
 For a portable copy, close Reader and replace its program files with the complete corrected portable ZIP in the existing folder, preserving `data/` and custom plugins. Use the matching edition. Existing preferences are retained. You do not need to uninstall Reader first.
+
+
+Version 0.1.10 adds Zig/ZON coloring and remembered manual syntax choices for
+saved files. See [syntax modes](doc:syntax-plugins#zig-and-zon). Highlighting does
+not include ZLS, compilation, debugging or semantic services.

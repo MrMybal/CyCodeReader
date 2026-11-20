@@ -1,6 +1,6 @@
 {
   "name": "CyCodeReader",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "logo": "assets/app-logo.png",
   "defaultLocale": "en",
   "locales": [

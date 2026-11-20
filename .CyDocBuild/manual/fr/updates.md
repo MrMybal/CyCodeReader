@@ -5,7 +5,7 @@ description: Utilisez le parcours de l’édition portable ou installée.
 section: Utiliser Reader
 order: 180
 parent: overview
-sourceRevision: 6
+sourceRevision: 7
 ---
 
 ## Éditions {#updates}
@@ -23,3 +23,8 @@ Au passage en 0.1.9, les configurations MCP sans choix explicite utilisent Free 
 Si Reader 0.1.4 ou 0.1.5 affiche **Invalid update arguments**, l’assistant s’est arrêté avant toute installation. Fermez Reader et lancez manuellement l’installateur Windows actuel à l’emplacement déjà installé une fois. Le lanceur corrigé est inclus à partir de la 0.1.6 ; l’ancien exécutable ne peut pas corriger sa propre transmission en téléchargeant un autre paquet.
 
 Pour une copie portable, fermez Reader puis remplacez ses fichiers de programme par le ZIP portable corrigé complet dans le dossier existant, en conservant `data/` et les plugins personnalisés. Utilisez l’édition correspondante. Les préférences existantes sont conservées. Il n’est pas nécessaire de désinstaller Reader au préalable.
+
+
+La 0.1.10 ajoute la coloration Zig/ZON et les choix manuels de syntaxe mémorisés
+pour les fichiers enregistrés. Voir les [modes](doc:syntax-plugins#zig-and-zon).
+La coloration n’inclut ni ZLS, ni compilation, ni débogage, ni service sémantique.

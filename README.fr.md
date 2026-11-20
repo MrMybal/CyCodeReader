@@ -13,8 +13,8 @@
     </td>
     <td width="300" align="right" valign="top">
       <p><sub>Licence de l’application</sub><br><a href="LICENSE"><strong>GPL-3.0-only</strong></a></p>
-      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.1.9</strong></a><br><strong>BÊTA</strong></p>
-      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip">ZIP portable</a></p>
+      <p><sub>Version</sub><br><a href="VERSION.fr.md"><strong>0.1.10</strong></a><br><strong>BÊTA</strong></p>
+      <p><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-setup.exe"><strong>Installer CyCodeReader</strong></a><br><sub>Windows x64 · installateur</sub><br><a href="https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-portable.zip">ZIP portable</a></p>
     </td>
   </tr>
 </table>
@@ -26,11 +26,11 @@ leurs fichiers directement, les modifier avec une coloration syntaxique, cherche
 dans les documents et comparer des révisions. Construit avec CyUI, il fonctionne
 indépendamment de l’IDE CyCode.
 
-> **BÊTA · 0.1.9**
+> **BÊTA · 0.1.10**
 >
-> La 0.1.9 choisit **Free** par défaut pour le MCP local : connexion avec l’adresse
-> seule, sans jeton, avec toutes les opérations exposées accessibles. Les profils
-> choisis et les contrôles des documents sont conservés. Voir les [notes et limites](VERSION.fr.md).
+> La 0.1.10 ajoute la coloration **Zig/ZON** et les choix manuels de syntaxe
+> persistants dans l’éditeur, les aperçus et les comparaisons. Contrôles des
+> documents et profils MCP Free sont conservés. Voir les [notes et limites](VERSION.fr.md).
 > Si la 0.1.4 ou la 0.1.5 affiche **Invalid update arguments**, suivez la
 > [récupération manuelle existante](Docs/Releases/v0.1.6.fr.md).
 
@@ -38,7 +38,7 @@ indépendamment de l’IDE CyCode.
 
 *Vues réelles de l’application v0.1.1, rendues à partir des données ImGui sur des
 documents d’exemple. Ces images illustrent l’interface ; elles ne valident pas
-le fonctionnement sur le bureau ou l’installateur de la v0.1.9 et précèdent sa nouvelle police et sa palette.*
+le fonctionnement sur le bureau ou l’installateur de la v0.1.10 et précèdent sa nouvelle police et sa palette.*
 
 ## À propos de CyCodeReader
 
@@ -61,10 +61,21 @@ ne fournit pas le parcours de commit/compilation/débogage de l’IDE.
 | **Comparaison en lecture seule** | **Historique de fichier Git** |
 | [![Comparaison côte à côte avec coloration syntaxique](Docs/images/compare.png)](Docs/images/compare.png) | [![Révisions d’un fichier d’exemple et différences du commit sélectionné](Docs/images/git-history.png)](Docs/images/git-history.png) |
 
-## Services natifs en 0.1.9
+## Zig / ZON
 
-La 0.1.9 épingle Core `b902736b0edb9a76365a47778af8a223d50e5b83`, CyUI
-`6ef01cfcdb197f3a89d64618ce5ef8818c704728` et CyMCPSDK 0.7.2
+La 0.1.10 ajoute les profils CyUI communs Zig/ZON pour `.zig`, `build.zig`,
+`.zon` et `build.zig.zon`. La détection automatique respecte les associations des
+plugins ; les choix manuels sont mémorisés par identifiant stable pour les
+fichiers enregistrés et suivent les éditions et Enregistrer sous. Éditeur,
+aperçus de recherche et comparaisons de fichiers/historique partagent le mode.
+Les vues paginées réutilisent les plages UTF-8 contextualisées jusqu’à 32 Mio.
+Voir les [modes](Docs/SyntaxModes.md) et les [exemples](examples/zig/README.md).
+Aucun ZLS, compilateur Zig, débogueur ou service sémantique n’est fourni.
+
+## Services natifs en 0.1.10
+
+La 0.1.10 épingle Core `b902736b0edb9a76365a47778af8a223d50e5b83`, CyUI
+`e8ccec0a96ed820fc46e86059e010efafcef687e` et CyMCPSDK 0.7.2
 `e562c731a146d599e3404718ea8414bb5b96b66d` (inclut `34d4bca`).
 Le SDK est compilé depuis ses sources locales correspondantes, avec la révision
 GitHub officielle exacte en secours. Le MCP local choisit **Free** par défaut :
@@ -94,8 +105,8 @@ voir le [guide des grands fichiers](Docs/PagedText.md).
 - **Lecture du code** : JetBrains Mono fournie sous SIL OFL 1.1 ; Ctrl + molette
   règle le texte de la vue survolée de 50 à 300 %, y compris les aperçus et diffs.
   Chaînes orange, commentaires verts et guides verticaux réservés aux blocs.
-- **Syntaxes** : 102 modes CyUI partagés, dont C/C++/Unreal, C#, Rust, Java,
-  JavaScript/TypeScript, HTML/CSS, Python, Lua, JSON, Markdown, HLSL, GLSL et Verse.
+- **Syntaxes** : 104 modes CyUI partagés, dont C/C++/Unreal, C#, Rust, Java,
+  JavaScript/TypeScript, Zig/ZON, HTML/CSS, Python, Lua, JSON, Markdown, HLSL, GLSL et Verse.
   Les journaux distinguent les lignes Error et Warning. La coloration fonctionne
   sans outils de langage ; complétion sémantique, compilation et intégration UEFN
   ne sont pas incluses.
@@ -146,12 +157,12 @@ Les DLL du runtime MSVC sont fournies avec les paquets Windows. Linux et macOS
 restent des cibles prévues depuis les sources ; leur fonctionnement graphique
 complet n’est pas validé et cette version ne propose aucun paquet natif pour eux.
 
-1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-setup.exe), exécuter Setup pour l’utilisateur courant, puis ouvrir CyCodeReader depuis le menu Démarrer.
-2. Pour une copie portable, [télécharger le ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.9/CyCodeReader-0.1.9-windows-x64-portable.zip). Extraire le ZIP **complet** dans un dossier accessible en écriture et lancer `CyCodeReader.exe`, avec tous les dossiers fournis à côté.
+1. [Télécharger l’installateur Windows](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-setup.exe), exécuter Setup pour l’utilisateur courant, puis ouvrir CyCodeReader depuis le menu Démarrer.
+2. Pour une copie portable, [télécharger le ZIP portable](https://github.com/MrMybal/CyCodeReader/releases/download/v0.1.10/CyCodeReader-0.1.10-windows-x64-portable.zip). Extraire le ZIP **complet** dans un dossier accessible en écriture et lancer `CyCodeReader.exe`, avec tous les dossiers fournis à côté.
 3. Ouvrir les fichiers et choisir une syntaxe si nécessaire. Installer Git
    séparément pour l’historique optionnel ; configurer un fournisseur pour le chat intégré ; MCP natif est inclus.
 
-Les [notes de release et sommes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.9)
+Les [notes de release et sommes SHA-256](https://github.com/MrMybal/CyCodeReader/releases/tag/v0.1.10)
 accompagnent les deux téléchargements. Les réglages portables restent dans
 `data/reader` ; les réglages installés utilisent `%LOCALAPPDATA%/CyCodeReader/reader`.
 Les versions publiques vérifient GitHub Releases au démarrage par défaut pour les nouvelles installations. Une nouvelle

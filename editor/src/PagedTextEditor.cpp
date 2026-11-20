@@ -1,4 +1,5 @@
 #include "cycode/PagedTextEditor.h"
+#include "cycode/CodeTokenSlice.h"
 #include <cycode/paged/LargeText.h>
 #include <cycode/text/Search.h>
 #include <cycode/TextFile.h>
@@ -73,6 +74,7 @@ struct PagedTextEditor::Impl {
     std::uint64_t activeRead=0, activeEdit=0;
     bool actionPending=false, queuedInput=false, waitingForView=false;
     cyui::CodeLanguage language=cyui::CodeLanguage::plain;
+    std::uint64_t languageCatalogue=0;
     std::string searchKey;
     std::optional<bool> navigateAfterSearch;
     // Worker-exclusive native state; never inspected by drawing or the UI thread.
@@ -229,12 +231,9 @@ struct PagedTextEditor::Impl {
             const auto begin=start+fragment.firstByte,end=begin+fragment.text.size();
             if (backend) fragment.tokens=backend->syntax(identity,r.revision,selected,begin,fragment.text.size());
             else {
-            auto token=std::lower_bound(tokens.begin(),tokens.end(),begin,[](const auto &t,auto b) { return t.start+t.length<=b; });
-            for (;token!=tokens.end() && token->start<end;++token) {
-                const auto a=std::max<std::uint64_t>(begin,token->start),b=std::min<std::uint64_t>(end,token->start+token->length);
-                if (a<b) fragment.tokens.push_back({static_cast<std::size_t>(a-begin),static_cast<std::size_t>(b-a),token->role});
+                fragment.tokens=clipCodeTokens(tokens,begin,fragment.text);
             }
-            }
+            validateCodeTokens(fragment.text,fragment.tokens);
             if (markedRevision==r.revision) for (const auto &match:marks) {
                 const auto a=std::max<std::uint64_t>(begin,match.offset),b=std::min<std::uint64_t>(end,match.offset+match.length);
                 if (a>=b) continue;
@@ -251,6 +250,7 @@ struct PagedTextEditor::Impl {
                 std::sort(next.begin(),next.end(),[](const auto &a,const auto &b) { return a.start<b.start; });
                 fragment.tokens=std::move(next);
             }
+            validateCodeTokens(fragment.text,fragment.tokens);
             bytes+=fragment.text.size()+fragment.tokens.size()*sizeof(cyui::CodeToken)+sizeof(cyui::PagedCodeLine);tokenCount+=fragment.tokens.size();
             if (bytes>r.maxBytes || tokenCount>65536) throw std::runtime_error("Page preparation exceeds its byte/token budget");
             p.lines.push_back(std::move(fragment));
@@ -429,7 +429,9 @@ std::vector<Command> PagedTextEditor::draw(const char *id,ImVec2 size) {
     return commands;
 }
 void PagedTextEditor::setLanguage(cyui::CodeLanguage value) {
-    auto &s=*impl_;if (s.language==value) return;s.language=value;s.invalidatePresentation();
+    auto &s=*impl_;const auto catalogue=cyui::codeLanguageRevision();
+    if (s.language==value && s.languageCatalogue==catalogue) return;
+    s.language=value;s.languageCatalogue=catalogue;s.invalidatePresentation();
 }
 void PagedTextEditor::setReadOnly(bool value) {
     auto &s=*impl_;if (!s.available() || s.ui.readOnly==value) return;

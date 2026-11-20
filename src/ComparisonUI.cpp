@@ -58,7 +58,7 @@ void Reader::showComparison(std::string before,std::string after,std::string lef
     const auto tab=find(rightId);const auto language=tab ? tab->codeEditor.language() : cyui::CodeLanguage::plain;
     auto diff=makeDiffDocument(before,after,language);
     comparison_.before=std::move(before);comparison_.after=std::move(after);comparison_.leftLabel=std::move(left);comparison_.rightLabel=std::move(right);
-    comparison_.left=leftId;comparison_.right=rightId;comparison_.kind=kind;comparison_.document=std::move(diff);comparison_.ready=true;comparison_.open=true;
+    comparison_.left=leftId;comparison_.right=rightId;comparison_.kind=kind;comparison_.language=language;comparison_.catalogue=cyui::codeLanguageRevision();comparison_.document=std::move(diff);comparison_.ready=true;comparison_.open=true;
     comparison_.leftRevision=find(leftId) ? find(leftId)->live->revision : 0;comparison_.rightRevision=tab ? tab->live->revision : 0;
     comparison_.diskChanged=false;comparison_.nextDiskCheck=0;comparison_.message.clear();
     const auto split=comparison_.state.split;comparison_.state={};comparison_.state.split=split;
@@ -131,6 +131,13 @@ void Reader::refreshComparison() {
     } catch (const std::exception &error) { comparison_.message=error.what(); }
 }
 void Reader::comparisonPanel() {
+    if(comparison_.ready)if(const auto tab=find(comparison_.right)){
+        const auto language=tab->codeEditor.language();
+        if(language!=comparison_.language || comparison_.catalogue!=cyui::codeLanguageRevision()){
+            comparison_.document=makeDiffDocument(comparison_.before,comparison_.after,language);
+            comparison_.language=language;comparison_.catalogue=cyui::codeLanguageRevision();
+        }
+    }
     core_.refresh();
     if (ready(comparison_.pending)) {
         try {

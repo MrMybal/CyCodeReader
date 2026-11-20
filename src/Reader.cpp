@@ -6,6 +6,8 @@
 #include "cycode/FileIcons.h"
 #include "cycode/Paths.h"
 #include <algorithm>
+#include <set>
+#include <cctype>
 #include <fstream>
 #include <cstring>
 #include <cyui/Core.h>
@@ -37,7 +39,8 @@ constexpr const char *themes[]={"graphite","mid-grey","light-grey","amber-night"
 Reader::Reader(Options options,SDL_Window *window) : options_(std::move(options)),core_(options_.installation/"plugins"),window_(window) {
     try { std::ifstream in(options_.installation/"locales/ui.json"); in>>translations_; } catch (...) {}
     if (!options_.automated) try {
-        const auto settings=Json::parse(readTextFileBytes(readerDataDirectory(options_.installation)/"reader/preferences.json"));
+        preferences_=Json::parse(readTextFileBytes(readerDataDirectory(options_.installation)/"reader/preferences.json"));
+        const auto &settings=preferences_;syntaxPreferences_.load(settings);
         updateCheckOnStartup_=settings.value("checkUpdatesAtStartup",updateCheckOnStartup_);
         theme_=settings.value("theme",theme_); locale_=settings.value("language",locale_);
         density_=settings.value("density",density_);
@@ -103,9 +106,12 @@ Reader::~Reader() {
         std::filesystem::create_directories(path.parent_path());
         std::optional<std::string> baseline;
         if (std::filesystem::exists(path)) baseline=readTextFileBytes(path);
-        const auto pluginState=core_.plugins().describe();Json pluginOptions=Json::object();for (const auto &plugin : pluginState.at("plugins")) pluginOptions[plugin.at("id").get<std::string>()]=plugin.at("options");
-        writeTextFileAtomic(path,Json{{"checkUpdatesAtStartup",updateCheckOnStartup_},{"pluginOptions",pluginOptions},{"density",density_},{"theme",theme_},{"language",locale_},{"textScale",textScale_},
-            {"interfaceVersion",2},{"sidebar",sidebar_},{"whitespace",whitespace_},{"wrap",wrap_},{"minimap",minimap_},{"recent",recent_}}.dump(2),baseline);
+        auto settings=baseline?Json::parse(*baseline):preferences_;
+        auto pluginOptions=settings.contains("pluginOptions")&&settings.at("pluginOptions").is_object()?settings.at("pluginOptions"):Json::object();
+        const auto pluginState=core_.plugins().describe();for(const auto &plugin:pluginState.at("plugins"))pluginOptions[plugin.at("id").get<std::string>()]=plugin.at("options");
+        settings.update(Json{{"checkUpdatesAtStartup",updateCheckOnStartup_},{"pluginOptions",pluginOptions},{"density",density_},{"theme",theme_},{"language",locale_},{"textScale",textScale_},
+            {"interfaceVersion",2},{"sidebar",sidebar_},{"whitespace",whitespace_},{"wrap",wrap_},{"minimap",minimap_},{"recent",recent_}});
+        syntaxPreferences_.mergeInto(settings);writeTextFileAtomic(path,settings.dump(2),baseline);
     } catch (...) {}
 }
 const char *Reader::tr(const char *key) const {
@@ -131,7 +137,17 @@ void Reader::remember(const std::filesystem::path &path) {
     const auto text=pathUtf8(path);
     std::erase(recent_,text); recent_.insert(recent_.begin(),text); if (recent_.size()>12) recent_.resize(12);
 }
+std::string Reader::syntaxName(const std::shared_ptr<Tab> &tab) const {
+    const auto info=cyui::codeLanguageInfo(tab->codeEditor.language());
+    if(tab->language=="auto")return info.name+" ("+tr("Automatic")+")";
+    if(info.language==cyui::CodeLanguage::plain && tab->language!="plain")return tab->language+" ("+tr("Unavailable syntax")+")";
+    return info.name;
+}
 void Reader::setLanguage(const std::shared_ptr<Tab> &tab) {
+    const auto path=tab->untitled()?std::string{}:pathUtf8(tab->path());
+    if(!tab->languageInitialized){tab->language=syntaxPreferences_.choice(tab->path());tab->languageInitialized=true;}
+    else if(tab->languagePath!=path && !path.empty())syntaxPreferences_.remember(tab->path(),tab->language);
+    tab->language=syntaxModeId(tab->language);tab->languagePath=path;tab->languageCatalogue=cyui::codeLanguageRevision();
 #ifdef CYUI_CODE_LANGUAGE_CATALOGUE
     const auto &mode=tab->language;
     tab->syntaxPath=tab->untitled() ? "code.cpp" : pathUtf8(tab->path());
@@ -208,6 +224,7 @@ void Reader::open(const std::filesystem::path &path) {
 }
 void Reader::sync(const std::shared_ptr<Tab> &tab) {
     if (!tab) return;
+    if(tab->languagePath!=(tab->untitled()?std::string{}:pathUtf8(tab->path())) || tab->languageCatalogue!=cyui::codeLanguageRevision())setLanguage(tab);
     if (tab->paged) { const auto oldPath=tab->path();tab->paged->poll();tab->live->revision=tab->paged->status().revision;if (oldPath!=tab->path()) { remember(tab->path());setLanguage(tab); }return; }
     if (pullLiveDocument(tab->editor,*tab->live,tab->appliedRevision,tab->version)) tab->syntax.update(tab->editor,tab->syntaxPath,tab->document.text());
     if (tab->version==tab->editor.GetUndoIndex()) return;
@@ -229,8 +246,15 @@ void Reader::showDialog(bool save,size_t tab,bool compare) {
         else for (size_t i=0; files[i]; ++i) state->files.emplace_back(files[i]);
         state->done=true;
     };
-    if (save) SDL_ShowSaveFileDialog(callback,owner,window_,nullptr,0,dialog_->initial.empty() ? nullptr : dialog_->initial.c_str());
-    else SDL_ShowOpenFileDialog(callback,owner,window_,nullptr,0,nullptr,!compare);
+    std::set<std::string> extensions;
+    for(const auto &language:cyui::codeLanguages())for(const auto &ext:language.extensions)
+        if(!ext.empty() && std::all_of(ext.begin(),ext.end(),[](unsigned char c){return std::isalnum(c)||c=='-'||c=='_'||c=='.';}))extensions.insert(ext);
+    std::string pattern;for(const auto &ext:extensions){if(!pattern.empty())pattern+=';';pattern+=ext;}
+    dialog_->filterValues={{tr("All files"),"*"},{tr("Code and text files"),pattern},{tr("Zig and ZON files"),"zig;zon"}};
+    for(const auto &[name,filter]:dialog_->filterValues)dialog_->filters.push_back({name.c_str(),filter.c_str()});
+    const auto *filters=dialog_->filters.data();const int filterCount=static_cast<int>(dialog_->filters.size());
+    if (save) SDL_ShowSaveFileDialog(callback,owner,window_,filters,filterCount,dialog_->initial.empty() ? nullptr : dialog_->initial.c_str());
+    else SDL_ShowOpenFileDialog(callback,owner,window_,filters,filterCount,nullptr,!compare);
 }
 void Reader::pollDialog() {
     if (!dialog_) return;
@@ -355,7 +379,7 @@ void Reader::execute(const std::string &command,const Json &params) {
         else if (command=="view.scale") { textScale_=std::clamp(params.value("value",textScale_+params.value("delta",0.f)),.8f,2.f);ImGui::GetStyle().FontScaleMain=textScale_; }
         else if (command=="view.locale") { const auto value=params.at("locale").get<std::string>();if (value=="en" || value=="fr") { locale_=value;cyui::setLocale(locale_.c_str()); } }
         else if (command=="view.theme") { const auto value=params.at("theme").get<std::string>();if (std::find(std::begin(themes),std::end(themes),value)!=std::end(themes)) { theme_=value;applyAppearance(); } }
-        else if (command=="syntax" && tab) { tab->language=params.at("language");setLanguage(tab); }
+        else if (command=="syntax" && tab) { tab->language=syntaxModeId(params.at("language").get<std::string>());setLanguage(tab);if(!tab->untitled())syntaxPreferences_.remember(tab->path(),tab->language); }
         else if (command=="format") nativeAction("documents.format",params);
         else if (command=="searchOpen") openFind(false,true);
         else if (command=="plugins") pluginsPanel_=true;
@@ -453,11 +477,11 @@ void Reader::tools() {
         if (tab->paged) {
             const auto &status=tab->paged->status();const auto pos=tab->paged->view().selection().caret;
             cyui::statusText(cyui::Tone::neutral,"%s | Ln %llu, Col %llu | %llu %s | UTF-8 | %llu %s%s",
-                tr("Paged text"),static_cast<unsigned long long>(pos.line+1),static_cast<unsigned long long>(pos.character+1),
+                (syntaxName(tab)+" | "+tr("Paged text")).c_str(),static_cast<unsigned long long>(pos.line+1),static_cast<unsigned long long>(pos.character+1),
                 static_cast<unsigned long long>(status.lines),tr("Lines"),static_cast<unsigned long long>(status.bytes),tr("bytes"),tab->dirty() ? " *" : "");
         } else {
         const auto pos=tab->editor.GetMainCursorPosition();
-        cyui::statusText(cyui::Tone::neutral,"%s | Ln %zu, Col %zu | %zu %s | %s | %s%s",tab->editor.GetLanguageName().c_str(),pos.line+1,pos.index+1,tab->editor.GetLineCount(),tr("Lines"),tab->document.encoding(),tab->document.lineEnding(),tab->dirty() ? " *" : "");
+        cyui::statusText(cyui::Tone::neutral,"%s | Ln %zu, Col %zu | %zu %s | %s | %s%s",syntaxName(tab).c_str(),pos.line+1,pos.index+1,tab->editor.GetLineCount(),tr("Lines"),tab->document.encoding(),tab->document.lineEnding(),tab->dirty() ? " *" : "");
         }
     } else cyui::statusText(cyui::Tone::neutral,"%s",tr("Code editor"));
     cyui::endStatusBar();
@@ -657,9 +681,10 @@ Json Reader::state() const {
     std::lock_guard lock(const_cast<Core&>(core_).mutex());
     Json docs=Json::array();
     for (const auto &tab : tabs_) {
-        if (tab->paged) { const auto &p=tab->paged->status();docs.push_back({{"id",tab->id},{"path",pathUtf8(tab->path())},{"paged",true},{"revision",p.revision},{"bytes",p.bytes},{"lines",p.lines},{"dirty",tab->dirty()},{"busy",p.busy},{"message",p.message}});continue; }
+        if (tab->paged) { const auto &p=tab->paged->status();docs.push_back({{"id",tab->id},{"path",pathUtf8(tab->path())},{"paged",true},{"syntaxMode",tab->language},{"syntaxLanguage",cyui::codeLanguageInfo(tab->codeEditor.language()).id},{"revision",p.revision},{"bytes",p.bytes},{"lines",p.lines},{"dirty",tab->dirty()},{"busy",p.busy},{"message",p.message}});continue; }
         docs.push_back({{"id",tab->id},{"path",pathUtf8(tab->path())},
         {"text",tab->document.text()},{"dirty",tab->dirty()},{"syntax",tab->editor.GetLanguageName()},
+        {"syntaxMode",tab->language},{"syntaxAutomatic",tab->language=="auto"},{"syntaxLanguage",cyui::codeLanguageInfo(tab->codeEditor.language()).id},
         {"syntaxSpans",tab->syntax.spans()},{"syntaxTruncated",tab->syntax.truncated()},
         {"diskChanged",tab->diskChanged},{"undo",tab->editor.GetUndoIndex()},
         {"hasFind",tab->editor.HasFindString()},{"selection",tab->editor.GetCursorText(0)}});

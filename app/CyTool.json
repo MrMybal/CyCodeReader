@@ -3,7 +3,7 @@
   "protocolVersion": "1.0",
   "id": "cy.code.reader",
   "name": "CyCodeReader",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Native Reader operations shared by CyMCPSDK chat, CLI and MCP.",
   "vendor": "Cyberalien",
   "author": "Cyberalien",
